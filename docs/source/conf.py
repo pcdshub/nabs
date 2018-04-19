@@ -20,9 +20,11 @@ sys.path.insert(0, module_path)
 
 
 # -- Project information -----------------------------------------------------
+from datetime import datetime
 
 project = 'nabs'
-copyright = '2018, SLAC National Accelerator Laboratory'
+copyright = ('{}, SLAC National Accelerator Laboratory'
+             ''.format(datetime.now().year))
 author = 'SLAC National Accelerator Laboratory'
 
 # The short X.Y version
