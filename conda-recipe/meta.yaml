@@ -1,0 +1,27 @@
+{% set data = load_setup_py_data() %}
+
+package:
+    name    : nabs
+    version : {{ data.get('version') }}
+
+source:
+    path: ..
+
+requirements:
+    build:
+      - python
+
+    run:
+      - bluesky 
+      - python
+test:
+    imports:
+      - nabs
+
+    requires: 
+      - pytest
+
+about:
+  home: https://github.com/pcdshub/nabs
+  license: SLAC Open License
+  summary: Not a Beamline Scientist
