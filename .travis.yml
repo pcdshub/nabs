@@ -3,6 +3,8 @@ sudo: false
 env:
   global:
     - OFFICIAL_REPO="pcdshub/nabs"
+    # Doctr deploy key for pcdshub/nabs
+    - secure: "k/ROKH3udsFPk4zfvAzCW2JGhxyAuGTol//1g1xNyILqmIPnrF7eHbtMkc7cWPqYkmj9cGjcXtzbGBYDEQ4IoXElujWFhhhTTp6+m7A8IlGsw6gDFNkzDQpOKtNd9y5QeXH9MmOb2FiT/ykbzGLYCZ6AIHVMGtG7FnLn2HTurzWaopw68Fmf+7TFWysq4vnLptowrhirohxYq8KukSlBu+WRKVVn5g2fL4S3g2cKlsQkNg5II1ayit7xDzJ8LpZo/WcadDl4SkypEP1Ubx7iSMOyTTMidg+pRJ7Lyahq/5Yd6EmLm0Vo0424ilu+qHx324lDk87eKRjBR/pjkxPJIv2VBMHdwwOQKszajmbNNVLe4p1nDsoluszrR5OKK0mhqyhy+j3ZS+y/0knjX9B+aGwBE46Ov4Fci0wP1fGY1CvFtfiIk3uI1pNOY1P0Xp/vrVdBfIvnZ850lS6lCg/pemObhwR0cL1G/G2JLrRhbp3BZriVMHDTOa7kxUZONjx9ZttR/j2fNLOKAEmBtcyjJ4I4yGDtPwwc2l92lL0OKELFx4mXcnVViBFwB8J9Qbu1lfv32dq/dK2k/3l7sd8VpmDY60F1gpjS9pK652DsWqgWqgDXNsG/tor0EjSS6xk+pcsFUgG3OKJdj/xgh/nK9p/P8oGz6xtr5nW4vGWCUZI="
 
 matrix:
   include:
@@ -35,7 +37,7 @@ script:
   - set -e
   # Build docs.
   - |
-    if [[ -n "$DOCTR_DEPLOY_ENCRYPTION_KEY_PCDSHUB_HAPPI" && $BUILD_DOCS ]]; then
+    if [[ -n "$DOCTR_DEPLOY_ENCRYPTION_KEY_PCDSHUB_NABS" && $BUILD_DOCS ]]; then
       pushd docs
       sphinx-autogen -o source/generated source/*.rst 
       make html
