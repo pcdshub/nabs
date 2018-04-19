@@ -1,0 +1,6 @@
+pytest
+codecov
+doctr
+sphinx
+sphinx_rtd_theme
+flake8
