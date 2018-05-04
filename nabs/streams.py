@@ -1,5 +1,4 @@
 """Standard data streams for automated routines"""
-import streamz
 import numpy as np
 from bluesky.callbacks.stream import LiveDispatcher
 
@@ -24,9 +23,8 @@ class AverageStream(LiveDispatcher):
     """
     def __init__(self, n=None):
         self.n = n
-        self.in_node = None
-        self.out_node = None
-        self.averager = None
+        self.last_event = None
+        self.raw_cache = list()
         super().__init__()
 
     def start(self, doc):
@@ -38,17 +36,19 @@ class AverageStream(LiveDispatcher):
         """
         # Grab the average key
         self.n = doc.get('average', self.n)
-        # Define our nodes
-        if not self.in_node:
-            self.in_node = streamz.Source(stream_name='Input')
+        super().start(doc)
 
-        self.averager = self.in_node.partition(self.n)
-
-        def average_events(cache):
+    def event(self, doc):
+        """Send an Event through the stream"""
+        # Add event to raw cache
+        self.raw_cache.append(doc)
+        # If we have enough events average
+        if len(self.raw_cache) == self.n:
             average_evt = dict()
-            desc_id = cache[0]['descriptor']
             # Check that all of our events came from the same configuration
-            if not all([desc_id == evt['descriptor'] for evt in cache]):
+            desc_id = self.raw_cache[0]['descriptor']
+            if not all([desc_id == evt['descriptor']
+                        for evt in self.raw_cache]):
                 raise Exception('The events in this bundle are from '
                                 'different configurations!')
             # Use the last descriptor to avoid strings and objects
@@ -58,20 +58,16 @@ class AverageStream(LiveDispatcher):
                 if info['dtype'] in ('number', 'array'):
                     # Average together
                     average_evt[key] = np.mean([evt['data'][key]
-                                                for evt in cache], axis=0)
-            return {'data': average_evt, 'descriptor': desc_id}
-
-        self.out_node = self.averager.map(average_events)
-        self.out_node.sink(self.process_event)
-        super().start(doc)
-
-    def event(self, doc):
-        """Send an Event through the stream"""
-        self.in_node.emit(doc)
+                                                for evt in self.raw_cache],
+                                               axis=0)
+            self.last_event = {'data': average_evt, 'descriptor': desc_id}
+            # Clear cache of events
+            self.raw_cache.clear()
+            # Emit event for subscribers
+            return super().event(self.last_event)
 
     def stop(self, doc):
         """Delete the stream when run stops"""
-        self.in_node = None
-        self.out_node = None
-        self.averager = None
+        self.raw_cache.clear()
+        self.last_event = None
         super().stop(doc)
