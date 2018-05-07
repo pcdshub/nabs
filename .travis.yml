@@ -31,8 +31,8 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION nabs --file dev-requirements.txt
   - source activate test-environment
 script:
-    #  - coverage run run_tests.py
-    #- coverage report -m
+  - coverage run run_tests.py
+  - coverage report -m
   - flake8 nabs
   - set -e
   # Build docs.
