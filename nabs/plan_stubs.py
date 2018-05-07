@@ -43,11 +43,11 @@ def measure_average(detectors, num, delay=None, stream=None):
     """
     # Create a stream and subscribe if not given one
     if not stream:
-        stream = AverageStream(n=num)
+        stream = AverageStream(num=num)
         yield from subscribe('all', stream)
     # Ensure we sync our stream with request if using a prior one
     else:
-        stream.n = num
+        stream.num = num
     # Measure our detectors
     yield from stub_wrapper(count(detectors, num=num, delay=delay))
     # Return the measured average as a dictionary for use in adaptive plans

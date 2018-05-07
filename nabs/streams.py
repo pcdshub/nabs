@@ -18,13 +18,13 @@ class AverageStream(LiveDispatcher):
 
     Parameters
     ----------
-    n : int, optional
+    num : int, optional
         Number of points to average together
     """
-    def __init__(self, n=None):
+    def __init__(self, num=None):
         # Initialize LiveDispatcher
         super().__init__()
-        self.n = n
+        self.num = num
         self.last_event = None
         self.raw_cache = list()
 
@@ -36,7 +36,7 @@ class AverageStream(LiveDispatcher):
         configure itself.
         """
         # Grab the average key
-        self.n = doc.get('average', self.n)
+        self.num = doc.get('average', self.num)
         super().start(doc)
 
     def event(self, doc):
@@ -44,7 +44,7 @@ class AverageStream(LiveDispatcher):
         # Add event to raw cache
         self.raw_cache.append(doc)
         # If we have enough events average
-        if len(self.raw_cache) == self.n:
+        if len(self.raw_cache) == self.num:
             average_evt = dict()
             # Check that all of our events came from the same configuration
             desc_id = self.raw_cache[0]['descriptor']
