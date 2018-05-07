@@ -22,10 +22,11 @@ class AverageStream(LiveDispatcher):
         Number of points to average together
     """
     def __init__(self, n=None):
+        # Initialize LiveDispatcher
+        super().__init__()
         self.n = n
         self.last_event = None
         self.raw_cache = list()
-        super().__init__()
 
     def start(self, doc):
         """
