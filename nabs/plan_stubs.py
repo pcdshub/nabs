@@ -45,6 +45,9 @@ def measure_average(detectors, num, delay=None, stream=None):
     if not stream:
         stream = AverageStream(num=num)
         yield from subscribe('all', stream)
+        # Manually kick the LiveDispatcher to emit a start document because we
+        # will not see the original one since this is subscribed after open_run
+        stream.start({'uid': None})
     # Ensure we sync our stream with request if using a prior one
     else:
         stream.num = num
