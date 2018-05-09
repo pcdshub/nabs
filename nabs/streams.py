@@ -61,11 +61,13 @@ class AverageStream(LiveDispatcher):
                     average_evt[key] = np.mean([evt['data'][key]
                                                 for evt in self.raw_cache],
                                                axis=0)
-            self.last_event = {'data': average_evt, 'descriptor': desc_id}
+            evt = {'data': average_evt, 'descriptor': desc_id}
             # Clear cache of events
             self.raw_cache.clear()
+            # Store data internally
+            self.last_event = evt['data']
             # Emit event for subscribers
-            return super().event(self.last_event)
+            return super().event(evt)
 
     def stop(self, doc):
         """Delete the stream when run stops"""

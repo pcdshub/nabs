@@ -51,4 +51,4 @@ def measure_average(detectors, num, delay=None, stream=None):
     # Measure our detectors
     yield from stub_wrapper(count(detectors, num=num, delay=delay))
     # Return the measured average as a dictionary for use in adaptive plans
-    return stream.last_event['data']
+    return stream.last_event
