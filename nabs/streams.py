@@ -20,6 +20,12 @@ class AverageStream(LiveDispatcher):
     ----------
     num : int, optional
         Number of points to average together
+
+    Attributes
+    ----------
+    last_event : dict
+        Data from the last event emitted by the stream. Used for limited access
+        to processed data without the need for a subscription.
     """
     def __init__(self, num=None):
         # Initialize LiveDispatcher
