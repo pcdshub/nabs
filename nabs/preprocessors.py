@@ -39,11 +39,11 @@ class DropWrapper:
             self.ret = {}
             self.first_read_time = None
             self.last_read_time = None
-            return None, None
         elif msg.command == 'read':
             return self._cache_read(msg), None
         elif msg.command == 'save':
             return self._filter_save(), None
+        return None, None
 
     def _cache_read(self, msg):
         if self.first_read_time is None:
