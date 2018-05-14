@@ -1,8 +1,44 @@
-from bluesky.plans import count
-from bluesky.plan_stubs import subscribe
-from bluesky.preprocessors import stub_wrapper
+import logging
 
-from nabs.streams import AverageStream
+from bluesky.callbacks import CallbackCounter
+from bluesky.plan_stubs import subscribe, trigger_and_read, repeat
+from bluesky.preprocessors import stage_decorator, subs_decorator
+
+from .streams import AverageStream
+
+logger = logging.getLogger(__name__)
+
+
+def count_events(detectors, num=1, delay=None, *, md=None):
+    """
+    Extended version of the built-in count that doesn't count dropped events.
+
+    Unlike count, this it NOT a full plan by itself (no run wrapper).
+    Otherwise, this will work exactly like normal count unless `drop_wrapper`
+    is in effect, in which case we will repeat any dropped reading.
+    """
+    counter = CallbackCounter()
+
+    def read_and_check_done():
+        yield from trigger_and_read(detectors)
+        if counter.value >= num:
+            raise CountDone()
+
+    @stage_decorator(detectors)
+    @subs_decorator({'event': counter})
+    def inner_count_events():
+        try:
+            # Start an infinite count
+            yield from repeat(read_and_check_done, num=None, delay=delay)
+        except CountDone:
+            # Quit when the event counter says so
+            return
+
+    return (yield from inner_count_events())
+
+
+class CountDone(Exception):
+    pass
 
 
 def measure_average(detectors, num, delay=None, stream=None):
@@ -52,6 +88,6 @@ def measure_average(detectors, num, delay=None, stream=None):
     else:
         stream.num = num
     # Measure our detectors
-    yield from stub_wrapper(count(detectors, num=num, delay=delay))
+    yield from count_events(detectors, num=num, delay=delay)
     # Return the measured average as a dictionary for use in adaptive plans
     return stream.last_event
