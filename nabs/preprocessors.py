@@ -1,3 +1,4 @@
+import collections
 import logging
 import time
 
@@ -24,6 +25,9 @@ class DropWrapper:
         read to after the last read is greater than this number.
     """
     def __init__(self, filters=None, max_dt=None):
+        if filters is not None:
+            if not isinstance(filters, collections.Iterable):
+                filters = [filters]
         self.filters = filters
         self.max_dt = max_dt
 
@@ -56,20 +60,14 @@ class DropWrapper:
                          'Dropping'), dt)
             return (yield from drop())
         elif self.filters is not None:
-            for key, filt in self.filters.items():
-                try:
-                    value = self.ret[key]
-                except KeyError:
-                    logger.debug('Read bundle did not have filter key %s', key)
-                    value = None
-                if value is not None and filt[value]:
-                    logger.info('Event had bad value %s=%s. Dropping',
-                                key, value)
+            for filt in self.filters:
+                if not filt(self.ret):
+                    logger.info('Bad event=%s. Dropping', self.ret)
                     return (yield from drop())
         return (yield from save())
 
 
-def drop_wrapper(plan, filters, max_dt):
+def drop_wrapper(plan, filters=None, max_dt=None):
     """
     Replaces ``save`` messages with ``drop`` if the event is bad.
 
@@ -78,10 +76,9 @@ def drop_wrapper(plan, filters, max_dt):
     plan: ``plan``
         The plan to wrap.
 
-    filters: ``dict``, optional
-        A dictionary mapping from read key to function of one argument. This
-        is an "is_bad_value(value)" function that should return ``True`` if the
-        value is bad.
+    filters: ``list``, optional
+        A list of functions that take in the read dictionary and output
+        ``False`` if we should drop the event and ``True`` otherwise.
 
     max_dt: ``float``, optional
         If provided, we'll ``drop`` events if the time from before the first
