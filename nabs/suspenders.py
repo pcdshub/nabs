@@ -1,4 +1,5 @@
 import asyncio
+import copy
 import logging
 from threading import RLock, Event
 
@@ -120,17 +121,19 @@ class SuspendPreprocessor:
         with self._rlock:
             if self._cmd is None or msg.command in self._cmd:
                 if not self._ok_future.done() and not self._suspend_active:
-                    logger.debug('saw msg_proc(%s), suspend now', msg)
-
-                    def new_gen():
-                        self._suspend_active = True
-                        yield from wait_for([self._ok_future])
-                        self._suspend_active = False
-                        logger.info('Resuming plan')
-                        yield msg
-
-                    return new_gen(), None
+                    return self._suspend(msg), None
             return None, None
+
+    def _suspend(self, msg):
+        logger.debug('suspend on msg=%s', msg)
+        # Set this flag so we don't recursively check to suspend on wait_for
+        self._suspend_active = True
+        yield from wait_for([self._ok_future])
+        self._suspend_active = False
+        logger.info('Resuming plan')
+        # Yield a copy of the message so we can suspend again
+        # Bluesky skips preprocessor if it already saw the message
+        return (yield copy.copy(msg))
 
 
 class BeamSuspender(SuspendPreprocessor):
