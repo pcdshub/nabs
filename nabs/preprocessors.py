@@ -39,9 +39,10 @@ class DropWrapper:
             self.ret = {}
             self.first_read_time = None
             self.last_read_time = None
+            self._in_filter = False
         elif msg.command == 'read':
             return self._cache_read(msg), None
-        elif msg.command == 'save':
+        elif msg.command == 'save' and not self._in_filter:
             return self._filter_save(), None
         return None, None
 
@@ -54,6 +55,7 @@ class DropWrapper:
         return ret
 
     def _filter_save(self):
+        self._in_filter = True
         dt = self.last_read_time - self.first_read_time
         if self.max_dt is not None and dt > self.max_dt:
             logger.info(('Event took %ss to bundle, readings are desynced. '
@@ -64,7 +66,9 @@ class DropWrapper:
                 if not filt(self.ret):
                     logger.info('Bad event=%s. Dropping', self.ret)
                     return (yield from drop())
-        return (yield from save())
+        msg = (yield from save())
+        self._in_filter = False
+        return msg
 
 
 def drop_wrapper(plan, filters=None, max_dt=None):
