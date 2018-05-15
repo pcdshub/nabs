@@ -44,13 +44,14 @@ def test_no_drop(RE_counter, hw):
     assert counter.value == 3
 
 
+@pytest.mark.timeout(3)
 def test_drop_filter(RE_counter, hw):
     logger.debug('test_drop_filter')
     RE, counter = RE_counter
 
     # Filter on det, value starts good
     def my_filter(reads):
-        return reads['det_value'] > 0.8
+        return reads['det']['value'] > 0.8
 
     RE(drop_wrapper(trigger_and_read([hw.det]), filters=my_filter))
     assert counter.value == 1
@@ -60,6 +61,7 @@ def test_drop_filter(RE_counter, hw):
     assert counter.value == 1
 
 
+@pytest.mark.timeout(3)
 def test_dt_filter(RE_counter, hw):
     logger.debug('test_dt_filter')
     RE, counter = RE_counter
