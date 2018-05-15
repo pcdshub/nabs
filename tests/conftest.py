@@ -1,7 +1,10 @@
 import asyncio
+import logging
 
 from bluesky import RunEngine
 import pytest
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='function')
@@ -9,6 +12,8 @@ def RE(request):
     loop = asyncio.new_event_loop()
     loop.set_debug(True)
     RE = RunEngine({}, loop=loop)
+    RE.msg_hook = logger.debug
+    RE.verbose = True
 
     def clean_event_loop():
         if RE.state != 'idle':
