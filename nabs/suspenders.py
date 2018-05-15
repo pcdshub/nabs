@@ -130,7 +130,7 @@ class SuspendPreprocessor:
         self._suspend_active = True
         yield from wait_for([self._ok_future])
         self._suspend_active = False
-        logger.info('Resuming plan')
+        logger.debug('resuming plan in _suspend')
         # Yield a copy of the message so we can suspend again
         # Bluesky skips preprocessor if it already saw the message
         return (yield copy.copy(msg))
