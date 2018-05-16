@@ -15,6 +15,7 @@ class EventBuilder:
         self.duplicates = duplicates
         self.cbid = {}
         self.start_ts = 0
+        self.name = 'event_builder'
         self._clear_events()
 
     def add(self, name, *, value, timestamp, **kwargs):
