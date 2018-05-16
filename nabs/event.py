@@ -2,27 +2,31 @@ from collections import defaultdict
 from functools import partial
 from threading import Event, Thread
 import math
+import time
 
 from ophyd.status import Status
 
 
 class EventBuilder:
-    def __init__(self, signals, rate, duplicates='closest'):
+    def __init__(self, signals, rate, timeout=10.0, duplicates='closest'):
         self.signals = signals
         self.rate = rate
+        self.timeout = timeout
         self.duplicates = duplicates
         self.cbid = {}
+        self.start_ts = 0
         self._clear_events()
 
     def add(self, name, *, value, timestamp, **kwargs):
-        bin_ts = self._nearest_ts(timestamp)
-        delta = timestamp - bin_ts
-        event = self.bins[bin_ts]
-        event[name].append({'value': value,
-                            'timestamp': timestamp,
-                            'delta': delta})
-        if len(event) == len(self.signals):
-            self._has_evt.set()
+        if timestamp > self.start_ts:
+            bin_ts = self._nearest_ts(timestamp)
+            delta = timestamp - bin_ts
+            event = self.bins[bin_ts]
+            event[name].append({'value': value,
+                                'timestamp': timestamp,
+                                'delta': delta})
+            if len(event) == len(self.signals):
+                self._has_evt.set()
 
     def _nearest_ts(self, timestamp):
         expanded = timestamp * self.rate
@@ -35,6 +39,7 @@ class EventBuilder:
 
     def _monitor_events(self):
         if not self.cbid:
+            self.start_ts = time.time()
             for sig in self.signals:
                 cbid = sig.subscribe(partial(self.add, sig.name))
                 self.cbid[sig.name] = cbid
@@ -58,9 +63,9 @@ class EventBuilder:
         return status
 
     def _wait_trigger(self, status):
-        self._has_evt.wait()
+        success = self._has_evt.wait(timeout=self.timeout)
         self._stop_events()
-        status._finished(success=True)
+        status._finished(success=success)
 
     def read(self):
         timestamps = sorted(self.bins.keys())
