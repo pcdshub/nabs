@@ -7,6 +7,8 @@ from bluesky.preprocessors import stub_wrapper
 from scipy.constants import golden_ratio
 
 from nabs.streams import AverageStream
+from nabs.utils import InvertedSignal
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +65,10 @@ def measure_average(detectors, num, delay=None, stream=None):
     return stream.last_event
 
 
-def golden_section_search(signal, motor, tolerance, limits, average=None):
+def golden_section_search(signal, motor, tolerance, limits,
+                          average=None, maximize=False):
     """
-    Use golden-section search to find the local minima of a signal
+    Use golden-section search to find the extrema of a signal
 
     The algorithm is fed the starting range in which the extrema is contained
     within and a tolerance in which we would like to know the position of the
@@ -97,6 +100,11 @@ def golden_section_search(signal, motor, tolerance, limits, average=None):
         Option to average the signal we are reading to limit the affect of
         noise on our measurements
 
+    maximize : bool, optional
+        By default, the plan will minimize the relationship between the signal
+        and the motor. If you would instead like to maximize the signal, mark
+        this as True
+
     Returns
     -------
     bounds: tuple
@@ -110,16 +118,26 @@ def golden_section_search(signal, motor, tolerance, limits, average=None):
     yield from subscribe('all', stream)
     stream.start({'uid': None})
 
+    # Create an inverted signal if we need to maximize
+    if maximize:
+        raw = signal
+        signal = InvertedSignal(raw)
+        detectors = [signal, raw, motor]
+    else:
+        detectors = [signal, motor]
+
     # Measurement plan
     def measure_probe(position):
+        # Move motor
         yield from mv(motor, position)
-        ret = yield from measure_average([signal, motor], average,
+        # Return measurement
+        ret = yield from measure_average(detectors, average,
                                          stream=stream)
         return ret[signal.name]
 
+    # If we have already found what we are looking for stop the scan
     (a, b) = limits
     region_size = b - a
-    # If we have already found what we are looking for stop the scan
     if region_size <= tolerance:
         return (a, b)
     # Determine the number of steps to converge
