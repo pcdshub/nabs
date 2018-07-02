@@ -7,7 +7,7 @@ from scipy.constants import golden_ratio
 
 from nabs.plan_stubs import measure_average
 from nabs.streams import AverageStream
-from nabs.utils import InvertedSignal
+from nabs.utils import InvertedSignal, ErrorSignal
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,16 @@ def maximize(*args, **kwargs):
     _md.update(kwargs.get('md', {}))
     # Run the plan
     return (yield from optimize(*args, maximize=True, **kwargs))
+
+
+def walk_to_target(signal, motor, target, tolerance, **kwargs):
+    # Add walk information to metadata
+    _md = {'plan_name': 'walk_to_target',
+           'target': target}
+    _md.update(kwargs.get('md', {}))
+    # Create a signal whose value is the absolute error
+    error = ErrorSignal(signal, target)
+    return (yield from minimize(error, motor, tolerance, **kwargs))
 
 
 def optimize(signal, motor, tolerance,
