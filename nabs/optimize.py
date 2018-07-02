@@ -196,6 +196,8 @@ def golden_section_search(signal, motor, tolerance, limits,
         # Return measurement
         ret = yield from measure_average(detectors, average,
                                          stream=stream)
+        logger.debug("Found a values of %r at %r",
+                     ret[signal.name], position)
         return ret[signal.name]
 
     # If we have already found what we are looking for stop the scan
