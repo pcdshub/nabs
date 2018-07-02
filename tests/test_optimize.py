@@ -5,8 +5,7 @@ from ophyd.sim import SynGauss, SynAxis
 import numpy as np
 import pytest
 
-from nabs.optimize import maximize, minimize, optimize
-
+from nabs.optimize import maximize, minimize, optimize, golden_section_search
 
 logger = logging.getLogger(__name__)
 
@@ -50,3 +49,45 @@ def test_maximize(RE, hw):
     RE(maximize(hw.det, hw.motor, 0.05, limits=(-9, 13), method='golden'))
     # Should at least be within the tolerance at the end
     assert np.isclose(hw.motor.position, 0.0, atol=0.05)
+
+
+def test_golden_section_search(RE, hw, inverted_gauss):
+    logger.debug("test_golden_section_search")
+    (sig, motor) = inverted_gauss
+    # Catch the reported limits
+    global region_limits
+    region_limits = None
+
+    # Pseudo-plan to golden-section search
+    def gss():
+        global region_limits
+        yield from open_run()
+        region_limits = yield from golden_section_search(sig, motor, 0.01,
+                                                         limits=(-10, 5))
+        yield from close_run()
+
+    # Execute the plan
+    RE(gss())
+    # Check that the region we found is under the resolution
+    assert (region_limits[1] - region_limits[0]) < 0.1
+    # Check that the limits bound the center of the gaussian
+    assert region_limits[1] > 0.
+    assert region_limits[0] < 0.
+
+    # Maximize plan
+    def gss():
+        global region_limits
+        yield from open_run()
+        region_limits = yield from golden_section_search(hw.det, hw.motor,
+                                                         0.01,
+                                                         limits=(-5, 10),
+                                                         maximize=True)
+        yield from close_run()
+
+    # Execute plan
+    RE(gss())
+    # Check that the region we found is under the resolution
+    assert (region_limits[1] - region_limits[0]) < 0.1
+    # Check that the limits bound the center of the gaussian
+    assert region_limits[1] > 0.
+    assert region_limits[0] < 0.
