@@ -1,11 +1,12 @@
 import logging
 
 from bluesky.plan_stubs import open_run, close_run
-from ophyd.sim import SynGauss, SynAxis
+from ophyd.sim import SynGauss, SynAxis, SynSignal
 import numpy as np
 import pytest
 
-from nabs.optimize import maximize, minimize, optimize, golden_section_search
+from nabs.optimize import (maximize, minimize, optimize,
+                           golden_section_search, walk_to_target)
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,14 @@ def inverted_gauss():
     motor = SynAxis(name='motor')
     # Make our inverted detector
     sig = SynGauss('det', motor, 'motor', center=0, Imax=-1, sigma=1)
+    return (sig, motor)
+
+
+@pytest.fixture(scope='function')
+def linear():
+    motor = SynAxis(name='motor')
+    # Make our linear detector
+    sig = SynSignal(func=lambda: 4*motor.position, name='det')
     return (sig, motor)
 
 
@@ -49,6 +58,15 @@ def test_maximize(RE, hw):
     RE(maximize(hw.det, hw.motor, 0.05, limits=(-9, 13), method='golden'))
     # Should at least be within the tolerance at the end
     assert np.isclose(hw.motor.position, 0.0, atol=0.05)
+
+
+def test_walk_to_target(RE, linear):
+    logger.debug("test_walk_to_target")
+    (det, motor) = linear
+    # Run the plan
+    RE(walk_to_target(det, motor, 16.0, 0.05,
+                      limits=(-12, 18), method='golden'))
+    assert np.isclose(motor.position, 4.0, atol=0.05)
 
 
 def test_golden_section_search(RE, hw, inverted_gauss):
