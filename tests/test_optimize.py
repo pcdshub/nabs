@@ -91,21 +91,3 @@ def test_golden_section_search(RE, hw, inverted_gauss):
     # Check that the limits bound the center of the gaussian
     assert region_limits[1] > 0.
     assert region_limits[0] < 0.
-
-    # Maximize plan
-    def gss():
-        global region_limits
-        yield from open_run()
-        region_limits = yield from golden_section_search(hw.det, hw.motor,
-                                                         0.01,
-                                                         limits=(-5, 10),
-                                                         maximize=True)
-        yield from close_run()
-
-    # Execute plan
-    RE(gss())
-    # Check that the region we found is under the resolution
-    assert (region_limits[1] - region_limits[0]) < 0.1
-    # Check that the limits bound the center of the gaussian
-    assert region_limits[1] > 0.
-    assert region_limits[0] < 0.

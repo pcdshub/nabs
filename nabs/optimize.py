@@ -35,6 +35,38 @@ def maximize(*args, **kwargs):
 
 
 def walk_to_target(signal, motor, target, tolerance, **kwargs):
+    """
+    Walk the motor until a signal reaches our target
+
+    Similar to the :func:`.maximize` and :func:`.minimize`. There are options
+    for multiple algorithms to dictate the scanning procedure. This may change
+    the interpretation of values passed into this scanning procedure.
+
+    Parameters
+    ----------
+    signal: ophyd.Signal
+        Signal to maximize
+
+    motor: ophyd.OphydObject
+        Any set-able object
+
+    tolerance: float, optional
+        The tolerance in which our motor is
+
+    average: int, optional
+        Choice to take an average of points at each point in the scan
+
+    limits: tuple, optional
+        Limit the region the scan will search within. If this is not provided,
+        the soft limits of the signal will be used. In this case, these must be
+        configured or the scan will not be allowed to continue.
+
+    method: str, optional
+        Choice of optimization methods
+
+    md: dict, optional
+        metadata
+    """
     # Add walk information to metadata
     _md = {'plan_name': 'walk_to_target',
            'target': target}
@@ -99,6 +131,11 @@ def optimize(signal, motor, tolerance,
         else:
             raise ValueError("No limits provided or set on motor")
 
+    # Create an inverted signal if we need to maximize
+    if maximize:
+        raw = signal
+        signal = InvertedSignal(raw)
+
     # Create plan metadata
     _md = {'detectors': [signal],
            'motors': [motor],
@@ -126,8 +163,7 @@ def optimize(signal, motor, tolerance,
             # Search the system for the minimum
             ret = yield from golden_section_search(signal, motor, tolerance,
                                                    average=average,
-                                                   limits=limits,
-                                                   maximize=maximize)
+                                                   limits=limits)
             # Go to the minimum of the range
             logger.debug("Moving motor to center of discovered range ...")
             yield from bps.mv(motor, (ret[1] + ret[0])/2)
@@ -138,8 +174,7 @@ def optimize(signal, motor, tolerance,
     return (yield from inner_optimize())
 
 
-def golden_section_search(signal, motor, tolerance, limits,
-                          average=None, maximize=False):
+def golden_section_search(signal, motor, tolerance, limits, average=None):
     """
     Use golden-section search to find the extrema of a signal
 
@@ -173,11 +208,6 @@ def golden_section_search(signal, motor, tolerance, limits,
         Option to average the signal we are reading to limit the affect of
         noise on our measurements
 
-    maximize : bool, optional
-        By default, the plan will minimize the relationship between the signal
-        and the motor. If you would instead like to maximize the signal, mark
-        this as True
-
     Returns
     -------
     bounds: tuple
@@ -191,20 +221,12 @@ def golden_section_search(signal, motor, tolerance, limits,
     yield from bps.subscribe('all', stream)
     stream.start({'uid': None})
 
-    # Create an inverted signal if we need to maximize
-    if maximize:
-        raw = signal
-        signal = InvertedSignal(raw)
-        detectors = [signal, raw, motor]
-    else:
-        detectors = [signal, motor]
-
     # Measurement plan
     def measure_probe(position):
         # Move motor
         yield from bps.mv(motor, position)
         # Return measurement
-        ret = yield from measure_average(detectors, average,
+        ret = yield from measure_average([signal, motor], average,
                                          stream=stream)
         logger.debug("Found a values of %r at %r",
                      ret[signal.name], position)
