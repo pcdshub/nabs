@@ -46,7 +46,7 @@ script:
     fi
 
 after_success:
-    #- codecov
+  - codecov
   - |
     if [[ $TRAVIS_PULL_REQUEST == false && $TRAVIS_REPO_SLUG == $OFFICIAL_REPO && $TRAVIS_BRANCH == $TRAVIS_TAG  && $TRAVIS_TAG != '' ]]; then
       export ANACONDA_API_TOKEN=$CONDA_UPLOAD_TOKEN_TAG
