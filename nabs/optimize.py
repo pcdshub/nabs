@@ -1,5 +1,6 @@
 import math
 import logging
+import inspect
 
 import bluesky.preprocessors as bpp
 import bluesky.plan_stubs as bps
@@ -278,5 +279,7 @@ optimize_opts = """
         metadata
 """
 maximize.__doc__ += optimize_opts
+maximize.__signature__ = inspect.signature(optimize)
 minimize.__doc__ += optimize_opts
+minimize.__signature__ = inspect.signature(optimize)
 optimize.__doc__ += optimize_opts
