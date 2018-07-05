@@ -51,6 +51,10 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
+# Add custom CSS to avoid table wraps
+def setup(app):
+    app.add_stylesheet('custom.css')
+
 autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
