@@ -7,14 +7,16 @@ Welcome to nabs's documentation!
 ================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Overview:
+   :hidden:
 
+   optimize.rst
 
+.. toctree::
+   :maxdepth: 1
+   :caption: API
+   :hidden:
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   optimize_api.rst
+   plan_stubs.rst
