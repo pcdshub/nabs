@@ -1,0 +1,6 @@
+nabs.optimize.walk\_to\_target
+==============================
+
+.. currentmodule:: nabs.optimize
+
+.. autofunction:: walk_to_target
