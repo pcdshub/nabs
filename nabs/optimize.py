@@ -80,44 +80,10 @@ def optimize(signal, motor, tolerance,
              average=None, limits=None, method='golden',
              maximize=False, md=None):
     """
-    The optimization methods within ``nabs`` take a similar approach to the
-    methodology behind ``scipy.optimize``. Different use cases will have
-    different requirements and it is impossible to devise a single plan that
-    will be optimal for all of them. Instead, ``optimize`` supports different
-    "methods" each with their own strengths and weaknesses. Select between
-    these with the ``method`` parameter. Keep in mind that different
-    methodologies will interpret certain keywords differently. For instance,
-    the ``tolerance`` of the optimization may be interpreted in ways specific
-    to the algorithm chosen. For more information, see the docstring for the
-    specific method.
+    Generic optimization method
 
-    Parameters
-    ----------
-    signal: ophyd.Signal
-        Signal to maximize
-
-    motor: ophyd.OphydObject
-        Any set-able object
-
-    tolerance: float, optional
-        The tolerance in which our motor is
-
-    average: int, optional
-        Choice to take an average of points at each point in the scan
-
-    limits: tuple, optional
-        Limit the region the scan will search within. If this is not provided,
-        the soft limits of the signal will be used. In this case, these must be
-        configured or the scan will not be allowed to continue.
-
-    method: str, optional
-        Choice of optimization methods
-
-    maximize: bool, optional
-        Whether to maximize or minimize the signal
-
-    md: dict, optional
-        metadata
+    This method serves as the switchyard for various methods and requirements
+    necessary to maximize or minimize.
     """
     # Decide the limits
     if not limits:
@@ -285,5 +251,32 @@ def golden_section_search(signal, motor, tolerance, limits, average=None):
 
 
 # Add the optimization docstring to both minimize and maximize
-maximize.__doc__ += optimize.__doc__
-minimize.__doc__ += optimize.__doc__
+optimize_opts = """
+    Parameters
+    ----------
+    signal: ophyd.Signal
+        Signal to maximize
+
+    motor: ophyd.OphydObject
+        Any set-able object
+
+    tolerance: float, optional
+        The tolerance in which our motor is
+
+    average: int, optional
+        Choice to take an average of points at each point in the scan
+
+    limits: tuple, optional
+        Limit the region the scan will search within. If this is not provided,
+        the soft limits of the signal will be used. In this case, these must be
+        configured or the scan will not be allowed to continue.
+
+    method: str, optional
+        Choice of optimization methods
+
+    md: dict, optional
+        metadata
+"""
+maximize.__doc__ += optimize_opts
+minimize.__doc__ += optimize_opts
+optimize.__doc__ += optimize_opts
