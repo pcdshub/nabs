@@ -82,6 +82,43 @@ def move_per_step(detectors, step, pos_cache):
     yield from wait_uid(group=grp)
 
 
+def monitor_events(detectors, events=None, duration=None):
+    """
+    Monitor for value updates from detectors and wait for completion.
+
+    This can run for a fixed number of events, for a fixed duration, or both.
+    If both, this will run until both conditions are met: until enough time has
+    passed and until enough events have been seen.
+
+    If events is used, we'll wait until every detector reaches the set events
+    count.
+
+    Parameters
+    ----------
+    events: ``int``, optional
+        If provided, we'll monitor until we have enough events.
+    duration: ``float``, optional
+        If provided, we'll monitor for this fixed duration in seconds.
+        If both arguments are provided, then we'll wait for both to be true,
+        so we'll have a minimum elapsed time and a minimum number of events.
+    """
+    if events is not None:
+        counter = CallbackCounterFuture(events, detectors)
+        sub_id = yield from subscribe(counter, 'event')
+
+    for det in detectors:
+        yield from monitor(det)
+
+    if duration is not None:
+        yield from sleep(duration)
+    if events is not None:
+        yield from wait_future(counter.future)
+        yield from unsubscribe(sub_id)
+
+    for det in detectors:
+        yield from unmonitor(det)
+
+
 def monitor_step(events=None, duration=None):
     """
     Create bluesky per_step hook for monitoring detectors at every point.
@@ -106,21 +143,6 @@ def monitor_step(events=None, duration=None):
 
     def inner_monitor_step(detectors, step, pos_cache):
         yield from move_per_step(detectors, step, pos_cache)
-
-        if events is not None:
-            counter = CallbackCounterFuture(events)
-            sub_id = yield from subscribe(counter, 'event')
-
-        for det in detectors:
-            yield from monitor(det)
-
-        if duration is not None:
-            yield from sleep(duration)
-        if events is not None:
-            yield from wait_future(counter.future)
-            yield from unsubscribe(sub_id)
-
-        for det in detectors:
-            yield from unmonitor(det)
+        yield from monitor_events(detectors, events=events, duration=duration)
 
     return inner_monitor_step
