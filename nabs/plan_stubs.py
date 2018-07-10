@@ -104,7 +104,8 @@ def monitor_events(detectors, events=None, duration=None):
     """
     if events is not None:
         counter = CallbackCounterFuture(events, detectors)
-        sub_id = yield from subscribe(counter, 'event')
+        counter.ensure_future()
+        sub_id = yield from subscribe('event', counter)
 
     for det in detectors:
         yield from monitor(det)
@@ -112,7 +113,7 @@ def monitor_events(detectors, events=None, duration=None):
     if duration is not None:
         yield from sleep(duration)
     if events is not None:
-        yield from wait_future(counter.future)
+        yield from wait_future([counter.future])
         yield from unsubscribe(sub_id)
 
     for det in detectors:

@@ -1,12 +1,10 @@
 import asyncio
 import logging
 
-from bluesky.callbacks import CallbackCounter
-
 logger = logging.getLogger(__name__)
 
 
-class CallbackCounterFuture(CallbackCounter):
+class CallbackCounterFuture:
     """
     A callback counter that marks a Future when the count reaches max_count.
 
@@ -23,17 +21,17 @@ class CallbackCounterFuture(CallbackCounter):
         for a total number of events.
     """
     def __init__(self, max_count, detectors=None):
-        super().__init__(self)
+        self.value = 0
         self.max_count = max_count
         if detectors is None:
             self.dets = None
         else:
             self.dets = {det.name: 0 for det in detectors}
-        loop = asyncio.get_event_loop()
-        self.future = loop.create_future()
+        self.future = None
 
     def __call__(self, name, doc):
-        super().__call__(self, name, doc)
+        self.value += 1
+        self.ensure_future()
         if not self.future.done():
             if self.dets is None:
                 if self.value >= self.max_count:
@@ -51,3 +49,8 @@ class CallbackCounterFuture(CallbackCounter):
                 if all(val >= self.max_count for val in self.dets.values()):
                     self.future.set_result(('reached {} for all '
                                             'dets'.format(self.max_count)))
+
+    def ensure_future(self):
+        if self.future is None:
+            loop = asyncio.get_event_loop()
+            self.future = loop.create_future()
