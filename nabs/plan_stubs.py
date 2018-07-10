@@ -3,7 +3,7 @@ import logging
 from bluesky.plans import count
 from bluesky.plan_stubs import (subscribe, unsubscribe, monitor, unmonitor,
                                 sleep, checkpoint, abs_set, wait as wait_uid,
-                                wait_for as wait_future)
+                                wait_for as wait_future, trigger_and_read)
 from bluesky.preprocessors import stub_wrapper
 from bluesky.utils import short_uid
 
@@ -124,6 +124,15 @@ def monitor_step(events=None, duration=None):
     """
     Create bluesky per_step hook for monitoring detectors at every point.
 
+    This relies on the detectors being monitorable e.g. signals or some other
+    simple input that doesn't need to be triggered.
+
+    At each point, this will:
+
+        - Read all the motor positions once
+        - Monitor each detector until number of events and/or duration
+          has passed
+
     Parameters
     ----------
     events: ``int``, optional
@@ -144,6 +153,7 @@ def monitor_step(events=None, duration=None):
 
     def inner_monitor_step(detectors, step, pos_cache):
         yield from move_per_step(detectors, step, pos_cache)
+        yield from trigger_and_read(list(step.keys()))
         yield from monitor_events(detectors, events=events, duration=duration)
 
     return inner_monitor_step
