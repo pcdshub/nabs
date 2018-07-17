@@ -1,5 +1,5 @@
 from bluesky.callbacks import CallbackCounter
-from bluesky.examples import stepscan
+from bluesky.plans import scan
 from bluesky.tests.utils import DocCollector
 from nabs.streams import AverageStream
 
@@ -12,7 +12,7 @@ def test_average_stream(RE, hw):
     avg.subscribe(c)
     avg.subscribe(d.insert)
     # Run a basic plan
-    RE(stepscan(hw.det, hw.motor), {'all': avg})
+    RE(scan([hw.det], hw.motor, -5, 4, 10), {'all': avg})
     assert c.value == 1 + 1 + 2  # events, descriptor, start and stop
     # See that we made sensible descriptor
     start_uid = d.start[0]['uid']
