@@ -1,5 +1,7 @@
 from threading import RLock
 
+from bluesky.callbacks.stream import LiveDispatcher
+
 
 class EventBuilder:
     """
@@ -142,3 +144,50 @@ class EventBuilder:
                     del self.buckets[ts]
                 else:
                     break
+
+
+class SignalEventBuilder(EventBuilder):
+    """
+    Event builder for ophyd signals.
+
+    This will need to be subclassed to define a proper ``emit_data`` method.
+
+    This works for ``Signal`` objects, or any device that can be
+    subscribed to that sends the ``obj``, ``value``, and
+    ``timestamp`` kwargs as part of the callback.
+
+    Parameters
+    ----------
+    timed_signals: ``list of Signal``
+        Signals that have matched timestamps. This is your high-rate data that
+        will have a new value at every event.
+
+    slow_signals: ``list of Signal``
+        Signals with unmatched timestamps. This is your slow data. The last
+        value of each will be included in each event.
+
+    auto_clear: ``bool``, optional
+        If ``True``, we'll keep clearing out old data as we emit it.
+    """
+    def __init__(self, timed_signals, slow_signals, auto_clear=True):
+        super().__init__([sig.name for sig in timed_signals],
+                         [sig.name for sig in slow_signals],
+                         auto_clear=auto_clear)
+        for sig in slow_signals:
+            sig.subscribe(self)
+        for sig in timed_signals:
+            sig.subscribe(self)
+
+    def __call__(self, obj, value, timestamp, **kwargs):
+        self.save_value(obj.name, value, timestamp)
+
+
+class BlueskyEventBuilder(EventBuilder, LiveDispatcher):
+    """
+    Event builder for bluesky monitor documents.
+
+    If this is subscribed to the run engine, it will combine the monitor
+    document into normal-looking event documents, which will then be emitted.
+    """
+    def event(self, doc, **kwargs):
+        pass
