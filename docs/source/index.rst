@@ -11,15 +11,20 @@ Beamline Scientist!", e.g. it is something that should not be done by hand.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Overview:
-   :hidden:
+   :caption: Overview
 
    optimize.rst
 
 .. toctree::
    :maxdepth: 1
    :caption: API
-   :hidden:
 
    optimize_api.rst
    plan_stubs.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer Notes
+
+   releases.rst
+   upcoming_changes.rst
