@@ -27,4 +27,4 @@ test:
 about:
   home: https://github.com/pcdshub/nabs
   license: SLAC Open License
-  summary: NABS: Not a Beamline Scientist
+  summary: "NABS: Not a Beamline Scientist"
