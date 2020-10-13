@@ -1,11 +1,10 @@
 import logging
 
-from bluesky.plans import count
 from bluesky.plan_stubs import subscribe
+from bluesky.plans import count
 from bluesky.preprocessors import stub_wrapper
 
 from nabs.streams import AverageStream
-
 
 logger = logging.getLogger(__name__)
 

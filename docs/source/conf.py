@@ -13,6 +13,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
+
 import sphinx_rtd_theme
 
 module_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../../')
@@ -29,6 +30,7 @@ author = 'SLAC National Accelerator Laboratory'
 
 # The short X.Y version
 import nabs
+
 version = nabs.__version__
 # The full version, including alpha/beta/rc tags
 release = nabs.__version__
