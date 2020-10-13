@@ -1,8 +1,8 @@
 import logging
 
-from bluesky.callbacks import CallbackCounter
-from bluesky.plan_stubs import open_run, close_run
 import numpy as np
+from bluesky.callbacks import CallbackCounter
+from bluesky.plan_stubs import close_run, open_run
 
 from nabs.plan_stubs import measure_average
 

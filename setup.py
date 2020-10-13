@@ -1,5 +1,6 @@
+from setuptools import find_packages, setup
+
 import versioneer
-from setuptools import setup, find_packages
 
 setup(name='nabs',
       version=versioneer.get_version(),
@@ -7,4 +8,5 @@ setup(name='nabs',
       license='BSD',
       author='SLAC National Accelerator Laboratory',
       packages=find_packages(),
-      description='Not a Beamline Scientist')
+      description='NABS: Not a beamline scientist. Beamline automatation '
+                  'that should be handled by code, not by people.')

@@ -1,12 +1,12 @@
 import logging
 
-from bluesky.plan_stubs import open_run, close_run
-from ophyd.sim import SynGauss, SynAxis, SynSignal
 import numpy as np
 import pytest
+from bluesky.plan_stubs import close_run, open_run
+from ophyd.sim import SynAxis, SynGauss, SynSignal
 
-from nabs.optimize import (maximize, minimize, optimize,
-                           golden_section_search, walk_to_target)
+from nabs.optimize import (golden_section_search, maximize, minimize, optimize,
+                           walk_to_target)
 
 logger = logging.getLogger(__name__)
 

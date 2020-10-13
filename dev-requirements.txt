@@ -1,7 +1,4 @@
 codecov
-doctr
 flake8
 ophyd
 pytest
-sphinx
-sphinx_rtd_theme

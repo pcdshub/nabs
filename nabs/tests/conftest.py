@@ -1,7 +1,7 @@
 import asyncio
 
-from bluesky import RunEngine
 import pytest
+from bluesky import RunEngine
 
 
 @pytest.fixture(scope='function')

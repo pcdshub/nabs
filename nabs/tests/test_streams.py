@@ -1,6 +1,7 @@
 from bluesky.callbacks import CallbackCounter
 from bluesky.examples import stepscan
 from bluesky.tests.utils import DocCollector
+
 from nabs.streams import AverageStream
 
 
