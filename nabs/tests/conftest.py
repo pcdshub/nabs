@@ -5,20 +5,15 @@ from bluesky import RunEngine
 
 
 @pytest.fixture(scope='function')
-def RE(request):
+def RE():
     loop = asyncio.new_event_loop()
     loop.set_debug(True)
     RE = RunEngine({}, loop=loop)
 
-    def clean_event_loop():
-        if RE.state != 'idle':
-            RE.halt()
-        ev = asyncio.Event(loop=loop)
-        ev.set()
-        loop.run_until_complete(ev.wait())
+    yield RE
 
-    request.addfinalizer(clean_event_loop)
-    return RE
+    if RE.state != 'idle':
+        RE.halt()
 
 
 @pytest.fixture(scope='function')

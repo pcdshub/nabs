@@ -16,6 +16,7 @@ def test_measure_average(RE, hw):
     def measure_plan(detectors):
         yield from open_run()
         ret = yield from measure_average(detectors, num=250)
+        logger.debug(ret)
         assert ret['motor'] == 0.0
         assert ret['motor_setpoint'] == 0.0
         assert np.isclose(ret['noisy_det'], 1.0, atol=0.01)
