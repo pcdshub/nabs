@@ -65,7 +65,6 @@ class AverageStream(LiveDispatcher):
             # Use the last descriptor to avoid strings and objects
             data_keys = self.raw_descriptors[desc_id]['data_keys']
             for key, info in data_keys.items():
-                logger.debug(info)
                 # Information from non-number fields is dropped
                 if info['dtype'] in ('number', 'array', 'integer'):
                     # Average together
