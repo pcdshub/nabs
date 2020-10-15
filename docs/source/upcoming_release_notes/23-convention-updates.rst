@@ -11,7 +11,8 @@ Features
 
 Bugfixes
 --------
-- N/A
+- Fix issues related to SignalRO moving around in the ophyd API
+- Fix issues related to measure_average not working for integer values
 
 Maintenance
 -----------
