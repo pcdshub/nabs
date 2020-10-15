@@ -1,6 +1,10 @@
 """Standard data streams for automated routines"""
+import logging
+
 import numpy as np
 from bluesky.callbacks.stream import LiveDispatcher
+
+logger = logging.getLogger(__name__)
 
 
 class AverageStream(LiveDispatcher):
@@ -61,8 +65,9 @@ class AverageStream(LiveDispatcher):
             # Use the last descriptor to avoid strings and objects
             data_keys = self.raw_descriptors[desc_id]['data_keys']
             for key, info in data_keys.items():
+                logger.debug(info)
                 # Information from non-number fields is dropped
-                if info['dtype'] in ('number', 'array'):
+                if info['dtype'] in ('number', 'array', 'integer'):
                     # Average together
                     average_evt[key] = np.mean([evt['data'][key]
                                                 for evt in self.raw_cache],
