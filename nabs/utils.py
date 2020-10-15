@@ -1,5 +1,4 @@
-from ophyd.signal import DerivedSignal
-from ophyd.sim import SignalRO
+from ophyd.signal import DerivedSignal, SignalRO
 
 
 class InvertedSignal(DerivedSignal):

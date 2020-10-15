@@ -1,14 +1,14 @@
-import math
-import logging
 import inspect
+import logging
+import math
 
-import bluesky.preprocessors as bpp
 import bluesky.plan_stubs as bps
+import bluesky.preprocessors as bpp
 from scipy.constants import golden_ratio
 
 from nabs.plan_stubs import measure_average
 from nabs.streams import AverageStream
-from nabs.utils import InvertedSignal, ErrorSignal
+from nabs.utils import ErrorSignal, InvertedSignal
 
 logger = logging.getLogger(__name__)
 

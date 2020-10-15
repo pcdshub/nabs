@@ -1,12 +1,12 @@
 import logging
 
-from bluesky.plan_stubs import open_run, close_run
-from ophyd.sim import SynGauss, SynAxis, SynSignal
 import numpy as np
 import pytest
+from bluesky.plan_stubs import close_run, open_run
+from ophyd.sim import SynAxis, SynGauss, SynSignal
 
-from nabs.optimize import (maximize, minimize, optimize,
-                           golden_section_search, walk_to_target)
+from nabs.optimize import (golden_section_search, maximize, minimize, optimize,
+                           walk_to_target)
 
 logger = logging.getLogger(__name__)
 
@@ -32,22 +32,23 @@ def test_optimize(RE, inverted_gauss):
     # Respect motor limits
     (det, motor) = inverted_gauss
     setattr(motor, 'limits', (-2., -1.))
-    RE(optimize(det, motor, 0.05, method='golden'))
+    RE(optimize(det.val, motor, 0.05, method='golden'))
     assert -2 <= motor.position <= -1.
     # No limits, no scan
     setattr(motor, 'limits', (0., 0.))
     with pytest.raises(ValueError):
-        RE(optimize(det, motor, 0.05, method='golden'))
+        RE(optimize(det.val, motor, 0.05, method='golden'))
     # Unknown optimization method
     with pytest.raises(ValueError):
-        RE(optimize(det, motor, 0.05, limits=(-1., 1), method='jump around'))
+        RE(optimize(det.val, motor, 0.05, limits=(-1., 1),
+                    method='jump around'))
 
 
 def test_minimize(RE, inverted_gauss):
     logger.debug("test_minimize")
     (det, motor) = inverted_gauss
     # Run the plan
-    RE(minimize(det, motor, 0.05, limits=(-5, 10), method='golden'))
+    RE(minimize(det.val, motor, 0.05, limits=(-5, 10), method='golden'))
     # Should at least be within the tolerance at the end
     assert np.isclose(motor.position, 0.0, atol=0.05)
 
@@ -55,7 +56,7 @@ def test_minimize(RE, inverted_gauss):
 def test_maximize(RE, hw):
     logger.debug("test_maximize")
     # Run the plan
-    RE(maximize(hw.det, hw.motor, 0.05, limits=(-9, 13), method='golden'))
+    RE(maximize(hw.det.val, hw.motor, 0.05, limits=(-9, 13), method='golden'))
     # Should at least be within the tolerance at the end
     assert np.isclose(hw.motor.position, 0.0, atol=0.05)
 

@@ -1,7 +1,21 @@
 from bluesky.callbacks import CallbackCounter
-from bluesky.examples import stepscan
 from bluesky.tests.utils import DocCollector
+from bluesky.utils import Msg
+
 from nabs.streams import AverageStream
+
+
+def stepscan(det, motor):
+    """Old example scan from bluesky deprecated submodule."""
+    yield Msg('open_run')
+    for i in range(-5, 5):
+        yield Msg('create', name='primary')
+        yield Msg('set', motor, i)
+        yield Msg('trigger', det)
+        yield Msg('read', motor)
+        yield Msg('read', det)
+        yield Msg('save')
+    yield Msg('close_run')
 
 
 def test_average_stream(RE, hw):
