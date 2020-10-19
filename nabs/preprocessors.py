@@ -19,6 +19,7 @@ def _get_daq():
     This also wraps the pcdsdaq import because pcdsdaq is an optional
     dependency of nabs.
     """
+
     from pcdsdaq.daq import get_daq  # NOQA
     return get_daq()
 
@@ -35,7 +36,29 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
 
     The DAQ trigger and the DAQ read always go first, before any other triggers
     or reads, to ensure all events are recorded.
+
+    Parameters
+    ----------
+    plan : plan
+        A bluesky plan that yields bluesky Msg objects.
+
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
     """
+
     daq = _get_daq()
     motor_cache = set()
     first_calib_cycle = True
@@ -90,6 +113,7 @@ def daq_step_scan_decorator(plan):
     :func:`daq_step_scan_wrapper` to insert the DAQ object into every
     `trigger` and `read` pair and configure before the first scan point.
     """
+
     @wraps(plan)
     def inner(*args, events=None, duration=None, record=True, use_l3t=False,
               **kwargs):
@@ -98,23 +122,4 @@ def daq_step_scan_decorator(plan):
                                                       record=record,
                                                       use_l3t=use_l3t,
                                                       **kwargs)))
-
-    inner.__doc__ += """
-    events : int, optional
-        Number of events to take at each step. If omitted, uses the
-        duration argument or the last configured value.
-
-    duration : int or float, optional
-        Duration of time to spend at each step. If omitted, uses the events
-        argument or the last configured value.
-
-    record : bool, optional
-        Whether or not to record the run in the DAQ. Defaults to True because
-        we don't want to accidentally skip recording good runs.
-
-    use_l3t : bool, optional
-        Whether or not the use the l3t filter for the events argument. Defaults
-        to False to avoid confusion from unconfigured filters.
-    """
-
     return inner
