@@ -47,13 +47,11 @@ def daq_step_scan_wrapper(plan):
         # Insert daq trigger before first trigger
         elif msg.command == 'trigger' and first_trigger:
             first_trigger = False
-            yield from trigger(daq, group=msg.kwargs['group'])
+            return trigger(daq, group=msg.kwargs['group']), None
         # Insert daq read before first read
         elif msg.command == 'read' and first_read:
             first_read = False
-            yield from read(daq)
-        # Resume normal operation
-        return (yield msg)
+            return read(daq), None
 
     return (yield from plan_mutator(plan, insert_daq_trigger_and_read))
 
