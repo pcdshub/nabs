@@ -6,11 +6,21 @@ used to take full individual runs using a RunEngine.
 
 Plans preceded by "daq_" incorporate standard daq step scan args and behavior.
 """
-from bluesky.plans import scan
+from bluesky.plans import list_scan, scan
 from bluesky.preprocessors import (relative_set_decorator,
                                    reset_positions_decorator)
 
 from .preprocessors import daq_step_scan_decorator
+
+# The bottom of this file contains thin wrappers around bluesky built-ins
+# These exist to mimic an older hutch python API,
+# easing the transition to bluesky
+
+# TODO just count with docstring and DAQ
+# TODO n-dimensional ascan with docstring and DAQ
+# TODO n-dimensional list scan with docstring and DAQ
+# ^ These three cover 99.9% of use-cases
+# The rest are just for full legacy familiarity
 
 
 @reset_positions_decorator
@@ -215,3 +225,41 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
 
     yield from scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
+
+
+@reset_positions_decorator
+@daq_step_scan_decorator
+def daq_list_scan(motor, pos_list):
+    """
+    One-dimensional daq scan with a list of positions
+
+    This moves a motor through pos_list, taking data in the
+    DAQ at every step, and returning the motor to its original position at
+    the end of the scan.
+
+    Parameters
+    ----------
+    motor : Movable
+        A movable object to scan.
+
+    pos_list : list of int or float
+        The points to include in the scan.
+
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+    """
+
+    yield from list_scan([], motor, pos_list)
