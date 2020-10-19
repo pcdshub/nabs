@@ -23,37 +23,61 @@ def _get_daq():
     return get_daq()
 
 
-def daq_step_scan_wrapper(plan):
+def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
+                          use_l3t=False):
     """
     Wrapper to turn an open plan into a standard LCLS DAQ step plan.
 
-    This simply inserts the DAQ object into every `trigger` and `read` pair,
-    ensuring events are taken at every bundle.
+    This inserts the DAQ object into every `trigger` and `read` pair,
+    ensuring events are taken at every bundle, and yields an appropriate
+    `configure` message using the input arguments and all motors moved prior to
+    the first data point.
 
     The DAQ trigger and the DAQ read always go first, before any other triggers
     or reads, to ensure all events are recorded.
     """
     daq = _get_daq()
+    motor_cache = set()
+    first_calib_cycle = True
     first_trigger = True
     first_read = True
 
-    def insert_daq_trigger_and_read(msg):
+    def daq_first_cycle(msg):
+        yield from configure(events=events, duration=duration, record=record,
+                             use_l3t=use_l3t, controls=list(motor_cache))
+        yield from daq_next_cycle(msg)
+
+    def daq_next_cycle(msg):
+        yield from trigger(daq, group=msg.kwargs['group'])
+
+    def daq_mutator(msg):
+        nonlocal first_calib_cycle
         nonlocal first_trigger
         nonlocal first_read
-        # Reset flags after closing a bundle
+        # Reset "first" flags after closing a bundle
         if msg.command in ('save', 'drop'):
             first_trigger = True
             first_read = True
         # Insert daq trigger before first trigger
         elif msg.command == 'trigger' and first_trigger:
             first_trigger = False
-            return trigger(daq, group=msg.kwargs['group']), None
+            # Configure before the first begin (after we've found all motors)
+            if first_calib_cycle:
+                first_calib_cycle = False
+                return daq_first_cycle(msg), None
+            else:
+                return daq_next_cycle(msg), None
         # Insert daq read before first read
         elif msg.command == 'read' and first_read:
             first_read = False
             return read(daq), None
+        # Gather all moving devices for the daq controls configuration arg
+        elif msg.command == 'set':
+            motor_cache.add(msg.obj)
+        # If didn't mutate, return the (None, None) signal for plan_mutator
+        return None, None
 
-    return (yield from plan_mutator(plan, insert_daq_trigger_and_read))
+    return (yield from plan_mutator(plan, daq_mutator))
 
 
 def daq_step_scan_decorator(plan):
@@ -64,16 +88,16 @@ def daq_step_scan_decorator(plan):
     events, duration, record, and use_l3t onto the plan function,
     adds these to the docstring, and wraps the plan in the
     :func:`daq_step_scan_wrapper` to insert the DAQ object into every
-    `trigger` and `read` pair.
+    `trigger` and `read` pair and configure before the first scan point.
     """
-    daq = _get_daq()
-
     @wraps(plan)
     def inner(*args, events=None, duration=None, record=True, use_l3t=False,
               **kwargs):
-        yield from configure(daq, events=events, duration=duration,
-                             record=record, use_l3t=use_l3t)
-        return (yield from daq_step_scan_wrapper(plan(*args, **kwargs)))
+        return (yield from daq_step_scan_wrapper(plan(*args, events=events,
+                                                      duration=duration,
+                                                      record=record,
+                                                      use_l3t=use_l3t,
+                                                      **kwargs)))
 
     inner.__doc__ += """
     events : int, optional
