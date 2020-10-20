@@ -18,7 +18,12 @@ def _get_daq():
     Helper function to get the active DAQ object.
 
     This also wraps the pcdsdaq import because pcdsdaq is an optional
-    dependency of nabs.
+    dependency of nabs. This will fail unless pcdsdaq is installed.
+
+    Returns
+    -------
+    daq: Daq
+        The DAQ (data aquisition) system bluesky-compatible control object.
     """
 
     from pcdsdaq.daq import get_daq  # NOQA
@@ -31,9 +36,9 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     Wrapper to turn an open plan into a standard LCLS DAQ step plan.
 
     This inserts the DAQ object into every `trigger` and `read` pair,
-    ensuring events are taken at every bundle, and yields an appropriate
-    `configure` message using the input arguments and all motors moved prior to
-    the first data point.
+    ensuring events are taken at every bundle. It also stages the daq and
+    yields an appropriate `configure` message using the input arguments
+    and all motors moved prior to the first data point.
 
     The DAQ trigger and the DAQ read always go first, before any other triggers
     or reads, to ensure all events are recorded.
@@ -58,6 +63,16 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     use_l3t : bool, optional
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
+
+    Returns
+    -------
+    daq_step_plan : plan
+        The same plan as before, but modified appropriately to the run the DAQ
+        at every step. This will be an open generator.
+
+    See Also
+    --------
+    :func:`daq_step_scan_decorator`
     """
 
     daq = _get_daq()
@@ -102,7 +117,11 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         # If didn't mutate, return the (None, None) signal for plan_mutator
         return None, None
 
-    return (yield from bpp.plan_mutator(plan, daq_mutator))
+    @bpp.stage_decorator([daq])
+    def daq_step_plan():
+        return (yield from bpp.plan_mutator(plan, daq_mutator))
+
+    return (yield from daq_step_plan())
 
 
 def daq_step_scan_decorator(plan):
@@ -113,6 +132,25 @@ def daq_step_scan_decorator(plan):
     events, duration, record, and use_l3t onto the plan function
     and wraps the plan in the :func:`daq_step_scan_wrapper` to properly
     execute a step scan.
+
+    See :func:`daq_step_scan_standard_args` for argument specifications for the
+    standard DAQ configuration arguments.
+
+    Parameters
+    ----------
+    plan : plan
+        A bluesky plan that yields bluesky Msg objects.
+
+    Returns
+    -------
+    daq_step_plan : plan
+        The same plan as before, but modified appropriately for DAQ use.
+        This will be a callable generator function.
+
+    See Also
+    --------
+    :func:`daq_step_scan_wrapper`
+    :func:`daq_step_scan_standard_args`
     """
 
     @wraps(plan)
@@ -126,44 +164,85 @@ def daq_step_scan_decorator(plan):
     return inner
 
 
-def daq_during_wrapper(plan, record=None, use_l3t=False, controls=None):
+def daq_step_scan_standard_args(events=None, duration=None, record=True,
+                                use_l3t=False):
     """
-    Run a plan with the `Daq`.
-
-    This can be used with an ordinary ``bluesky`` plan that you'd like the daq
-    to run along with. This also stages the daq so that the run start/stop
-    will be synchronized with the bluesky runs.
-
-    This must be applied outside the ``run_wrapper``. All configuration must
-    be done by supplying config kwargs to this wrapper.
-
-    The `daq_during_decorator` is the same as the `daq_during_wrapper`,
-    but it is meant to be used as a function decorator.
+    No-op function to hold template parameter info for generated docs.
 
     Parameters
     ----------
-    plan: ``plan``
-        The ``plan`` to use the daq in
-    record: ``bool``, optional
-        If ``True``, we'll record the data. Otherwise, we'll run without
-        recording. Defaults to ``False``, or the last set value for
-        ``record``.
-    use_l3t: ``bool``, optional
-        If ``True``, an ``events`` argument to begin will be reinterpreted
-        to only count events that pass the level 3 trigger. Defaults to
-        ``False``.
-    controls: ``dict{name: device}`` or ``list[device...]``, optional
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+    """
+    pass
+
+
+def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
+    """
+    Wrap a plan so that the DAQ runs at the same time.
+
+    This can be used with an ordinary bluesky plan that you'd like the daq
+    to run along with. This also stages the DAQ so that the run start/stop
+    will be synchronized with the bluesky runs.
+
+    Note that this is not a calib cycle scan. See
+    :func:`daq_step_scan_wrapper` and :func:`daq_step_scan_decorator`
+    for the calib cycle variant.
+
+    All configuration must be done by supplying config kwargs to this wrapper.
+
+    This must be applied outside the run_wrapper.
+
+    The :func:`daq_during_decorator` is the same as the
+    :func:`daq_during_wrapper`, but it is meant to be used as a function
+    decorator.
+
+    Parameters
+    ----------
+    plan : plan
+        A bluesky plan that yields bluesky Msg objects.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+
+    controls : list of readables, optional
         If provided, values from these will make it into the DAQ data
-        stream as variables. We will check ``device.position`` and
-        ``device.value`` for quantities to use and we will update these
-        values each time begin is called. To provide a list, all devices
-        must have a ``name`` attribute.
+        stream as variables. For this purpose, the position and value
+        attributes will be checked.
+
+    Returns
+    -------
+    daq_during_plan : plan
+        The same plan as before, but modified appropriately to run the DAQ at
+        the same time.
     """
     daq = _get_daq()
-    yield from bps.configure(daq, events=None, duration=None, record=record,
-                             use_l3t=use_l3t, controls=controls)
-    yield from bpp.stage_wrapper(bpp.fly_during_wrapper(plan, flyers=[daq]),
-                                 [daq])
+
+    @bpp.stage_decorator([daq])
+    def daq_during_plan():
+        yield from bps.configure(daq, events=0, record=record,
+                                 use_l3t=use_l3t, controls=controls)
+        return (yield from bpp.fly_during_wrapper(plan, flyers=[daq]))
+
+    return (yield from daq_during_plan())
 
 
 daq_during_decorator = make_decorator(daq_during_wrapper)
