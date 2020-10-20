@@ -1,10 +1,12 @@
 """
-nabs.preprocessors
+Wrappers and decorators to modify existing plans.
 
-Much like bluesky.preprocessors, this module contains "wrapper" functions
-that take a plan as an argument and yield messages from a new, modified plan,
-as well as "decorator" functions that can be applied to bluesky plans to
-modify them in standard ways.
+This is the LCLS counterpart to bluesky.preprocessors.
+
+This module contains "wrapper" functions that take a plan as an argument
+and yield messages from a new, modified plan, as well as "decorator"
+functions that can be applied to bluesky plan functions to return new
+plan functions with modifications.
 """
 from functools import wraps
 

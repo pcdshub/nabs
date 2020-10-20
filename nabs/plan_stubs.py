@@ -1,7 +1,7 @@
 """
-nabs.plan_stubs
+Plan pieces that may be useful for assembling plans.
 
-This module is a counterpart to bluesky.plan_stubs.
+This is the LCLS counterpart to bluesky.plan_stubs.
 
 The plans in this module are not meant to be run individually, instead these
 are intended as building blocks for other complete plans.

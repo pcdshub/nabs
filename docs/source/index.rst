@@ -20,10 +20,7 @@ Beamline Scientist!", e.g. it is something that should not be done by hand.
    :maxdepth: 1
    :caption: API
 
-   plans_api.rst
-   preprocessors_api.rst
-   plan_stubs_api.rst
-   optimize_api.rst
+   api.rst
 
 .. toctree::
    :maxdepth: 1

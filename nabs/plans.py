@@ -1,10 +1,12 @@
 """
-nabs.plans
+Standalone bluesky plans for data collection.
 
-Much like bluesky.plans, this module contain full standalone plans that can be
-used to take full individual runs using a RunEngine.
+This is the LCLS counterpart to bluesky.plans.
 
-Plans preceded by "daq" incorporate running the LCLS-I DAQ in the plan.
+All plans in this module will work as-is when passed into a
+bluesky Run Engine, including starting and stopping a run.
+
+Plans preceded by "daq" incorporate running the LCLS DAQ in the plan.
 """
 import math
 import time

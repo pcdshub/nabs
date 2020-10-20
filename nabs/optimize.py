@@ -1,3 +1,6 @@
+"""
+Support for generic optimization routines through bluesky.
+"""
 import inspect
 import logging
 import math
