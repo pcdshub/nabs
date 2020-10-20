@@ -8,7 +8,7 @@ modify them in standard ways.
 """
 from functools import wraps
 
-import bluesky.plan_subs as bps
+import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import make_decorator
 

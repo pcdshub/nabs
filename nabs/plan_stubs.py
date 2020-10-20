@@ -1,3 +1,11 @@
+"""
+nabs.plan_stubs
+
+This module is a counterpart to bluesky.plan_stubs.
+
+The plans in this module are not meant to be run individually, instead these
+are intended as building blocks for other complete plans.
+"""
 import logging
 
 from bluesky.plan_stubs import subscribe

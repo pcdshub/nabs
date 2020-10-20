@@ -4,7 +4,7 @@ nabs.plans
 Much like bluesky.plans, this module contain full standalone plans that can be
 used to take full individual runs using a RunEngine.
 
-Plans preceded by "daq_" incorporate running the LCLS-I DAQ in the plan.
+Plans preceded by "daq" incorporate running the LCLS-I DAQ in the plan.
 """
 import math
 import time
@@ -41,6 +41,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
         In general:
 
         .. code-block:: python
+
             motor1, [point1, point2, ...],
             motor2, [point1, point2, ...],
             ...,
@@ -279,6 +280,7 @@ def daq_scan(*args, num=None, per_step=None, md=None):
         In general:
 
         .. code-block:: python
+
             motor1, start1, stop1,
             motor2, start2, start2,
             ...,
@@ -343,6 +345,7 @@ def daq_list_scan(*args, per_step=None, md=None):
         In general:
 
         .. code-block:: python
+
             motor1, [point1, point2, ...],
             motor2, [point1, point2, ...],
             ...,

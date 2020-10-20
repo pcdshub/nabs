@@ -50,7 +50,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autosectionlabel'
 ]
 
 # Add custom CSS to avoid table wraps

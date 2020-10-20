@@ -2,3 +2,4 @@ codecov
 flake8
 ophyd
 pytest
+pcdsdaq
