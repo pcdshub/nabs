@@ -150,7 +150,7 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     space_delta = abs(spatial_pts[0] - spatial_pts[1])
     velo = space_delta/sweep_time
 
-    @bpp.reset_positions_decorator
+    @bpp.reset_positions_decorator()
     def inner_delay_scan():
         yield from bps.abs_set(time_motor.motor.velocity, velo)
         return (yield from duration_scan([], time_motor, time_points,
@@ -262,7 +262,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
                                  per_shot=per_shot, md=md))
 
 
-@bpp.reset_positions_decorator
+@bpp.reset_positions_decorator()
 @daq_step_scan_decorator
 def daq_scan(*args, num=None, per_step=None, md=None):
     """
@@ -391,7 +391,7 @@ def daq_list_scan(*args, per_step=None, md=None):
                                      per_step=per_step, md=md))
 
 
-@bpp.reset_positions_decorator
+@bpp.reset_positions_decorator()
 @daq_step_scan_decorator
 def daq_ascan(motor, start, end, nsteps):
     """
@@ -435,8 +435,8 @@ def daq_ascan(motor, start, end, nsteps):
     yield from bp.scan([], motor, start, end, nsteps)
 
 
-@bpp.relative_set_decorator
-@bpp.reset_positions_decorator
+@bpp.relative_set_decorator()
+@bpp.reset_positions_decorator()
 @daq_step_scan_decorator
 def daq_dscan(motor, start, end, nsteps):
     """
@@ -480,7 +480,7 @@ def daq_dscan(motor, start, end, nsteps):
     yield from bp.scan([], motor, start, end, nsteps)
 
 
-@bpp.reset_positions_decorator
+@bpp.reset_positions_decorator()
 @daq_step_scan_decorator
 def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
     """
@@ -533,7 +533,7 @@ def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, nsteps)
 
 
-@bpp.reset_positions_decorator
+@bpp.reset_positions_decorator()
 @daq_step_scan_decorator
 def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
