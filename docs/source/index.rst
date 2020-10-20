@@ -21,8 +21,8 @@ Beamline Scientist!", e.g. it is something that should not be done by hand.
    :caption: API
 
    plans_api.rst
-   plan_stubs_api.rst
    preprocessors_api.rst
+   plan_stubs_api.rst
    optimize_api.rst
 
 .. toctree::

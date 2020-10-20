@@ -160,7 +160,7 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
 def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
                    record=True):
     """
-    A bluesky DAQ plan that sets up and executes the delay scan.
+    Scan a laser delay timing motor with DAQ support.
 
     A delay scan is one that moves a "delay" PseudoPositioner back and forth.
     Underneath, this moves a physical motor that changes the path length
@@ -264,7 +264,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
 @daq_step_scan_decorator
 def daq_scan(*args, num=None, per_step=None, md=None):
     """
-    Scan through a multi-motor trajectory with DAQ support.
+    Scan through a multi-motor start, end, num trajectory with DAQ support.
 
     This is an LCLS-I DAQ version of bluesky's built-in scan plan.
     It also returns the motors to their starting points after the scan is
