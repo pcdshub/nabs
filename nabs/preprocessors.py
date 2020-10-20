@@ -187,6 +187,7 @@ def daq_step_scan_standard_args(events=None, duration=None, record=True,
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
     """
+
     pass
 
 
