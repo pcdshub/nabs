@@ -4,7 +4,7 @@ nabs.plans
 Much like bluesky.plans, this module contain full standalone plans that can be
 used to take full individual runs using a RunEngine.
 
-Plans preceded by "daq_" incorporate standard daq step scan args and behavior.
+Plans preceded by "daq_" incorporate running the LCLS-I DAQ in the plan.
 """
 import math
 import time
@@ -202,15 +202,189 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     return (yield from inner_daq_delay_scan())
 
 
-# The bottom of this file contains thin wrappers around bluesky built-ins
+# The rest of this file contains thin wrappers around bluesky built-ins.
 # These exist to mimic an older hutch python API,
-# easing the transition to bluesky
+# easing the transition to bluesky.
 
-# TODO just count with docstring and DAQ
-# TODO n-dimensional ascan with docstring and DAQ
-# TODO n-dimensional list scan with docstring and DAQ
-# ^ These three cover 99.9% of use-cases
-# The rest are just for full legacy familiarity
+
+@daq_step_scan_decorator
+def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
+    """
+    Take repeated DAQ runs with no motors.
+
+    This is an LCLS-I DAQ version of bluesky's built-in count plan.
+
+    Parameters
+    ----------
+    detectors : list, optional
+        List of 'readable' objects to read at every step.
+
+    num : int, optional
+        Number of readings to take; default is 1.
+        If None, capture data until canceled.
+
+    delay : iterable or scalar, optional
+        Time delay in seconds between successive readings; default is 0.
+
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+
+    per_shot : callable, optional
+        Hook for customizing action of inner loop (messages per step).
+        Expected signature ::
+
+           def f(detectors: Iterable[OphydObj]) -> Generator[Msg]:
+               ...
+
+    md : dict, optional
+        Additional metadata to include in the start document.
+    """
+
+    detectors = detectors or []
+
+    return (yield from bpp.count(detectors, num=num, delay=delay,
+                                 per_shot=per_shot, md=md))
+
+
+@bpp.reset_positions_decorator
+@daq_step_scan_decorator
+def daq_scan(*args, num=None, per_step=None, md=None):
+    """
+    Scan through a multi-motor trajectory with DAQ support.
+
+    This is an LCLS-I DAQ version of bluesky's built-in scan plan.
+    It also returns the motors to their starting points after the scan is
+    complete.
+
+    Parameters
+    ----------
+    detectors : list, optional
+        List of 'readable' objects to read at every step.
+
+    *args :
+        For one dimension, ``motor, start, stop``.
+        In general:
+
+        .. code-block:: python
+            motor1, start1, stop1,
+            motor2, start2, start2,
+            ...,
+            motorN, startN, stopN
+
+        Motors can be any 'settable' object (motor, temp controller, etc.)
+
+    num : integer
+        Number of points.
+
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+
+    per_step : callable, optional
+        Hook for customizing action of inner loop (messages per step).
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+        for details.
+
+    md : dict, optional
+        Additional metadata to include in the start document.
+    """
+
+    if isinstance(args[0], list):
+        detectors = args[0]
+        scan_args = args[1:]
+    else:
+        detectors = []
+        scan_args = args
+
+    return (yield from bpp.scan(detectors, *scan_args, num=num,
+                                per_step=per_step, md=md))
+
+
+def daq_list_scan(*args, per_step=None, md=None):
+    """
+    Scan through a multi-motor list trajectory with DAQ support.
+
+    This is an LCLS-I DAQ version of bluesky's built-in list_scan plan.
+    It also returns the motors to their starting points after the scan is
+    complete.
+
+    Parameters
+    ----------
+    detectors : list, optional
+        List of 'readable' objects to read at every step.
+
+    *args :
+        For one dimension, ``motor, [point1, point2, ....]``.
+        In general:
+
+        .. code-block:: python
+            motor1, [point1, point2, ...],
+            motor2, [point1, point2, ...],
+            ...,
+            motorN, [point1, point2, ...]
+
+        Motors can be any 'settable' object (motor, temp controller, etc.)
+
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+
+    per_step : callable, optional
+        Hook for customizing action of inner loop (messages per step).
+        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+        for details.
+
+    md : dict, optional
+        Additional metadata to include in the start document.
+    """
+
+    if isinstance(args[0], list):
+        detectors = args[0]
+        scan_args = args[1:]
+    else:
+        detectors = []
+        scan_args = args
+
+    return (yield from bpp.list_scan(detectors, *scan_args,
+                                     per_step=per_step, md=md))
+
 
 @bpp.reset_positions_decorator
 @daq_step_scan_decorator
@@ -414,41 +588,3 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
 
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
-
-
-@bpp.reset_positions_decorator
-@daq_step_scan_decorator
-def daq_list_scan(motor, pos_list):
-    """
-    One-dimensional daq scan with a list of positions
-
-    This moves a motor through pos_list, taking data in the
-    DAQ at every step, and returning the motor to its original position at
-    the end of the scan.
-
-    Parameters
-    ----------
-    motor : Movable
-        A movable object to scan.
-
-    pos_list : list of int or float
-        The points to include in the scan.
-
-    events : int, optional
-        Number of events to take at each step. If omitted, uses the
-        duration argument or the last configured value.
-
-    duration : int or float, optional
-        Duration of time to spend at each step. If omitted, uses the events
-        argument or the last configured value.
-
-    record : bool, optional
-        Whether or not to record the run in the DAQ. Defaults to True because
-        we don't want to accidentally skip recording good runs.
-
-    use_l3t : bool, optional
-        Whether or not the use the l3t filter for the events argument. Defaults
-        to False to avoid confusion from unconfigured filters.
-    """
-
-    yield from bp.list_scan([], motor, pos_list)
