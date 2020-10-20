@@ -8,52 +8,97 @@ Plans preceded by "daq_" incorporate standard daq step scan args and behavior.
 """
 import time
 from collections import defaultdict
+from itertools import chain, cycle
 
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
+from bluesky import plan_patterns
+from toolz import partition
 
 from .preprocessors import daq_during_wrapper, daq_step_scan_decorator
 
 
-def infinite_scan(detectors, motor, points, duration=None,
-                  per_step=None, md=None):
+def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     """
-    Bluesky plan that moves a motor among points until interrupted.
+    Bluesky plan that moves motors among points for a fixed duration.
+
+    For each motor, a list of points must be provided.
+
+    This will take a reading at every scan step by default via
+    trigger_and_read.
+
 
     Parameters
     ----------
-    detectors: list of readables
+    detectors : list of readables
         Objects to read into Python in the scan.
 
-    motor: settable
-        Object to move in the scan.
+    *args :
+        For one dimension, ``motor, [point1, point2, ....]``.
+        In general:
 
-    points: list of floats
-        Positions to move between in the scan.
+        .. code-block:: python
+            motor1, [point1, point2, ...],
+            motor2, [point1, point2, ...],
+            ...,
+            motorN, [point1, point2, ...]
 
-    duration: float
-        If provided, the time to run in seconds. If omitted, we'll run forever.
+        Motors can be any 'settable' object (motor, temp controller, etc.)
+
+    duration : float
+        The time to run in seconds.
+
+    per_step : plan, optional
+        An alternate plan to run for every scan point. Defaults to
+        one_nd_step.
+
+    md : dict, optional
+        Additional metadata to include in the bluesky start document.
     """
     if per_step is None:
         per_step = bps.one_nd_step
 
-    if md is None:
-        md = {}
+    pos_lists = {}
+    pos_cycles = {}
+    motors = []
+    detectors = list(detectors)
 
-    md.update(motors=[motor.name])
+    for motor, pos_list in partition(2, args):
+        pos_list = list(pos_list)
+        pos_lists[motor] = pos_list
+        pos_cycles[motor] = cycle(pos_list)
+        motors.append(motor)
+
+    # md handling lifted from bluesky.plans.list_scan for consistency
+    md_args = list(chain(*((repr(motor), pos_list)
+                           for motor, pos_list in pos_list.items())))
+
+    _md = {'detectors': [det.name for det in detectors],
+           'motors': [mot.name for mot in motors],
+           'plan_args': {'detectors': list(map(repr, detectors)),
+                         'args': md_args,
+                         'duration': duration,
+                         'per_step': repr(per_step)},
+           'plan_name': 'duration_scan',
+           'plan_pattern': 'inner_list_product',
+           'plan_pattern_module': plan_patterns.__name__,
+           'plan_pattern_args': dict(args=md_args),
+           'hints': {},
+           }
+
+    _md.update(md or {})
+
     start = time.time()
 
-    # @bpp.stage_decorator(list(detectors) + [motor])
-    @bpp.reset_positions_decorator()
-    @bpp.run_decorator(md=md)
+    @bpp.stage_decorator(detectors + motors)
+    @bpp.run_decorator(md=_md)
     def inner():
         # Where last position is stored
         pos_cache = defaultdict(lambda: None)
-        while duration is None or time.time() - start < duration:
-            for pt in points:
-                step = {motor: pt}
-                yield from per_step(detectors, step, pos_cache)
+        while time.time() - start < duration:
+            step = {motor: next(cyc) for motor, cyc in pos_cycles.items()}
+            yield from per_step(detectors, step, pos_cache)
 
     return (yield from inner())
 
@@ -91,7 +136,7 @@ def delay_scan(daq, time_motor, time_points, sweep_time, duration=None):
 
     yield from bps.abs_set(time_motor.motor.velocity, velo)
 
-    scan = infinite_scan([], time_motor, time_points, duration=duration)
+    scan = duration_scan([], time_motor, time_points, duration=duration)
 
     if daq is not None:
         yield from daq_during_wrapper(scan)
