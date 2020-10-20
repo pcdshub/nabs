@@ -110,10 +110,9 @@ def daq_step_scan_decorator(plan):
     Decorator to turn a plan function into a standard LCLS DAQ step plan.
 
     This adds the standard DAQ configuration arguments
-    events, duration, record, and use_l3t onto the plan function,
-    adds these to the docstring, and wraps the plan in the
-    :func:`daq_step_scan_wrapper` to insert the DAQ object into every
-    `trigger` and `read` pair and configure before the first scan point.
+    events, duration, record, and use_l3t onto the plan function
+    and wraps the plan in the :func:`daq_step_scan_wrapper` to properly
+    execute a step scan.
     """
 
     @wraps(plan)
