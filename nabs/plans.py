@@ -6,11 +6,102 @@ used to take full individual runs using a RunEngine.
 
 Plans preceded by "daq_" incorporate standard daq step scan args and behavior.
 """
-from bluesky.plans import list_scan, scan
-from bluesky.preprocessors import (relative_set_decorator,
-                                   reset_positions_decorator)
+import time
+from collections import defaultdict
 
-from .preprocessors import daq_step_scan_decorator
+import bluesky.plan_stubs as bps
+import bluesky.plans as bp
+import bluesky.preprocessors as bpp
+
+from .preprocessors import daq_during_wrapper, daq_step_scan_decorator
+
+
+def infinite_scan(detectors, motor, points, duration=None,
+                  per_step=None, md=None):
+    """
+    Bluesky plan that moves a motor among points until interrupted.
+
+    Parameters
+    ----------
+    detectors: list of readables
+        Objects to read into Python in the scan.
+
+    motor: settable
+        Object to move in the scan.
+
+    points: list of floats
+        Positions to move between in the scan.
+
+    duration: float
+        If provided, the time to run in seconds. If omitted, we'll run forever.
+    """
+    if per_step is None:
+        per_step = bps.one_nd_step
+
+    if md is None:
+        md = {}
+
+    md.update(motors=[motor.name])
+    start = time.time()
+
+    # @bpp.stage_decorator(list(detectors) + [motor])
+    @bpp.reset_positions_decorator()
+    @bpp.run_decorator(md=md)
+    def inner():
+        # Where last position is stored
+        pos_cache = defaultdict(lambda: None)
+        while duration is None or time.time() - start < duration:
+            for pt in points:
+                step = {motor: pt}
+                yield from per_step(detectors, step, pos_cache)
+
+    return (yield from inner())
+
+
+def delay_scan(daq, time_motor, time_points, sweep_time, duration=None):
+    """
+    Bluesky plan that sets up and executes the delay scan.
+
+    Parameters
+    ----------
+    daq: Daq
+        The daq
+
+    time_motor: DelayNewport
+        The movable device in seconds
+
+    time_points: list of float
+        The times in second to move between
+
+    sweep_time: float
+        The duration we take to move from one end of the range to the other.
+
+    duration: float
+        If provided, the time to run in seconds. If omitted, we'll run forever.
+    """
+
+    spatial_pts = []
+    for time_pt in time_points:
+        pseudo_tuple = time_motor.PseudoPosition(delay=time_pt)
+        real_tuple = time_motor.forward(pseudo_tuple)
+        spatial_pts.append(real_tuple.motor)
+
+    space_delta = abs(spatial_pts[0] - spatial_pts[1])
+    velo = space_delta/sweep_time
+
+    yield from bps.abs_set(time_motor.motor.velocity, velo)
+
+    scan = infinite_scan([], time_motor, time_points, duration=duration)
+
+    if daq is not None:
+        yield from daq_during_wrapper(scan)
+    else:
+        yield from bp.scan
+
+
+def daq_delay_scan():
+    raise NotImplementedError  # TODO
+
 
 # The bottom of this file contains thin wrappers around bluesky built-ins
 # These exist to mimic an older hutch python API,
@@ -22,8 +113,7 @@ from .preprocessors import daq_step_scan_decorator
 # ^ These three cover 99.9% of use-cases
 # The rest are just for full legacy familiarity
 
-
-@reset_positions_decorator
+@bpp.reset_positions_decorator
 @daq_step_scan_decorator
 def daq_ascan(motor, start, end, nsteps):
     """
@@ -64,11 +154,11 @@ def daq_ascan(motor, start, end, nsteps):
         to False to avoid confusion from unconfigured filters.
     """
 
-    yield from scan([], motor, start, end, nsteps)
+    yield from bp.scan([], motor, start, end, nsteps)
 
 
-@relative_set_decorator
-@reset_positions_decorator
+@bpp.relative_set_decorator
+@bpp.reset_positions_decorator
 @daq_step_scan_decorator
 def daq_dscan(motor, start, end, nsteps):
     """
@@ -109,10 +199,10 @@ def daq_dscan(motor, start, end, nsteps):
         to False to avoid confusion from unconfigured filters.
     """
 
-    yield from scan([], motor, start, end, nsteps)
+    yield from bp.scan([], motor, start, end, nsteps)
 
 
-@reset_positions_decorator
+@bpp.reset_positions_decorator
 @daq_step_scan_decorator
 def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
     """
@@ -162,10 +252,10 @@ def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
         to False to avoid confusion from unconfigured filters.
     """
 
-    yield from scan([], m1, a1, b1, m2, a2, b2, nsteps)
+    yield from bp.scan([], m1, a1, b1, m2, a2, b2, nsteps)
 
 
-@reset_positions_decorator
+@bpp.reset_positions_decorator
 @daq_step_scan_decorator
 def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
@@ -224,10 +314,10 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
         to False to avoid confusion from unconfigured filters.
     """
 
-    yield from scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
+    yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
 
 
-@reset_positions_decorator
+@bpp.reset_positions_decorator
 @daq_step_scan_decorator
 def daq_list_scan(motor, pos_list):
     """
@@ -262,4 +352,4 @@ def daq_list_scan(motor, pos_list):
         to False to avoid confusion from unconfigured filters.
     """
 
-    yield from list_scan([], motor, pos_list)
+    yield from bp.list_scan([], motor, pos_list)
