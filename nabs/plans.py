@@ -6,6 +6,7 @@ used to take full individual runs using a RunEngine.
 
 Plans preceded by "daq_" incorporate standard daq step scan args and behavior.
 """
+import math
 import time
 from collections import defaultdict
 from itertools import chain, cycle
@@ -23,7 +24,8 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     """
     Bluesky plan that moves motors among points for a fixed duration.
 
-    For each motor, a list of points must be provided.
+    For each motor, a list of points must be provided. Each motor will be moved
+    through its list of points simultaneously if multiple motors are provided.
 
     This will take a reading at every scan step by default via
     trigger_and_read.
@@ -103,26 +105,37 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     return (yield from inner())
 
 
-def delay_scan(daq, time_motor, time_points, sweep_time, duration=None):
+def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     """
     Bluesky plan that sets up and executes the delay scan.
 
+    A delay scan is one that moves a "delay" PseudoPositioner back and forth.
+    Underneath, this moves a physical motor that changes the path length
+    of an optical laser, thus changing the timing of the laser shot by
+    introducing a delay.
+
+    This is a :func:`duration_scan` in one dimension that also sets the stage
+    velocity to match the configured sweep time and returns the motor to the
+    starting position at the end of the scan.
+
     Parameters
     ----------
-    daq: Daq
-        The daq
+    time_motor : DelayNewport
+        The movable device in egu seconds.
 
-    time_motor: DelayNewport
-        The movable device in seconds
+    time_points : list of float
+        The times in second to move between.
 
-    time_points: list of float
-        The times in second to move between
-
-    sweep_time: float
+    sweep_time : float
         The duration we take to move from one end of the range to the other.
 
-    duration: float
+    duration : float, optional
         If provided, the time to run in seconds. If omitted, we'll run forever.
+
+    See Also
+    --------
+    :func:`daq_delay_scan`
+    :func:`duration_scan`
     """
 
     spatial_pts = []
@@ -134,18 +147,59 @@ def delay_scan(daq, time_motor, time_points, sweep_time, duration=None):
     space_delta = abs(spatial_pts[0] - spatial_pts[1])
     velo = space_delta/sweep_time
 
-    yield from bps.abs_set(time_motor.motor.velocity, velo)
+    @bpp.reset_positions_decorator
+    def inner_delay_scan():
+        yield from bps.abs_set(time_motor.motor.velocity, velo)
+        return (yield from duration_scan([], time_motor, time_points,
+                                         duration=duration))
 
-    scan = duration_scan([], time_motor, time_points, duration=duration)
-
-    if daq is not None:
-        yield from daq_during_wrapper(scan)
-    else:
-        yield from bp.scan
+    return (yield from inner_delay_scan())
 
 
-def daq_delay_scan():
-    raise NotImplementedError  # TODO
+def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
+                   record=True):
+    """
+    A bluesky DAQ plan that sets up and executes the delay scan.
+
+    A delay scan is one that moves a "delay" PseudoPositioner back and forth.
+    Underneath, this moves a physical motor that changes the path length
+    of an optical laser, thus changing the timing of the laser shot by
+    introducing a delay.
+
+    This is a :func:`duration_scan` in one dimension that also runs the DAQ,
+    sets the stage velocity to match the configured sweep time, and returns
+    the motor to the starting position at the end of the scan.
+
+    Parameters
+    ----------
+    time_motor : DelayNewport
+        The movable device in egu seconds.
+
+    time_points : list of float
+        The times in second to move between.
+
+    sweep_time : float
+        The duration we take to move from one end of the range to the other.
+
+    duration : float, optional
+        If provided, the time to run in seconds. If omitted, we'll run forever.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    See Also
+    --------
+    :func:`delay_scan`
+    :func:`duration_scan`
+    """
+
+    @daq_during_wrapper(record=record, controls=[time_motor])
+    def inner_daq_delay_scan():
+        return (yield from delay_scan(time_motor, time_points, sweep_time,
+                                      duration=duration))
+
+    return (yield from inner_daq_delay_scan())
 
 
 # The bottom of this file contains thin wrappers around bluesky built-ins
