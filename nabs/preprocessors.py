@@ -84,7 +84,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     first_read = True
 
     def daq_first_cycle(msg):
-        yield from bps.configure(events=events, duration=duration,
+        yield from bps.configure(daq, events=events, duration=duration,
                                  record=record, use_l3t=use_l3t,
                                  controls=list(motor_cache))
         yield from daq_next_cycle(msg)
@@ -156,13 +156,16 @@ def daq_step_scan_decorator(plan):
     """
 
     @wraps(plan)
-    def inner(*args, events=None, duration=None, record=True, use_l3t=False,
-              **kwargs):
-        return (yield from daq_step_scan_wrapper(plan(*args, events=events,
-                                                      duration=duration,
-                                                      record=record,
-                                                      use_l3t=use_l3t,
-                                                      **kwargs)))
+    def inner(*args, **kwargs):
+        events = kwargs.pop('events', None)
+        duration = kwargs.pop('duration', None)
+        record = kwargs.pop('record', True)
+        use_l3t = kwargs.pop('use_l3t', False)
+        return (yield from daq_step_scan_wrapper(plan(*args, **kwargs),
+                                                 events=events,
+                                                 duration=duration,
+                                                 record=record,
+                                                 use_l3t=use_l3t))
     return inner
 
 
