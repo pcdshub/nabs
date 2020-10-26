@@ -1,7 +1,10 @@
 import logging
 
+import bluesky.plan_stubs as bps
+import bluesky.plans as bp
+import bluesky.preprocessors as bpp
 import pytest
-from bluesky.plans import scan
+from ophyd.signal import Signal
 
 from nabs.preprocessors import (daq_during_decorator, daq_step_scan_decorator,
                                 daq_step_scan_standard_args)
@@ -11,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope='function')
 def daq_step_scan(daq):
-    return daq_step_scan_decorator(scan)
+    return daq_step_scan_decorator(bp.scan)
 
 
 def test_daq_step_scan_args(hw, daq, daq_step_scan):
@@ -56,11 +59,38 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
     assert_daq_messages(none_det)
 
 
-def test_daq_during_decorator():
-    # TODO write test
-    daq_during_decorator()
+def test_daq_step_scan_run(RE, hw, daq_step_scan):
+    """
+    Actually run a scan and make sure it doesn't error out.
+    """
+    RE(daq_step_scan([hw.det], hw.motor, 0, 10, 11, events=10, record=False,
+                     use_l3t=True))
+
+
+def test_daq_during_decorator(RE, daq):
+    """
+    Run a daq during scan and make sure the daq is running during it.
+    """
+    logger.debug('test_daq_during_decorator')
+
+    @daq_during_decorator()
+    @bpp.run_decorator()
+    def plan(reader):
+        yield from bps.null()
+        for i in range(10):
+            assert daq.state == 'Running'
+            yield from bps.trigger_and_read([reader])
+        assert daq.state == 'Running'
+        yield from bps.null()
+
+    daq.connect()
+    RE(plan(Signal(name='sig')))
+    assert daq.state == 'Configured'
 
 
 def test_noop_coverage():
+    """
+    Call the documentation function to cover the line.
+    """
     logger.debug('test_noop_coverage')
     daq_step_scan_standard_args()
