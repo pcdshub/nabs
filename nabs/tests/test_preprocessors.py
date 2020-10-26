@@ -44,7 +44,7 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
     with_det = list(daq_step_scan([hw.det], hw.motor, 0, 10, 11, events=10,
                                   record=False, use_l3t=True))
     assert_daq_messages(with_det)
-    none_det = list(daq_step_scan(hw.motor, 0, 10, 11, events=10,
+    none_det = list(daq_step_scan([], hw.motor, 0, 10, 11, events=10,
                                   record=False, use_l3t=True))
     assert_daq_messages(none_det)
 
