@@ -27,5 +27,5 @@ def hw():
 @pytest.fixture(scope='function')
 def daq(RE):
     set_sim_mode(True)
-    yield Daq(RE=RE, hutch='tst')
+    yield Daq(RE=RE, hutch_name='tst')
     set_sim_mode(False)

@@ -19,7 +19,7 @@ def test_measure_average(RE, hw):
         logger.debug('Test received %s from measure_average', str(ret))
         assert ret['motor'] == 0.0
         assert ret['motor_setpoint'] == 0.0
-        assert np.isclose(ret['noisy_det'], 1.0, atol=0.01)
+        assert np.isclose(ret['noisy_det'], 1.0, atol=0.1)
         yield from close_run()
 
     # Execute plan
