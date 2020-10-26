@@ -15,6 +15,13 @@ def daq_step_scan(daq):
 
 
 def test_daq_step_scan_args(hw, daq, daq_step_scan):
+    """
+    Basic args and message inspection tests.
+
+    Can I decorate a scan?
+    Can I call a decorated scan at all?
+    Does a decorated scan produce the messages I expect?
+    """
     logger.debug('test_daq_step_scan_args')
 
     def assert_daq_messages(msg_list):
