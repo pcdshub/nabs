@@ -329,8 +329,8 @@ def daq_scan(*args, num=None, per_step=None, md=None):
         detectors = []
         scan_args = args
 
-    return (yield from bpp.scan(detectors, *scan_args, num=num,
-                                per_step=per_step, md=md))
+    return (yield from bp.scan(detectors, *scan_args, num=num,
+                               per_step=per_step, md=md))
 
 
 @bpp.reset_positions_decorator()
@@ -393,8 +393,8 @@ def daq_list_scan(*args, per_step=None, md=None):
         detectors = []
         scan_args = args
 
-    return (yield from bpp.list_scan(detectors, *scan_args,
-                                     per_step=per_step, md=md))
+    return (yield from bp.list_scan(detectors, *scan_args,
+                                    per_step=per_step, md=md))
 
 
 @bpp.reset_positions_decorator()

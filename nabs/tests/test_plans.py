@@ -9,10 +9,11 @@ from pcdsdevices.sim import FastMotor
 
 import nabs.plans as nbp
 
+PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_duration_scan(RE, hw):
     """
     Run the duration scan and check the messages it creates.
@@ -52,7 +53,7 @@ def time_motor():
     return SimDelayStage('SIM', name='sim', egu='s', n_bounces=1)
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_delay_scan(RE, time_motor):
     """
     Check the delay scan, verify that velo is set appropriately.
@@ -73,7 +74,7 @@ def test_delay_scan(RE, time_motor):
     RE(msgs)
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_delay_scan(RE, daq, time_motor):
     """
     Check that daq_delay_scan's arguments all work.
@@ -131,7 +132,7 @@ def daq_test(RE, daq, plan):
     return msgs
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_count(RE, daq, hw):
     logger.debug('test_daq_count')
     daq_test(RE, daq, nbp.daq_count(events=10))
@@ -139,7 +140,7 @@ def test_daq_count(RE, daq, hw):
     daq_test(RE, daq, nbp.daq_count([hw.det], num=5, events=5))
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_scan(RE, daq, hw):
     logger.debug('test_daq_scan')
     daq_test(RE, daq, nbp.daq_scan(hw.motor, 0, 10, 11, events=15))
@@ -150,7 +151,7 @@ def test_daq_scan(RE, daq, hw):
                                    events=20))
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_list_scan(RE, daq, hw):
     logger.debug('test_daq_list_scan')
     daq_test(RE, daq, nbp.daq_list_scan(hw.motor, list(range(10)), events=10))
@@ -162,32 +163,32 @@ def test_daq_list_scan(RE, daq, hw):
                                         events=15))
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_ascan(RE, daq, hw):
     logger.debug('test_daq_ascan')
     daq_test(RE, daq, nbp.daq_ascan(hw.motor, 0, 10, 11, events=10))
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_dscan(RE, daq, hw):
     logger.debug('test_daq_dscan')
     daq_test(RE, daq, nbp.daq_dscan(hw.motor, 0, 10, 11, events=20))
 
     # Quick sanity check on the deltas
-    hw.motor.move(42)
+    hw.motor.set(42)
     msgs = list(nbp.daq_dscan(hw.motor, 0, 10, 11, events=30))
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     assert moves == list(range(42 + 11)) + [42]
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_a2scan(RE, daq, hw):
     logger.debug('test_daq_a2scan')
     daq_test(RE, daq, nbp.daq_a2scan(hw.motor1, 0, 10, hw.motor2, 0, 10, 11,
                                      events=15))
 
 
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_a3scan(RE, daq, hw):
     logger.debug('test_daq_a3scan')
     daq_test(RE, daq, nbp.daq_a3scan(hw.motor1, 0, 10,
