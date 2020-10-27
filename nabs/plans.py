@@ -19,7 +19,8 @@ import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
 
-from .preprocessors import daq_during_wrapper, daq_step_scan_decorator
+from .preprocessors import (_get_daq, daq_during_wrapper,
+                            daq_step_scan_decorator)
 
 
 def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
@@ -257,7 +258,10 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
         Additional metadata to include in the start document.
     """
 
-    detectors = detectors or []
+    if not detectors:
+        # Need to pass something in, grab the daq
+        daq = _get_daq()
+        detectors = [daq]
 
     return (yield from bpp.count(detectors, num=num, delay=delay,
                                  per_shot=per_shot, md=md))
@@ -330,6 +334,8 @@ def daq_scan(*args, num=None, per_step=None, md=None):
                                 per_step=per_step, md=md))
 
 
+@bpp.reset_positions_decorator()
+@daq_step_scan_decorator
 def daq_list_scan(*args, per_step=None, md=None):
     """
     Scan through a multi-motor list trajectory with DAQ support.
