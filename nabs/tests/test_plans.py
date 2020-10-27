@@ -40,7 +40,7 @@ def test_duration_scan(RE, hw):
 
 class SimDelayMotor(FastMotor):
     velocity = Cpt(Signal, value=0)
-    egu = Cpt(Signal, value='m')
+    egu = 'm'
 
 
 class SimDelayStage(DelayBase):
