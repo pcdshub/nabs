@@ -84,7 +84,7 @@ def test_daq_delay_scan(RE, daq, time_motor):
                                    record=True))
     configure_message = None
     for msg in msgs:
-        if msg.command == 'configure' and msg.object is daq:
+        if msg.command == 'configure' and msg.obj is daq:
             configure_message = msg
             break
     assert configure_message is not None, 'Did not find daq configure message.'
