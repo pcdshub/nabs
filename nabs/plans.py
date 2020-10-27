@@ -77,7 +77,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
     # md handling lifted from bluesky.plans.list_scan for consistency
     md_args = list(chain(*((repr(motor), pos_list)
-                           for motor, pos_list in pos_list.items())))
+                           for motor, pos_list in pos_lists.items())))
 
     _md = {'detectors': [det.name for det in detectors],
            'motors': [mot.name for mot in motors],
@@ -94,14 +94,15 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
     _md.update(md or {})
 
-    start = time.time()
-
     @bpp.stage_decorator(detectors + motors)
     @bpp.run_decorator(md=_md)
     def inner():
+        # Start timing after a dummy yield so it doesn't start early
+        yield from bps.null()
+        start = time.monotonic()
         # Where last position is stored
         pos_cache = defaultdict(lambda: None)
-        while time.time() - start < duration:
+        while time.monotonic() - start < duration:
             step = {motor: next(cyc) for motor, cyc in pos_cycles.items()}
             yield from per_step(detectors, step, pos_cache)
 
