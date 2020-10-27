@@ -59,12 +59,14 @@ def test_delay_scan(RE, time_motor):
     """
     logger.debug('test_delay_scan')
 
-    msgs = nbp.delay_scan(time_motor, [0, 1], 1, duration=0.01)
+    # Speed of light is more or less 3e8
+    goal = 1/(3e8)
+    msgs = nbp.delay_scan(time_motor, [0, goal], 1, duration=0.01)
     moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
-    # first point is the velo, which should be inverted speed of light
-    assert np.isclose(moves[0], 1/(3e8))
-    # next we move the time motor between zero and one for a while
-    assert moves[1:5] == [0, 1, 0, 1]
+    # first point is the velo, which should be close to 1 with 1 bounce set
+    assert np.isclose(moves[0], 1, rtol=1e-2)
+    # next we move the time motor between zero and goal
+    assert moves[1:5] == [0, goal, 0, goal]
     # scan should keep going
     assert len(moves) > 20
     # scan should not error if run
