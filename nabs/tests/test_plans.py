@@ -88,8 +88,8 @@ def test_daq_delay_scan(RE, daq, time_motor):
             configure_message = msg
             break
     assert configure_message is not None, 'Did not find daq configure message.'
-    assert configure_message['record'] is True
-    assert configure_message['controls'] == [time_motor]
+    assert configure_message.kwargs['record'] is True
+    assert configure_message.kwargs['controls'] == [time_motor]
 
     # Run the scan
     RE(msgs)
