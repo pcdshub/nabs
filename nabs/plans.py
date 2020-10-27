@@ -262,8 +262,8 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
         daq = nbpp._get_daq()
         detectors = [daq]
 
-    return (yield from bpp.count(detectors, num=num, delay=delay,
-                                 per_shot=per_shot, md=md))
+    return (yield from bp.count(detectors, num=num, delay=delay,
+                                per_shot=per_shot, md=md))
 
 
 @bpp.reset_positions_decorator()

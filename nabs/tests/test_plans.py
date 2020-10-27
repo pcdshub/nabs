@@ -126,7 +126,7 @@ def daq_test(RE, daq, plan):
     """
     logger.debug('daq_test')
     msgs = list(plan)
-    assert_scan_has_daq(msgs)
+    assert_scan_has_daq(msgs, daq)
     RE(msgs)
     return msgs
 

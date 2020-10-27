@@ -45,6 +45,11 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     The DAQ trigger and the DAQ read always go first, before any other triggers
     or reads, to ensure all events are recorded.
 
+    If the DAQ is manually passed into the wrapped plan, and it is the first
+    detector in the list, we will skip adding a redundant trigger/read. If the
+    DAQ is manually passed in as the second detector or later we will end up
+    with two triggers and two reads, which can cause problems.
+
     Parameters
     ----------
     plan : plan
