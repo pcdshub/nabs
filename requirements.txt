@@ -1,3 +1,4 @@
 bluesky
+numpy
 scipy
 toolz
