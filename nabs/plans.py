@@ -19,8 +19,7 @@ import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
 
-from .preprocessors import (_get_daq, daq_during_wrapper,
-                            daq_step_scan_decorator)
+from . import preprocessors as nbpp
 
 
 def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
@@ -199,7 +198,7 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     :func:`duration_scan`
     """
 
-    @daq_during_wrapper(record=record, controls=[time_motor])
+    @nbpp.daq_during_decorator(record=record, controls=[time_motor])
     def inner_daq_delay_scan():
         return (yield from delay_scan(time_motor, time_points, sweep_time,
                                       duration=duration))
@@ -212,7 +211,7 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
 # easing the transition to bluesky.
 
 
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
     """
     Take repeated DAQ runs with no motors.
@@ -260,7 +259,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
 
     if not detectors:
         # Need to pass something in, grab the daq
-        daq = _get_daq()
+        daq = nbpp._get_daq()
         detectors = [daq]
 
     return (yield from bpp.count(detectors, num=num, delay=delay,
@@ -268,7 +267,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
 
 
 @bpp.reset_positions_decorator()
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_scan(*args, num=None, per_step=None, md=None):
     """
     Scan through a multi-motor start, end, num trajectory with DAQ support.
@@ -335,7 +334,7 @@ def daq_scan(*args, num=None, per_step=None, md=None):
 
 
 @bpp.reset_positions_decorator()
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_list_scan(*args, per_step=None, md=None):
     """
     Scan through a multi-motor list trajectory with DAQ support.
@@ -399,7 +398,7 @@ def daq_list_scan(*args, per_step=None, md=None):
 
 
 @bpp.reset_positions_decorator()
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_ascan(motor, start, end, nsteps):
     """
     One-dimensional daq scan with absolute positions.
@@ -444,7 +443,7 @@ def daq_ascan(motor, start, end, nsteps):
 
 @bpp.relative_set_decorator()
 @bpp.reset_positions_decorator()
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_dscan(motor, start, end, nsteps):
     """
     One-dimensional daq scan with relative (delta) positions.
@@ -488,7 +487,7 @@ def daq_dscan(motor, start, end, nsteps):
 
 
 @bpp.reset_positions_decorator()
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
     """
     Two-dimensional daq scan with absolute positions.
@@ -541,7 +540,7 @@ def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
 
 
 @bpp.reset_positions_decorator()
-@daq_step_scan_decorator
+@nbpp.daq_step_scan_decorator
 def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
     Three-dimensional daq scan with absolute positions.
