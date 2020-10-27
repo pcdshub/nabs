@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 import pytest
-from ophyd.signal import Component as Cpt
+from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
 from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
