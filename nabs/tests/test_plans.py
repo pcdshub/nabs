@@ -178,7 +178,7 @@ def test_daq_dscan(RE, daq, hw):
     hw.motor.set(42)
     msgs = list(nbp.daq_dscan(hw.motor, 0, 10, 11, events=30))
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
-    assert moves == list(range(42 + 11)) + [42]
+    assert moves == list(range(42, 42 + 11)) + [42]
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
