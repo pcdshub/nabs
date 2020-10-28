@@ -62,8 +62,8 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
         """
         Make sure no message from the original plan is lost.
         """
-        for msg in nodaq_msg_list:
-            assert msg in daq_msg_list
+        daq_without_daq = [msg for msg in daq_msg_list if msg.obj is not daq]
+        assert daq_without_daq == nodaq_msg_list
 
     nodaq_with_det = list(bp.scan([hw.det], hw.motor, 0, 10, 11))
     assert_no_lost_msg(nodaq_with_det, nodaq_with_det)
