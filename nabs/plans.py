@@ -441,8 +441,8 @@ def daq_ascan(motor, start, end, nsteps):
     yield from bp.scan([], motor, start, end, nsteps)
 
 
-@bpp.relative_set_decorator()
 @bpp.reset_positions_decorator()
+@bpp.relative_set_decorator()
 @nbpp.daq_step_scan_decorator
 def daq_dscan(motor, start, end, nsteps):
     """
