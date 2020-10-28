@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 import numpy as np
 import pytest
@@ -104,21 +105,30 @@ def assert_scan_has_daq(msgs, daq):
     built-in bluesky plan with the daq added to it.
 
     We check for the following things:
-    1. The DAQ is staged
-    2. The DAQ is configured
+    1. The DAQ is staged (exactly once)
+    2. The DAQ is configured (exactly once)
     3. The DAQ is triggered
     4. The DAQ is read
-    5. The DAQ is unstaged
+    5. The DAQ is unstaged (exactly once)
     """
     logger.debug('assert_scan_has_daq')
 
-    message_types = {msg.command for msg in msgs if msg.obj is daq}
+    message_types = defaultdict(int)
+
+    for msg in msgs:
+        if msg.obj is daq:
+            message_types[msg.command] = message_types[msg.command] + 1
 
     assert 'stage' in message_types, 'Scan does not stage daq.'
     assert 'configure' in message_types, 'Scan does not configure daq.'
     assert 'trigger' in message_types, 'Scan does not trigger daq.'
     assert 'read' in message_types, 'Scan does not read daq.'
     assert 'unstage' in message_types, 'Scan does not unstage daq.'
+
+    assert message_types['stage'] == 1, 'Scan stages daq multiple times.'
+    assert message_types['configure'] == 1, ('Scan configures daq multiple '
+                                             'times.')
+    assert message_types['unstage'] == 1, 'Scan unstages daq multiple times.'
 
 
 def daq_test(RE, daq, plan):
@@ -135,48 +145,48 @@ def daq_test(RE, daq, plan):
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_count(RE, daq, hw):
     logger.debug('test_daq_count')
-    daq_test(RE, daq, nbp.daq_count(events=10))
-    daq_test(RE, daq, nbp.daq_count(num=5, events=20))
-    daq_test(RE, daq, nbp.daq_count([hw.det], num=5, events=5))
+    daq_test(RE, daq, nbp.daq_count(events=1))
+    daq_test(RE, daq, nbp.daq_count(num=5, events=1))
+    daq_test(RE, daq, nbp.daq_count([hw.det], num=5, events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_scan(RE, daq, hw):
     logger.debug('test_daq_scan')
-    daq_test(RE, daq, nbp.daq_scan(hw.motor, 0, 10, 11, events=15))
-    daq_test(RE, daq, nbp.daq_scan([hw.det], hw.motor, 0, 10, 11, events=5))
+    daq_test(RE, daq, nbp.daq_scan(hw.motor, 0, 10, 11, events=1))
+    daq_test(RE, daq, nbp.daq_scan([hw.det], hw.motor, 0, 10, 11, events=1))
     daq_test(RE, daq, nbp.daq_scan([hw.det1, hw.det2],
                                    hw.motor1, 0, 10,
                                    hw.motor2, 0, 10, 11,
-                                   events=20))
+                                   events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_list_scan(RE, daq, hw):
     logger.debug('test_daq_list_scan')
-    daq_test(RE, daq, nbp.daq_list_scan(hw.motor, list(range(10)), events=10))
+    daq_test(RE, daq, nbp.daq_list_scan(hw.motor, list(range(10)), events=1))
     daq_test(RE, daq, nbp.daq_list_scan([hw.det], hw.motor, list(range(10)),
-                                        events=20))
+                                        events=1))
     daq_test(RE, daq, nbp.daq_list_scan([hw.det1, hw.det2],
                                         hw.motor1, list(range(10)),
                                         hw.motor2, list(range(10)),
-                                        events=15))
+                                        events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_ascan(RE, daq, hw):
     logger.debug('test_daq_ascan')
-    daq_test(RE, daq, nbp.daq_ascan(hw.motor, 0, 10, 11, events=10))
+    daq_test(RE, daq, nbp.daq_ascan(hw.motor, 0, 10, 11, events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_dscan(RE, daq, hw):
     logger.debug('test_daq_dscan')
-    daq_test(RE, daq, nbp.daq_dscan(hw.motor, 0, 10, 11, events=20))
+    daq_test(RE, daq, nbp.daq_dscan(hw.motor, 0, 10, 11, events=1))
 
     # Quick sanity check on the deltas
     hw.motor.set(42)
-    msgs = list(nbp.daq_dscan(hw.motor, 0, 10, 11, events=30))
+    msgs = list(nbp.daq_dscan(hw.motor, 0, 10, 11, events=1))
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     assert moves == list(range(42, 42 + 11)) + [42]
 
@@ -185,7 +195,7 @@ def test_daq_dscan(RE, daq, hw):
 def test_daq_a2scan(RE, daq, hw):
     logger.debug('test_daq_a2scan')
     daq_test(RE, daq, nbp.daq_a2scan(hw.motor1, 0, 10, hw.motor2, 0, 10, 11,
-                                     events=15))
+                                     events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
@@ -194,4 +204,4 @@ def test_daq_a3scan(RE, daq, hw):
     daq_test(RE, daq, nbp.daq_a3scan(hw.motor1, 0, 10,
                                      hw.motor2, 0, 10,
                                      hw.motor3, 0, 10, 11,
-                                     events=20))
+                                     events=1))
