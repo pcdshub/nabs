@@ -92,13 +92,11 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         yield from bps.configure(daq, events=events, duration=duration,
                                  record=record, use_l3t=use_l3t,
                                  controls=list(motor_cache))
-        yield from daq_next_cycle(msg)
+        if msg.obj is not daq:
+            yield from daq_next_cycle(msg)
 
     def daq_next_cycle(msg):
-        if msg.obj is daq:
-            yield from bps.null()
-        else:
-            yield from bps.trigger(daq, group=msg.kwargs['group'])
+        yield from bps.trigger(daq, group=msg.kwargs['group'])
 
     def daq_mutator(msg):
         nonlocal first_calib_cycle
@@ -115,7 +113,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
             if first_calib_cycle:
                 first_calib_cycle = False
                 return daq_first_cycle(msg), None
-            else:
+            elif msg.obj is not daq:
                 return daq_next_cycle(msg), None
         # Insert daq read before first read
         elif msg.command == 'read' and first_read:
