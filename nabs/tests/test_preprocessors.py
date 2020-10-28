@@ -51,12 +51,25 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
         assert found_trigger, 'Did not find daq trigger in msg list.'
         assert found_read, 'Did not find daq read in msg list.'
 
-    with_det = list(daq_step_scan([hw.det], hw.motor, 0, 10, 11, events=10,
-                                  record=False, use_l3t=True))
-    assert_daq_messages(with_det)
-    none_det = list(daq_step_scan([], hw.motor, 0, 10, 11, events=10,
-                                  record=False, use_l3t=True))
-    assert_daq_messages(none_det)
+    daq_with_det = list(daq_step_scan([hw.det], hw.motor, 0, 10, 11, events=10,
+                                      record=False, use_l3t=True))
+    assert_daq_messages(daq_with_det)
+    daq_none_det = list(daq_step_scan([], hw.motor, 0, 10, 11, events=10,
+                                      record=False, use_l3t=True))
+    assert_daq_messages(daq_none_det)
+
+    def assert_no_lost_msg(daq_msg_list, nodaq_msg_list):
+        """
+        Make sure no message from the original plan is lost.
+        """
+        for msg in nodaq_msg_list:
+            assert msg in daq_msg_list
+
+    nodaq_with_det = list(bp.scan([hw.det], hw.motor, 0, 10, 11))
+    assert_no_lost_msg(nodaq_with_det, nodaq_with_det)
+
+    nodaq_none_det = list(bp.scan([], hw.motor, 0, 10, 11))
+    assert_no_lost_msg(nodaq_none_det, nodaq_none_det)
 
 
 def test_daq_step_scan_run(RE, hw, daq_step_scan):

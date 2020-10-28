@@ -92,11 +92,17 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         yield from bps.configure(daq, events=events, duration=duration,
                                  record=record, use_l3t=use_l3t,
                                  controls=list(motor_cache))
-        if msg.obj is not daq:
-            yield from daq_next_cycle(msg)
+        return (yield from add_daq_trigger(msg))
 
-    def daq_next_cycle(msg):
-        yield from bps.trigger(daq, group=msg.kwargs['group'])
+    def add_daq_trigger(msg):
+        if msg.obj is not daq:
+            yield from bps.trigger(daq, group=msg.kwargs['group'])
+        return (yield msg)
+
+    def add_daq_read(msg):
+        if msg.obj is not daq:
+            yield from bps.read(daq)
+        return (yield msg)
 
     def daq_mutator(msg):
         nonlocal first_calib_cycle
@@ -113,13 +119,13 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
             if first_calib_cycle:
                 first_calib_cycle = False
                 return daq_first_cycle(msg), None
-            elif msg.obj is not daq:
-                return daq_next_cycle(msg), None
+            else:
+                return add_daq_trigger(msg), None
         # Insert daq read before first read
         elif msg.command == 'read' and first_read:
             first_read = False
             if msg.obj is not daq:
-                return bps.read(daq), None
+                return add_daq_read(msg), None
         # Gather all moving devices for the daq controls configuration arg
         elif msg.command == 'set':
             motor_cache.add(msg.obj)
