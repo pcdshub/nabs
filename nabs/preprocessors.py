@@ -32,6 +32,21 @@ def _get_daq():
     return get_daq()
 
 
+class _Dummy:
+    """
+    Class to sub in for the DAQ when we need to drop a message.
+
+    You cant just remove a message entirely with plan_mutator, you need
+    to yield a compatible message. To accomplish this we sub in a dummy object
+    for the daq to create a no-op with the right return value.
+    """
+    def stage(self):
+        return [self]
+
+    def unstage(self):
+        return [self]
+
+
 def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
                           use_l3t=False):
     """
@@ -104,6 +119,12 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
             yield from bps.read(daq)
         return (yield msg)
 
+    def drop_daq_msg(msg):
+        if msg.command == 'stage':
+            return (yield from bps.stage(_Dummy()))
+        elif msg.command == 'unstage':
+            return (yield from bps.unstage(_Dummy()))
+
     def daq_mutator(msg):
         nonlocal first_calib_cycle
         nonlocal first_trigger
@@ -129,6 +150,9 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         # Gather all moving devices for the daq controls configuration arg
         elif msg.command == 'set':
             motor_cache.add(msg.obj)
+        # Strip redundant DAQ stages from inner plan
+        elif msg.command in ('stage', 'unstage') and msg.obj is daq:
+            return drop_daq_msg(msg), None
         # If didn't mutate, return the (None, None) signal for plan_mutator
         return None, None
 
