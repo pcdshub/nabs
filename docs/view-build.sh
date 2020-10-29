@@ -1,2 +1,2 @@
 #!/bin/bash
-firefox --no-remote "file://$(readlink -f ./build/html/index.html)"
+xdg-open build/html/index.html
