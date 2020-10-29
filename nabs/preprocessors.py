@@ -36,7 +36,7 @@ class _Dummy:
     """
     Class to sub in for the DAQ when we need to drop a message.
 
-    You cant just remove a message entirely with plan_mutator, you need
+    You can't just remove a message entirely with plan_mutator, you need
     to yield a compatible message. To accomplish this we sub in a dummy object
     for the daq to create a no-op with the right return value.
     """
