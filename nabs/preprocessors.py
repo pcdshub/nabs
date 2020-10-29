@@ -122,7 +122,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     def drop_daq_msg(msg):
         if msg.command == 'stage':
             return (yield from bps.stage(_Dummy()))
-        elif msg.command == 'unstage':
+        if msg.command == 'unstage':
             return (yield from bps.unstage(_Dummy()))
 
     def daq_mutator(msg):
