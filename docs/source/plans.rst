@@ -13,7 +13,7 @@ Implementation
 ==============
 The ``bluesky`` module features a ``plan mutator`` concept, which allows
 us to intercept messages and modify what execution instructions the
-run engine recieves. In this way, we can "magically" include DAQ support
+run engine receives. In this way, we can "magically" include DAQ support
 in any existing ``bluesky`` plan in a standardized way.
 
 See :ref:`Preprocessors API` for the various magic methods we use to
