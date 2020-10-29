@@ -7,37 +7,40 @@ API Changes
 
 Features
 --------
-- Added the :mod:`nabs.plans` module with the following functions:
-  - :func:`nabs.plans.duration_scan`:
+- Added the `nabs.plans` module with the following functions:
+
+  - `nabs.plans.duration_scan`:
     A bluesky plan that moves a motor back and forth for a fixed duration.
-  - :func:`nabs.plans.delay_scan`:
+  - `nabs.plans.delay_scan`:
     A bluesky plan that configures a sweep time for a laser delay stage
-    and runs a :func:`nabs.plans.duration scan`.
-  - :func:`nabs.plans.daq_delay_scan`:
-    A bluesky plan that runs the daq during a :func:`nabs.plans.delay_scan`.
-  - :func:`nabs.plans.daq_count`:
+    and runs a `nabs.plans.duration_scan`.
+  - `nabs.plans.daq_delay_scan`:
+    A bluesky plan that runs the daq during a `nabs.plans.delay_scan`.
+  - `nabs.plans.daq_count`:
     A bluesky plan that runs the daq n times while moving no motors.
-  - :func:`nabs.plans.daq_scan`:
+  - `nabs.plans.daq_scan`:
     A bluesky plan that runs calib cycles at each step while doing the built-in bluesky nd ``scan`` plan, returning motors to their original positions after the scan.
-  - :func:`nabs.plans.daq_list_scan`:
+  - `nabs.plans.daq_list_scan`:
     A bluesky plan that runs calib cycles at each step while doing the built-in bluesky ``list_scan`` plan, returning motors to their original positions after the scan.
-  - :func:`nabs.plans.daq_ascan`:
+  - `nabs.plans.daq_ascan`:
     A bluesky plan that runs calib cycles at each step of a traditional 1D ascan (absolute scan), returning motors to their original positions after the scan.
-  - :func:`nabs.plans.daq_dscan`:
+  - `nabs.plans.daq_dscan`:
     A bluesky plan that runs calib cycles at each step of a traditional 1D dscan (delta scan), returning motors to their original positions after the scan.
-  - :func:`nabs.plans.daq_a2scan`:
-    A 2-dimensional :func:`nabs.plans.daq_ascan`.
-  - :func:`nabs.plans.daq_a3scan`:
-    A 3-dimensional :func:`nabs.plans.daq_ascan`.
-- Added the :mod:`nabs.preprocessors` module with the following functions:
-  - :func:`nabs.preprocessors.daq_step_scan_wrapper`:
+  - `nabs.plans.daq_a2scan`:
+    A 2-dimensional `nabs.plans.daq_ascan`.
+  - `nabs.plans.daq_a3scan`:
+    A 3-dimensional `nabs.plans.daq_ascan`.
+
+- Added the `nabs.preprocessors` module with the following functions:
+
+  - `nabs.preprocessors.daq_step_scan_wrapper`:
     A wrapper that mutates incoming messages from a plan to also include DAQ calib cycles as required for a step scan.
-  - :func:`nabs.preprocessors.daq_step_scan_decorator`:
+  - `nabs.preprocessors.daq_step_scan_decorator`:
     A function decorator that modifies a plan to add standard DAQ configuration arguments and to run properly with the DAQ as a step scan.
-  - :func:`nabs.preprocessors.daq_during_wrapper`:
+  - `nabs.preprocessors.daq_during_wrapper`:
     A wrapper that mutates a plan to run the DAQ in the background as a flyer during plan execution.
-  - :func:`nabs.preprocessors.daq_during_decorator`:
-    A function decorator that modifies a plan to execute using the :func:`nabs.preprocessors.daq_during_wrapper`.
+  - `nabs.preprocessors.daq_during_decorator`:
+    A function decorator that modifies a plan to execute using the `nabs.preprocessors.daq_during_wrapper`.
 
 Bugfixes
 --------

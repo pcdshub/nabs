@@ -84,6 +84,9 @@ language = None
 # This pattern also affects html_static_path and html_extra_path .
 exclude_patterns = []
 
+# The reST default role (used for this markup: `text`)
+default_role = 'any'
+
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
