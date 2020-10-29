@@ -32,7 +32,6 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     This will take a reading at every scan step by default via
     trigger_and_read.
 
-
     Parameters
     ----------
     detectors : list of readables
