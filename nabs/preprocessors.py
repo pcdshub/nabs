@@ -24,7 +24,7 @@ def _get_daq():
 
     Returns
     -------
-    daq: Daq
+    daq : Daq
         The DAQ (data aquisition) system bluesky-compatible control object.
     """
 
