@@ -277,6 +277,11 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
 
     md : dict, optional
         Additional metadata to include in the start document.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     if not detectors:
@@ -342,6 +347,11 @@ def daq_scan(*args, num=None, per_step=None, md=None):
 
     md : dict, optional
         Additional metadata to include in the start document.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     if isinstance(args[0], list):
@@ -406,6 +416,11 @@ def daq_list_scan(*args, per_step=None, md=None):
 
     md : dict, optional
         Additional metadata to include in the start document.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     if isinstance(args[0], list):
@@ -458,6 +473,11 @@ def daq_ascan(motor, start, end, nsteps):
     use_l3t : bool, optional
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan([], motor, start, end, nsteps)
@@ -503,6 +523,11 @@ def daq_dscan(motor, start, end, nsteps):
     use_l3t : bool, optional
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan([], motor, start, end, nsteps)
@@ -556,6 +581,11 @@ def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
     use_l3t : bool, optional
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, nsteps)
@@ -618,6 +648,11 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     use_l3t : bool, optional
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
+
+    Note
+    ----
+    The events, duration, record, and use_l3t arguments come from the
+    `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
