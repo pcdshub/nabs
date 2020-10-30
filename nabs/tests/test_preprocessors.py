@@ -80,6 +80,15 @@ def test_daq_step_scan_run(RE, hw, daq_step_scan):
                      use_l3t=True))
 
 
+def test_daq_step_scan_misconfigured(RE, hw, daq, daq_step_scan):
+    """
+    Check that we raise a TypeError when DAQ is passed as second detector.
+    """
+    with pytest.raises(TypeError):
+        list(daq_step_scan([hw.det, daq], hw.motor, 0, 10, 11, events=10,
+                           record=False, use_l3t=True))
+
+
 def test_daq_during_decorator(RE, daq):
     """
     Run a daq during scan and make sure the daq is running during it.

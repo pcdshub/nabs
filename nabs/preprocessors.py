@@ -65,7 +65,8 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     If the DAQ is manually passed into the wrapped plan, and it is the first
     detector in the list, we will skip adding a redundant trigger/read. If the
     DAQ is manually passed in as the second detector or later we will end up
-    with two triggers and two reads, which can cause problems.
+    with two triggers and two reads, which can cause problems. Running a scan
+    like this will raise a ``TypeError``.
 
     See `daq_step_scan_decorator` for the function decorator version.
 
@@ -104,6 +105,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         first_calib_cycle = True
         first_trigger = True
         first_read = True
+        daq_has_triggered = False
 
     def daq_first_cycle(msg):
         yield from bps.configure(daq, events=events, duration=duration,
@@ -132,14 +134,22 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         if msg.command in ('save', 'drop'):
             State.first_trigger = True
             State.first_read = True
+            State.daq_has_triggered = False
         # Insert daq trigger before first trigger
-        elif msg.command == 'trigger' and State.first_trigger:
-            State.first_trigger = False
-            # Configure before the first begin (after we've found all motors)
-            if State.first_calib_cycle:
-                State.first_calib_cycle = False
-                return daq_first_cycle(msg), None
-            return add_daq_trigger(msg), None
+        elif msg.command == 'trigger':
+            if msg.obj is daq:
+                if State.daq_has_triggered:
+                    raise TypeError('Scan misconfigured; daq cannot be passed '
+                                    'unless it is the first detector.')
+                else:
+                    State.daq_has_triggered = True
+            if State.first_trigger:
+                State.first_trigger = False
+                # Configure before the first begin (after all motors found)
+                if State.first_calib_cycle:
+                    State.first_calib_cycle = False
+                    return daq_first_cycle(msg), None
+                return add_daq_trigger(msg), None
         # Insert daq read before first read
         elif msg.command == 'read' and State.first_read:
             State.first_read = False
