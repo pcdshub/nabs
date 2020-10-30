@@ -140,6 +140,8 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     velocity to match the configured sweep time and returns the motor to the
     starting position at the end of the scan.
 
+    See `daq_delay_scan` for the version with DAQ support.
+
     Parameters
     ----------
     time_motor : `pcdsdevices.epics_motor.DelayNewport`
@@ -153,11 +155,6 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
 
     duration : float, optional
         If provided, the time to run in seconds. If omitted, we'll run forever.
-
-    See Also
-    --------
-    `daq_delay_scan`
-    `duration_scan`
     """
 
     spatial_pts = []
@@ -190,7 +187,8 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
 
     This is a `duration_scan` in one dimension that also sets the stage
     velocity to match the configured sweep time and returns the motor to the
-    starting position at the end of the scan.
+    starting position at the end of the scan. It is the `delay_scan` with
+    the DAQ added.
 
     Parameters
     ----------
@@ -209,11 +207,6 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     record : bool, optional
         Whether or not to record the run in the DAQ. Defaults to True because
         we don't want to accidentally skip recording good runs.
-
-    See Also
-    --------
-    `delay_scan`
-    `duration_scan`
     """
 
     @nbpp.daq_during_decorator(record=record, controls=[time_motor])

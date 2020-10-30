@@ -67,6 +67,8 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     DAQ is manually passed in as the second detector or later we will end up
     with two triggers and two reads, which can cause problems.
 
+    See `daq_step_scan_decorator` for the function decorator version.
+
     Parameters
     ----------
     plan : plan
@@ -93,10 +95,6 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     daq_step_plan : plan
         The same plan as before, but modified appropriately to the run the DAQ
         at every step. This will be an open generator.
-
-    See Also
-    --------
-    `daq_step_scan_decorator`
     """
 
     daq = _get_daq()
@@ -187,11 +185,6 @@ def daq_step_scan_decorator(plan):
     daq_step_plan : plan
         The same plan as before, but modified appropriately for DAQ use.
         This will be a callable generator function.
-
-    See Also
-    --------
-    `daq_step_scan_wrapper`
-    `daq_step_scan_standard_args`
     """
 
     @wraps(plan)
