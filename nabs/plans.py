@@ -113,7 +113,7 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     `bluesky` plan that sets up and executes the delay scan.
 
     A delay scan is one that moves a
-    `pcdsdevices.pseudopos.DelayNewport` back and forth.
+    `pcdsdevices.epics_motor.DelayNewport` back and forth.
     Underneath, this moves a physical motor that changes the path length
     of an optical laser, thus changing the timing of the laser shot by
     introducing a delay.
@@ -124,7 +124,7 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
 
     Parameters
     ----------
-    time_motor : `pcdsdevices.pseudopos.DelayNewport`
+    time_motor : `pcdsdevices.epics_motor.DelayNewport`
         The movable device in egu seconds.
 
     time_points : list of float
@@ -166,7 +166,7 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     Scan a laser delay timing motor with DAQ support.
 
     A delay scan is one that moves a
-    `pcdsdevices.pseudopos.DelayNewport` back and forth.
+    `pcdsdevices.epics_motor.DelayNewport` back and forth.
     Underneath, this moves a physical motor that changes the path length
     of an optical laser, thus changing the timing of the laser shot by
     introducing a delay.
@@ -177,7 +177,7 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
 
     Parameters
     ----------
-    time_motor : `pcdsdevices.pseudopos.DelayNewport`
+    time_motor : `pcdsdevices.epics_motor.DelayNewport`
         The movable device in egu seconds.
 
     time_points : list of float
