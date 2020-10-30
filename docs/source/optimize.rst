@@ -2,7 +2,7 @@
 Optimization
 ============
 
-.. curentmodule:: nabs.optimize
+.. currentmodule:: nabs.optimize
 
 Concept
 =======
