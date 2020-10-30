@@ -106,6 +106,8 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     if len(x_fields) > 0:
         default_hints.update(dimensions=default_dimensions)
 
+    md = md or {}
+
     _md['hints'] = default_hints
     _md['hints'].update(md.get('hints', {}) or {})
     # end borrowed md handling block
