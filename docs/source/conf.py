@@ -57,7 +57,7 @@ extensions = [
 
 # Add custom CSS to avoid table wraps
 def setup(app):
-    app.add_stylesheet('custom.css')
+    app.add_css_file('custom.css')
 
 autosummary_generate = True
 
