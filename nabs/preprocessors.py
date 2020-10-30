@@ -268,10 +268,11 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
         Whether or not the use the l3t filter for the events argument. Defaults
         to False to avoid confusion from unconfigured filters.
 
-    controls : list of readables, optional
+    controls : list of positioners or signals, optional
         If provided, values from these will make it into the DAQ data
-        stream as variables. For this purpose, the position and value
-        attributes will be checked.
+        stream as variables. For this purpose, the ``.position`` and
+        ``.value`` attributes will be checked, followed by the ``.get()``
+        method.
 
     Returns
     -------
