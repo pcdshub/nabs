@@ -278,7 +278,9 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
     """
 
     if not detectors:
-        # Need to pass something in, grab the daq
+        # count and daq_step_scan_decorator both need a detector to work
+        # so if none are found, we pass the daq explicitly
+        # otherwise, the decorator takes care of all the heavy lifting
         daq = nbpp._get_daq()
         detectors = [daq]
 
