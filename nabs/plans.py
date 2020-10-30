@@ -32,6 +32,9 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     This will take a reading at every scan step by default via
     `bluesky.plan_stubs.trigger_and_read.`
 
+    At the end of the scan, the motors will be returned to their original
+    positions.
+
     Parameters
     ----------
     detectors : list of readables
@@ -94,6 +97,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     _md.update(md or {})
 
     @bpp.stage_decorator(detectors + motors)
+    @bpp.reset_positions_decorator()
     @bpp.run_decorator(md=_md)
     def inner():
         # Start timing after a dummy yield so it doesn't start early
@@ -151,7 +155,6 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     space_delta = abs(spatial_pts[0] - spatial_pts[1])
     velo = space_delta/sweep_time
 
-    @bpp.reset_positions_decorator()
     def inner_delay_scan():
         yield from bps.abs_set(time_motor.motor.velocity, velo)
         return (yield from duration_scan([], time_motor, time_points,
