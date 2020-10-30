@@ -96,6 +96,20 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
     _md.update(md or {})
 
+    x_fields = []
+    for motor in motors:
+        x_fields.extend(getattr(motor, 'hints', {}).get('fields', []))
+
+    default_dimensions = [(x_fields, 'primary')]
+
+    default_hints = {}
+    if len(x_fields) > 0:
+        default_hints.update(dimensions=default_dimensions)
+
+    _md['hints'] = default_hints
+    _md['hints'].update(md.get('hints', {}) or {})
+    # end borrowed md handling block
+
     @bpp.stage_decorator(detectors + motors)
     @bpp.reset_positions_decorator()
     @bpp.run_decorator(md=_md)
