@@ -99,9 +99,11 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
 
     daq = _get_daq()
     motor_cache = set()
-    first_calib_cycle = True
-    first_trigger = True
-    first_read = True
+
+    class State:
+        first_calib_cycle = True
+        first_trigger = True
+        first_read = True
 
     def daq_first_cycle(msg):
         yield from bps.configure(daq, events=events, duration=duration,
@@ -126,24 +128,21 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
             return (yield from bps.unstage(_Dummy()))
 
     def daq_mutator(msg):
-        nonlocal first_calib_cycle
-        nonlocal first_trigger
-        nonlocal first_read
         # Reset "first" flags after closing a bundle
         if msg.command in ('save', 'drop'):
-            first_trigger = True
-            first_read = True
+            State.first_trigger = True
+            State.first_read = True
         # Insert daq trigger before first trigger
-        elif msg.command == 'trigger' and first_trigger:
-            first_trigger = False
+        elif msg.command == 'trigger' and State.first_trigger:
+            State.first_trigger = False
             # Configure before the first begin (after we've found all motors)
-            if first_calib_cycle:
-                first_calib_cycle = False
+            if State.first_calib_cycle:
+                State.first_calib_cycle = False
                 return daq_first_cycle(msg), None
             return add_daq_trigger(msg), None
         # Insert daq read before first read
-        elif msg.command == 'read' and first_read:
-            first_read = False
+        elif msg.command == 'read' and State.first_read:
+            State.first_read = False
             if msg.obj is not daq:
                 return add_daq_read(msg), None
         # Gather all moving devices for the daq controls configuration arg
