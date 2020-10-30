@@ -255,6 +255,9 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
     `daq_during_wrapper`, but it is meant to be used as a function
     decorator.
 
+    Internally, this uses the flyer interface of the `pcdsdaq.daq.Daq`
+    object.
+
     Parameters
     ----------
     plan : plan
