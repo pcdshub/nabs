@@ -153,8 +153,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         # Insert daq read before first read
         elif msg.command == 'read' and State.first_read:
             State.first_read = False
-            if msg.obj is not daq:
-                return add_daq_read(msg), None
+            return add_daq_read(msg), None
         # Gather all moving devices for the daq controls configuration arg
         elif msg.command == 'set':
             motor_cache.add(msg.obj)
