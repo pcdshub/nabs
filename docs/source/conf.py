@@ -47,11 +47,12 @@ release = nabs.__version__
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
+    'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
+    'sphinx.ext.githubpages',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
-    'sphinx.ext.autosectionlabel'
+    'sphinx.ext.viewcode',
 ]
 
 # Add custom CSS to avoid table wraps
@@ -178,3 +179,9 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
+intersphinx_mapping = {
+    'bluesky': ('https://blueskyproject.io/bluesky', None),
+    'ophyd': ('https://blueskyproject.io/ophyd', None),
+    'pcdsdaq': ('https://pcdshub.github.io/pcdsdaq', None),
+    'pcdsdevices': ('https://pcdshub.github.io/pcdsdevices', None),
+}

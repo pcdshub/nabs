@@ -3,11 +3,11 @@ from ophyd.signal import DerivedSignal, SignalRO
 
 class InvertedSignal(DerivedSignal):
     """
-    Invert another Ophyd Signal
+    Invert another `ophyd` Signal
 
     Parameters
     ----------
-    derived_from: ophyd.Signal
+    derived_from: `ophyd.signal.Signal`
         Ophyd Signal
     """
     def __init__(self, derived_from, *, name=None, **kwargs):
@@ -35,7 +35,7 @@ class ErrorSignal(SignalRO, DerivedSignal):
 
     Parameters
     ----------
-    derived_from : ophyd.Signal
+    derived_from : `ophyd.signal.Signal`
 
     target : float
         Position of zero error

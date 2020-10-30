@@ -11,8 +11,9 @@ class AverageStream(LiveDispatcher):
     """
     Stream that averages data points together
 
-    As event documents are emitted from the RunEngine they are collected by
-    AverageStream, averaged and re-emitted as a secondary event stream. This
+    As event documents are emitted from the `bluesky.run_engine.RunEngine`
+    they are collected by ``AverageStream``, averaged, and re-emitted
+    as a secondary event stream. This
     allows callbacks to subscribe to the average stream for more elegant
     visualization and analysis.
 

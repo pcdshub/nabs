@@ -1,7 +1,7 @@
 """
 Plan pieces that may be useful for assembling plans.
 
-This is the LCLS counterpart to bluesky.plan_stubs.
+This is the LCLS counterpart to `bluesky.plan_stubs`.
 
 The plans in this module are not meant to be run individually, instead these
 are intended as building blocks for other complete plans.
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 def measure_average(detectors, num, delay=None, stream=None):
     """
-    Measure an average over a number of shots from a set of detectors
+    Measure an average over a number of shots from a set of detectors.
 
     Parameters
     ----------
@@ -29,12 +29,12 @@ def measure_average(detectors, num, delay=None, stream=None):
     num : int
         Number of shots to average together
 
-    delay: iterable or scalar, optional
+    delay : iterable or scalar, optional
         Time delay between successive readings. See ``bluesky.count`` for more
         details
 
-    stream : AverageStream, optional
-        If a plan will call :func:`.measure_average` multiple times, a single
+    stream : `nabs.streams.AverageStream`, optional
+        If a plan will call `measure_average` multiple times, a single
         ``AverageStream`` instance can be created and then passed in on each
         call. This allows other callbacks to subscribe to the averaged data
         stream. If no ``AverageStream`` is provided then one is created for the

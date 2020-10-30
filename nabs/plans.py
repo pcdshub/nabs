@@ -1,10 +1,10 @@
 """
-Standalone bluesky plans for data collection.
+Standalone `bluesky` plans for data collection.
 
-This is the LCLS counterpart to bluesky.plans.
+This is the LCLS counterpart to `bluesky.plans`.
 
 All plans in this module will work as-is when passed into a
-bluesky Run Engine, including starting and stopping a run.
+`bluesky.run_engine.RunEngine`, including starting and stopping a run.
 
 Plans preceded by "daq" incorporate running the LCLS DAQ in the plan.
 """
@@ -30,7 +30,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     through its list of points simultaneously if multiple motors are provided.
 
     This will take a reading at every scan step by default via
-    trigger_and_read.
+    `bluesky.plan_stubs.trigger_and_read.`
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
     per_step : plan, optional
         An alternate plan to run for every scan point. Defaults to
-        one_nd_step.
+        `bluesky.plan_stubs.one_nd_step`.
 
     md : dict, optional
         Additional metadata to include in the bluesky start document.
@@ -110,20 +110,21 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
 def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     """
-    Bluesky plan that sets up and executes the delay scan.
+    `bluesky` plan that sets up and executes the delay scan.
 
-    A delay scan is one that moves a "delay" PseudoPositioner back and forth.
+    A delay scan is one that moves a
+    `pcdsdevices.pseudopos.DelayNewport` back and forth.
     Underneath, this moves a physical motor that changes the path length
     of an optical laser, thus changing the timing of the laser shot by
     introducing a delay.
 
-    This is a :func:`duration_scan` in one dimension that also sets the stage
+    This is a `duration_scan` in one dimension that also sets the stage
     velocity to match the configured sweep time and returns the motor to the
     starting position at the end of the scan.
 
     Parameters
     ----------
-    time_motor : DelayNewport
+    time_motor : `pcdsdevices.pseudopos.DelayNewport`
         The movable device in egu seconds.
 
     time_points : list of float
@@ -137,8 +138,8 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
 
     See Also
     --------
-    :func:`daq_delay_scan`
-    :func:`duration_scan`
+    `daq_delay_scan`
+    `duration_scan`
     """
 
     spatial_pts = []
@@ -164,18 +165,19 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     """
     Scan a laser delay timing motor with DAQ support.
 
-    A delay scan is one that moves a "delay" PseudoPositioner back and forth.
+    A delay scan is one that moves a
+    `pcdsdevices.pseudopos.DelayNewport` back and forth.
     Underneath, this moves a physical motor that changes the path length
     of an optical laser, thus changing the timing of the laser shot by
     introducing a delay.
 
-    This is a :func:`duration_scan` in one dimension that also runs the DAQ,
-    sets the stage velocity to match the configured sweep time, and returns
-    the motor to the starting position at the end of the scan.
+    This is a `duration_scan` in one dimension that also sets the stage
+    velocity to match the configured sweep time and returns the motor to the
+    starting position at the end of the scan.
 
     Parameters
     ----------
-    time_motor : DelayNewport
+    time_motor : `pcdsdevices.pseudopos.DelayNewport`
         The movable device in egu seconds.
 
     time_points : list of float
@@ -193,8 +195,8 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
 
     See Also
     --------
-    :func:`delay_scan`
-    :func:`duration_scan`
+    `delay_scan`
+    `duration_scan`
     """
 
     @nbpp.daq_during_decorator(record=record, controls=[time_motor])
@@ -215,7 +217,8 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
     """
     Take repeated DAQ runs with no motors.
 
-    This is an LCLS-I DAQ version of bluesky's built-in count plan.
+    This is an LCLS-I DAQ version of `bluesky`'s built-in
+    `bluesky.plans.count` plan.
 
     Parameters
     ----------
@@ -252,6 +255,9 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
            def f(detectors: Iterable[OphydObj]) -> Generator[Msg]:
                ...
 
+        See docstring of `bluesky.plan_stubs.one_shot` (the default)
+        for details.
+
     md : dict, optional
         Additional metadata to include in the start document.
     """
@@ -271,9 +277,9 @@ def daq_scan(*args, num=None, per_step=None, md=None):
     """
     Scan through a multi-motor start, end, num trajectory with DAQ support.
 
-    This is an LCLS-I DAQ version of bluesky's built-in scan plan.
-    It also returns the motors to their starting points after the scan is
-    complete.
+    This is an LCLS-I DAQ version of `bluesky`'s built-in
+    `bluesky.plans.scan` plan. It also returns the motors to their starting
+    points after the scan is complete.
 
     Parameters
     ----------
@@ -314,7 +320,7 @@ def daq_scan(*args, num=None, per_step=None, md=None):
 
     per_step : callable, optional
         Hook for customizing action of inner loop (messages per step).
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
         for details.
 
     md : dict, optional
@@ -338,9 +344,9 @@ def daq_list_scan(*args, per_step=None, md=None):
     """
     Scan through a multi-motor list trajectory with DAQ support.
 
-    This is an LCLS-I DAQ version of bluesky's built-in list_scan plan.
-    It also returns the motors to their starting points after the scan is
-    complete.
+    This is an LCLS-I DAQ version of `bluesky`'s built-in
+    `bluesky.plans.list_scan` plan. It also returns the motors
+    to their starting points after the scan is complete.
 
     Parameters
     ----------
@@ -378,7 +384,7 @@ def daq_list_scan(*args, per_step=None, md=None):
 
     per_step : callable, optional
         Hook for customizing action of inner loop (messages per step).
-        See docstring of :func:`bluesky.plan_stubs.one_nd_step` (the default)
+        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
         for details.
 
     md : dict, optional

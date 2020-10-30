@@ -1,11 +1,11 @@
 """
 Wrappers and decorators to modify existing plans.
 
-This is the LCLS counterpart to bluesky.preprocessors.
+This is the LCLS counterpart to `bluesky.preprocessors`.
 
 This module contains "wrapper" functions that take a plan as an argument
 and yield messages from a new, modified plan, as well as "decorator"
-functions that can be applied to bluesky plan functions to return new
+functions that can be applied to `bluesky` plan functions to return new
 plan functions with modifications.
 """
 from functools import wraps
@@ -19,13 +19,13 @@ def _get_daq():
     """
     Helper function to get the active DAQ object.
 
-    This also wraps the pcdsdaq import because pcdsdaq is an optional
-    dependency of nabs. This will fail unless pcdsdaq is installed.
+    This also wraps the `pcdsdaq` import because `pcdsdaq` is an optional
+    dependency of ``nabs``. This will fail unless `pcdsdaq` is installed.
 
     Returns
     -------
-    daq : Daq
-        The DAQ (data aquisition) system bluesky-compatible control object.
+    daq : `pcdsdaq.daq.Daq`
+        The DAQ (data aquisition) system `bluesky`-compatible control object.
     """
 
     from pcdsdaq.daq import get_daq  # NOQA
@@ -36,7 +36,8 @@ class _Dummy:
     """
     Class to sub in for the DAQ when we need to drop a message.
 
-    You can't just remove a message entirely with plan_mutator, you need
+    You can't just remove a message entirely with
+    `bluesky.preprocessors.plan_mutator`, you need
     to yield a compatible message. To accomplish this we sub in a dummy object
     for the daq to create a no-op with the right return value.
     """
@@ -52,9 +53,10 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
     """
     Wrapper to turn an open plan into a standard LCLS DAQ step plan.
 
-    This inserts the DAQ object into every `trigger` and `read` pair,
-    ensuring events are taken at every bundle. It also stages the daq and
-    yields an appropriate `configure` message using the input arguments
+    This inserts the DAQ object into every `bluesky.plan_stubs.trigger` and
+    `bluesky.plan_stubs.read` pair, ensuring events are taken at every
+    bundle. It also stages the `pcdsdaq.daq.Daq` and yields an appropriate
+    `bluesky.plan_stubs.configure` message using the input arguments
     and all motors moved prior to the first data point.
 
     The DAQ trigger and the DAQ read always go first, before any other triggers
@@ -94,7 +96,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
 
     See Also
     --------
-    :func:`daq_step_scan_decorator`
+    `daq_step_scan_decorator`
     """
 
     daq = _get_daq()
@@ -169,10 +171,10 @@ def daq_step_scan_decorator(plan):
 
     This adds the standard DAQ configuration arguments
     events, duration, record, and use_l3t onto the plan function
-    and wraps the plan in the :func:`daq_step_scan_wrapper` to properly
+    and wraps the plan in the `daq_step_scan_wrapper` to properly
     execute a step scan.
 
-    See :func:`daq_step_scan_standard_args` for argument specifications for the
+    See `daq_step_scan_standard_args` for argument specifications for the
     standard DAQ configuration arguments.
 
     Parameters
@@ -188,8 +190,8 @@ def daq_step_scan_decorator(plan):
 
     See Also
     --------
-    :func:`daq_step_scan_wrapper`
-    :func:`daq_step_scan_standard_args`
+    `daq_step_scan_wrapper`
+    `daq_step_scan_standard_args`
     """
 
     @wraps(plan)
@@ -237,20 +239,20 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
     """
     Wrap a plan so that the DAQ runs at the same time.
 
-    This can be used with an ordinary bluesky plan that you'd like the daq
+    This can be used with an ordinary `bluesky` plan that you'd like the daq
     to run along with. This also stages the DAQ so that the run start/stop
     will be synchronized with the bluesky runs.
 
     Note that this is not a calib cycle scan. See
-    :func:`daq_step_scan_wrapper` and :func:`daq_step_scan_decorator`
+    `daq_step_scan_wrapper` and `daq_step_scan_decorator`
     for the calib cycle variant.
 
     All configuration must be done by supplying config kwargs to this wrapper.
 
     This must be applied outside the run_wrapper.
 
-    The :func:`daq_during_decorator` is the same as the
-    :func:`daq_during_wrapper`, but it is meant to be used as a function
+    The `daq_during_decorator` is the same as the
+    `daq_during_wrapper`, but it is meant to be used as a function
     decorator.
 
     Parameters

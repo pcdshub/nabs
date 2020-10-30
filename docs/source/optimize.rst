@@ -2,14 +2,16 @@
 Optimization
 ============
 
+.. curentmodule:: nabs.optimize
+
 Concept
 =======
 A core part of the ``nabs`` library is support for the optimization of various
-process variables using the ``bluesky`` scanning framework. The physics behind
+process variables using the `bluesky` scanning framework. The physics behind
 every use case may be wildly different, but the main idea is to have a set of
 plans that scan a "motor" until a specific criteria is observed on a separate
 "detector". ``nabs`` contains three complete plans for different situations;
-:func:`.maximize`, :func:`.minimize`, and :func:`.walk_to_target`.  Hopefully
+`maximize`, `minimize`, and `walk_to_target`.  Hopefully
 the intention behind each is self-evident based on the name.
 
 There are numerous algorithms to locate extrema within a univariate function,
