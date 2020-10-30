@@ -140,8 +140,7 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
             if first_calib_cycle:
                 first_calib_cycle = False
                 return daq_first_cycle(msg), None
-            else:
-                return add_daq_trigger(msg), None
+            return add_daq_trigger(msg), None
         # Insert daq read before first read
         elif msg.command == 'read' and first_read:
             first_read = False
