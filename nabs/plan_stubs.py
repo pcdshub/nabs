@@ -30,8 +30,8 @@ def measure_average(detectors, num, delay=None, stream=None):
         Number of shots to average together
 
     delay : iterable or scalar, optional
-        Time delay between successive readings. See ``bluesky.count`` for more
-        details
+        Time delay between successive readings. See `bluesky.plans.count`
+        for more details
 
     stream : `nabs.streams.AverageStream`, optional
         If a plan will call `measure_average` multiple times, a single

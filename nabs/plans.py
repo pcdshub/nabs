@@ -1,5 +1,5 @@
 """
-Standalone `bluesky` plans for data collection.
+Standalone ``bluesky`` plans for data collection.
 
 This is the LCLS counterpart to `bluesky.plans`.
 
@@ -110,7 +110,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
 def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
     """
-    `bluesky` plan that sets up and executes the delay scan.
+    A ``bluesky`` plan that sets up and executes the delay scan.
 
     A delay scan is one that moves a
     `pcdsdevices.epics_motor.DelayNewport` back and forth.
@@ -217,7 +217,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
     """
     Take repeated DAQ runs with no motors.
 
-    This is an LCLS-I DAQ version of `bluesky`'s built-in
+    This is an LCLS-I DAQ version of ``bluesky``'s built-in
     `bluesky.plans.count` plan.
 
     Parameters
@@ -277,7 +277,7 @@ def daq_scan(*args, num=None, per_step=None, md=None):
     """
     Scan through a multi-motor start, end, num trajectory with DAQ support.
 
-    This is an LCLS-I DAQ version of `bluesky`'s built-in
+    This is an LCLS-I DAQ version of ``bluesky``'s built-in
     `bluesky.plans.scan` plan. It also returns the motors to their starting
     points after the scan is complete.
 
@@ -344,7 +344,7 @@ def daq_list_scan(*args, per_step=None, md=None):
     """
     Scan through a multi-motor list trajectory with DAQ support.
 
-    This is an LCLS-I DAQ version of `bluesky`'s built-in
+    This is an LCLS-I DAQ version of ``bluesky``'s built-in
     `bluesky.plans.list_scan` plan. It also returns the motors
     to their starting points after the scan is complete.
 

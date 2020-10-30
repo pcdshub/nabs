@@ -1,5 +1,5 @@
 """
-Support for generic optimization routines through `bluesky`.
+Support for generic optimization routines through ``bluesky``.
 """
 import inspect
 import logging

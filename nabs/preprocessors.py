@@ -5,7 +5,7 @@ This is the LCLS counterpart to `bluesky.preprocessors`.
 
 This module contains "wrapper" functions that take a plan as an argument
 and yield messages from a new, modified plan, as well as "decorator"
-functions that can be applied to `bluesky` plan functions to return new
+functions that can be applied to ``bluesky`` plan functions to return new
 plan functions with modifications.
 """
 from functools import wraps
@@ -239,7 +239,7 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
     """
     Wrap a plan so that the DAQ runs at the same time.
 
-    This can be used with an ordinary `bluesky` plan that you'd like the daq
+    This can be used with an ordinary ``bluesky`` plan that you'd like the daq
     to run along with. This also stages the DAQ so that the run start/stop
     will be synchronized with the bluesky runs.
 
