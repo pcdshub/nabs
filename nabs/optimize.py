@@ -1,3 +1,6 @@
+"""
+Support for generic optimization routines through ``bluesky``.
+"""
 import inspect
 import logging
 import math
@@ -15,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def minimize(*args, **kwargs):
     """
-    Minimize the value of an ophyd.Signal
+    Minimize the value of an `ophyd.signal.Signal`.
     """
     # Add plan name into metadata
     _md = {'plan_name': 'minimize'}
@@ -26,7 +29,7 @@ def minimize(*args, **kwargs):
 
 def maximize(*args, **kwargs):
     """
-    Maximize the value of an ophyd.Signal
+    Maximize the value of an `ophyd.signal.Signal`.
     """
     # Add plan name into metadata
     _md = {'plan_name': 'maximize'}
@@ -39,33 +42,33 @@ def walk_to_target(signal, motor, target, tolerance, **kwargs):
     """
     Walk the motor until a signal reaches our target
 
-    Similar to the :func:`.maximize` and :func:`.minimize`. There are options
+    Similar to the `maximize` and `minimize`. There are options
     for multiple algorithms to dictate the scanning procedure. This may change
     the interpretation of values passed into this scanning procedure.
 
     Parameters
     ----------
-    signal: ophyd.Signal
+    signal : `ophyd.signal.Signal`
         Signal to maximize
 
-    motor: ophyd.OphydObject
+    motor : `ophyd.ophydobj.OphydObject`
         Any set-able object
 
-    tolerance: float, optional
+    tolerance : float, optional
         The tolerance in which our motor is
 
-    average: int, optional
+    average : int, optional
         Choice to take an average of points at each point in the scan
 
-    limits: tuple, optional
+    limits : tuple, optional
         Limit the region the scan will search within. If this is not provided,
         the soft limits of the signal will be used. In this case, these must be
         configured or the scan will not be allowed to continue.
 
-    method: str, optional
+    method : str, optional
         Choice of optimization methods
 
-    md: dict, optional
+    md : dict, optional
         metadata
     """
     # Add walk information to metadata
@@ -156,19 +159,19 @@ def golden_section_search(signal, motor, tolerance, limits, average=None):
 
     Parameters
     ----------
-    signal: ophyd.Signal
+    signal : `ophyd.signal.Signal`
         Signal whose distribution we are investigating
 
-    motor: ophyd.OphydObject
+    motor : `ophyd.ophydobj.OphydObject`
         Object that is ``set`` to probe different points of the distribution.
 
-    tolerance: float
+    tolerance : float
         The size of the range we would like to narrow the position of our
         extrema. Note that this is not the tolerance that we will know the
         "value" of the extrema, but instead the resolution we will be sure that
         it lies within on the "x" axis
 
-    limits: tuple
+    limits : tuple
         Starting bounds that we know the extrema lie within
 
     average : int, optional
@@ -177,7 +180,7 @@ def golden_section_search(signal, motor, tolerance, limits, average=None):
 
     Returns
     -------
-    bounds: tuple
+    bounds : tuple
         The range in which we have determined the extrema to lie within.
     """
     # This is boiler plate code and should be packaged into a
@@ -255,27 +258,27 @@ def golden_section_search(signal, motor, tolerance, limits, average=None):
 optimize_opts = """
     Parameters
     ----------
-    signal: ophyd.Signal
+    signal : `ophyd.signal.Signal`
         Signal to maximize
 
-    motor: ophyd.OphydObject
+    motor : `ophyd.ophydobj.OphydObject`
         Any set-able object
 
-    tolerance: float, optional
+    tolerance : float, optional
         The tolerance in which our motor is
 
-    average: int, optional
+    average : int, optional
         Choice to take an average of points at each point in the scan
 
-    limits: tuple, optional
+    limits : tuple, optional
         Limit the region the scan will search within. If this is not provided,
         the soft limits of the signal will be used. In this case, these must be
         configured or the scan will not be allowed to continue.
 
-    method: str, optional
+    method : str, optional
         Choice of optimization methods
 
-    md: dict, optional
+    md : dict, optional
         metadata
 """
 maximize.__doc__ += optimize_opts

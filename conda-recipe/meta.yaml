@@ -19,7 +19,9 @@ requirements:
     run:
       - python >=3.6
       - bluesky
+      - numpy
       - scipy
+      - toolz
 
 test:
     imports:

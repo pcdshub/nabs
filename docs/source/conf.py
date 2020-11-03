@@ -47,15 +47,16 @@ release = nabs.__version__
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
     'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.githubpages',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
 ]
 
 # Add custom CSS to avoid table wraps
 def setup(app):
-    app.add_stylesheet('custom.css')
+    app.add_css_file('custom.css')
 
 autosummary_generate = True
 
@@ -82,6 +83,9 @@ language = None
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
 exclude_patterns = []
+
+# The reST default role (used for this markup: `text`)
+default_role = 'any'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -174,3 +178,9 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
+intersphinx_mapping = {
+    'bluesky': ('https://blueskyproject.io/bluesky', None),
+    'ophyd': ('https://blueskyproject.io/ophyd', None),
+    'pcdsdaq': ('https://pcdshub.github.io/pcdsdaq', None),
+    'pcdsdevices': ('https://pcdshub.github.io/pcdsdevices', None),
+}

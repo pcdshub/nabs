@@ -1,2 +1,4 @@
 bluesky
+numpy
 scipy
+toolz
