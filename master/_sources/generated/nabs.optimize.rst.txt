@@ -1,0 +1,27 @@
+﻿nabs.optimize
+=============
+
+.. automodule:: nabs.optimize
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree: generated
+   
+      golden_section_search
+      maximize
+      minimize
+      optimize
+      walk_to_target
+   
+   
+
+   
+   
+   
+
+   
+   
+   

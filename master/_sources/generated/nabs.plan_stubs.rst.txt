@@ -1,0 +1,23 @@
+﻿nabs.plan\_stubs
+================
+
+.. automodule:: nabs.plan_stubs
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree: generated
+   
+      measure_average
+   
+   
+
+   
+   
+   
+
+   
+   
+   
