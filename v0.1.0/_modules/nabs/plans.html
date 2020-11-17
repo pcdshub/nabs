@@ -1,0 +1,868 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>nabs.plans &mdash; nabs 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> nabs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../plans.html">Plans and Data Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimize.html">Optimization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Full API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../upcoming_changes.html">Upcoming Changes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nabs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>nabs.plans</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for nabs.plans</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Standalone ``bluesky`` plans for data collection.</span>
+
+<span class="sd">This is the LCLS counterpart to `bluesky.plans`.</span>
+
+<span class="sd">All plans in this module will work as-is when passed into a</span>
+<span class="sd">`bluesky.run_engine.RunEngine`, including starting and stopping a run.</span>
+
+<span class="sd">Plans preceded by &quot;daq&quot; incorporate running the LCLS DAQ in the plan.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">cycle</span>
+
+<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
+<span class="kn">import</span> <span class="nn">bluesky.plans</span> <span class="k">as</span> <span class="nn">bp</span>
+<span class="kn">import</span> <span class="nn">bluesky.preprocessors</span> <span class="k">as</span> <span class="nn">bpp</span>
+<span class="kn">from</span> <span class="nn">bluesky</span> <span class="kn">import</span> <span class="n">plan_patterns</span>
+<span class="kn">from</span> <span class="nn">toolz</span> <span class="kn">import</span> <span class="n">partition</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">preprocessors</span> <span class="k">as</span> <span class="n">nbpp</span>
+
+
+<div class="viewcode-block" id="duration_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.duration_scan.html#nabs.plans.duration_scan">[docs]</a><span class="k">def</span> <span class="nf">duration_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Bluesky plan that moves motors among points for a fixed duration.</span>
+
+<span class="sd">    For each motor, a list of points must be provided. Each motor will be moved</span>
+<span class="sd">    through its list of points simultaneously if multiple motors are provided.</span>
+
+<span class="sd">    This will take a reading at every scan step by default via</span>
+<span class="sd">    `bluesky.plan_stubs.trigger_and_read.`</span>
+
+<span class="sd">    At the end of the scan, the motors will be returned to their original</span>
+<span class="sd">    positions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
+<span class="sd">    *args :</span>
+<span class="sd">        For one dimension, ``motor, [point1, point2, ....]``.</span>
+<span class="sd">        In general:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            motor1, [point1, point2, ...],</span>
+<span class="sd">            motor2, [point1, point2, ...],</span>
+<span class="sd">            ...,</span>
+<span class="sd">            motorN, [point1, point2, ...]</span>
+
+<span class="sd">        Motors can be any &#39;settable&#39; object (motor, temp controller, etc.)</span>
+
+<span class="sd">    duration : float</span>
+<span class="sd">        The time to run in seconds.</span>
+
+<span class="sd">    per_step : plan, optional</span>
+<span class="sd">        An alternate plan to run for every scan point. Defaults to</span>
+<span class="sd">        `bluesky.plan_stubs.one_nd_step`.</span>
+
+<span class="sd">    md : dict, optional</span>
+<span class="sd">        Additional metadata to include in the bluesky start document.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">per_step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">per_step</span> <span class="o">=</span> <span class="n">bps</span><span class="o">.</span><span class="n">one_nd_step</span>
+
+    <span class="n">pos_lists</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">pos_cycles</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">motors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">detectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">detectors</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">motor</span><span class="p">,</span> <span class="n">pos_list</span> <span class="ow">in</span> <span class="n">partition</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">pos_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pos_list</span><span class="p">)</span>
+        <span class="n">pos_lists</span><span class="p">[</span><span class="n">motor</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos_list</span>
+        <span class="n">pos_cycles</span><span class="p">[</span><span class="n">motor</span><span class="p">]</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">pos_list</span><span class="p">)</span>
+        <span class="n">motors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">motor</span><span class="p">)</span>
+
+    <span class="c1"># md handling lifted from bluesky.plans.list_scan for consistency</span>
+    <span class="n">md_args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="p">((</span><span class="nb">repr</span><span class="p">(</span><span class="n">motor</span><span class="p">),</span> <span class="n">pos_list</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">motor</span><span class="p">,</span> <span class="n">pos_list</span> <span class="ow">in</span> <span class="n">pos_lists</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+
+    <span class="n">_md</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;detectors&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">det</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">detectors</span><span class="p">],</span>
+           <span class="s1">&#39;motors&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">mot</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">mot</span> <span class="ow">in</span> <span class="n">motors</span><span class="p">],</span>
+           <span class="s1">&#39;plan_args&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;detectors&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="n">detectors</span><span class="p">)),</span>
+                         <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">md_args</span><span class="p">,</span>
+                         <span class="s1">&#39;duration&#39;</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
+                         <span class="s1">&#39;per_step&#39;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="n">per_step</span><span class="p">)},</span>
+           <span class="s1">&#39;plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;duration_scan&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;plan_pattern&#39;</span><span class="p">:</span> <span class="s1">&#39;inner_list_product&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;plan_pattern_module&#39;</span><span class="p">:</span> <span class="n">plan_patterns</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+           <span class="s1">&#39;plan_pattern_args&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">md_args</span><span class="p">),</span>
+           <span class="s1">&#39;hints&#39;</span><span class="p">:</span> <span class="p">{},</span>
+           <span class="p">}</span>
+
+    <span class="n">_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">md</span> <span class="ow">or</span> <span class="p">{})</span>
+
+    <span class="n">x_fields</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="n">motors</span><span class="p">:</span>
+        <span class="n">x_fields</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="s1">&#39;hints&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fields&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+
+    <span class="n">default_dimensions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x_fields</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">)]</span>
+
+    <span class="n">default_hints</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">default_hints</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="n">default_dimensions</span><span class="p">)</span>
+
+    <span class="n">md</span> <span class="o">=</span> <span class="n">md</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="n">_md</span><span class="p">[</span><span class="s1">&#39;hints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_hints</span>
+    <span class="n">_md</span><span class="p">[</span><span class="s1">&#39;hints&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hints&#39;</span><span class="p">,</span> <span class="p">{})</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="c1"># end borrowed md handling block</span>
+
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">stage_decorator</span><span class="p">(</span><span class="n">detectors</span> <span class="o">+</span> <span class="n">motors</span><span class="p">)</span>
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">inner</span><span class="p">():</span>
+        <span class="c1"># Start timing after a dummy yield so it doesn&#39;t start early</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">null</span><span class="p">()</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+        <span class="c1"># Where last position is stored</span>
+        <span class="n">pos_cache</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">duration</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="p">{</span><span class="n">motor</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="n">cyc</span><span class="p">)</span> <span class="k">for</span> <span class="n">motor</span><span class="p">,</span> <span class="n">cyc</span> <span class="ow">in</span> <span class="n">pos_cycles</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">yield from</span> <span class="n">per_step</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">pos_cache</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="delay_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.delay_scan.html#nabs.plans.delay_scan">[docs]</a><span class="k">def</span> <span class="nf">delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A ``bluesky`` plan that sets up and executes the delay scan.</span>
+
+<span class="sd">    A delay scan is one that moves a</span>
+<span class="sd">    `pcdsdevices.epics_motor.DelayNewport` back and forth.</span>
+<span class="sd">    Underneath, this moves a physical motor that changes the path length</span>
+<span class="sd">    of an optical laser, thus changing the timing of the laser shot by</span>
+<span class="sd">    introducing a delay.</span>
+
+<span class="sd">    This is a `duration_scan` in one dimension that also sets the stage</span>
+<span class="sd">    velocity to match the configured sweep time and returns the motor to the</span>
+<span class="sd">    starting position at the end of the scan.</span>
+
+<span class="sd">    See `daq_delay_scan` for the version with DAQ support.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time_motor : `pcdsdevices.epics_motor.DelayNewport`</span>
+<span class="sd">        The movable device in egu seconds.</span>
+
+<span class="sd">    time_points : list of float</span>
+<span class="sd">        The times in second to move between.</span>
+
+<span class="sd">    sweep_time : float</span>
+<span class="sd">        The duration we take to move from one end of the range to the other.</span>
+
+<span class="sd">    duration : float, optional</span>
+<span class="sd">        If provided, the time to run in seconds. If omitted, we&#39;ll run forever.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">spatial_pts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">time_pt</span> <span class="ow">in</span> <span class="n">time_points</span><span class="p">:</span>
+        <span class="n">pseudo_tuple</span> <span class="o">=</span> <span class="n">time_motor</span><span class="o">.</span><span class="n">PseudoPosition</span><span class="p">(</span><span class="n">delay</span><span class="o">=</span><span class="n">time_pt</span><span class="p">)</span>
+        <span class="n">real_tuple</span> <span class="o">=</span> <span class="n">time_motor</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">pseudo_tuple</span><span class="p">)</span>
+        <span class="n">spatial_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">real_tuple</span><span class="o">.</span><span class="n">motor</span><span class="p">)</span>
+
+    <span class="n">space_delta</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">spatial_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">spatial_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">velo</span> <span class="o">=</span> <span class="n">space_delta</span><span class="o">/</span><span class="n">sweep_time</span>
+
+    <span class="k">def</span> <span class="nf">inner_delay_scan</span><span class="p">():</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">abs_set</span><span class="p">(</span><span class="n">time_motor</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="n">velo</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">duration_scan</span><span class="p">([],</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span>
+                                         <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner_delay_scan</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="daq_delay_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan">[docs]</a><span class="k">def</span> <span class="nf">daq_delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+                   <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scan a laser delay timing motor with DAQ support.</span>
+
+<span class="sd">    A delay scan is one that moves a</span>
+<span class="sd">    `pcdsdevices.epics_motor.DelayNewport` back and forth.</span>
+<span class="sd">    Underneath, this moves a physical motor that changes the path length</span>
+<span class="sd">    of an optical laser, thus changing the timing of the laser shot by</span>
+<span class="sd">    introducing a delay.</span>
+
+<span class="sd">    This is a `duration_scan` in one dimension that also sets the stage</span>
+<span class="sd">    velocity to match the configured sweep time and returns the motor to the</span>
+<span class="sd">    starting position at the end of the scan. It is the `delay_scan` with</span>
+<span class="sd">    the DAQ added.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time_motor : `pcdsdevices.epics_motor.DelayNewport`</span>
+<span class="sd">        The movable device in egu seconds.</span>
+
+<span class="sd">    time_points : list of float</span>
+<span class="sd">        The times in second to move between.</span>
+
+<span class="sd">    sweep_time : float</span>
+<span class="sd">        The duration we take to move from one end of the range to the other.</span>
+
+<span class="sd">    duration : float, optional</span>
+<span class="sd">        If provided, the time to run in seconds. If omitted, we&#39;ll run forever.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="p">[</span><span class="n">time_motor</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">inner_daq_delay_scan</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
+                                      <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner_daq_delay_scan</span><span class="p">())</span></div>
+
+
+<span class="c1"># The rest of this file contains thin wrappers around bluesky built-ins.</span>
+<span class="c1"># These exist to mimic an older hutch python API,</span>
+<span class="c1"># easing the transition to bluesky.</span>
+
+
+<div class="viewcode-block" id="daq_count"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_count.html#nabs.plans.daq_count">[docs]</a><span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_count</span><span class="p">(</span><span class="n">detectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">per_shot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take repeated DAQ runs with no motors.</span>
+
+<span class="sd">    This is an LCLS-I DAQ version of ``bluesky``&#39;s built-in</span>
+<span class="sd">    `bluesky.plans.count` plan.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detectors : list, optional</span>
+<span class="sd">        List of &#39;readable&#39; objects to read at every step.</span>
+
+<span class="sd">    num : int, optional</span>
+<span class="sd">        Number of readings to take; default is 1.</span>
+<span class="sd">        If None, capture data until canceled.</span>
+
+<span class="sd">    delay : iterable or scalar, optional</span>
+<span class="sd">        Time delay in seconds between successive readings; default is 0.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    per_shot : callable, optional</span>
+<span class="sd">        Hook for customizing action of inner loop (messages per step).</span>
+<span class="sd">        Expected signature ::</span>
+
+<span class="sd">           def f(detectors: Iterable[OphydObj]) -&gt; Generator[Msg]:</span>
+<span class="sd">               ...</span>
+
+<span class="sd">        See docstring of `bluesky.plan_stubs.one_shot` (the default)</span>
+<span class="sd">        for details.</span>
+
+<span class="sd">    md : dict, optional</span>
+<span class="sd">        Additional metadata to include in the start document.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">detectors</span><span class="p">:</span>
+        <span class="c1"># count and daq_step_scan_decorator both need a detector to work</span>
+        <span class="c1"># so if none are found, we pass the daq explicitly</span>
+        <span class="c1"># otherwise, the decorator takes care of all the heavy lifting</span>
+        <span class="n">daq</span> <span class="o">=</span> <span class="n">nbpp</span><span class="o">.</span><span class="n">_get_daq</span><span class="p">()</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="p">[</span><span class="n">daq</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">,</span>
+                                <span class="n">per_shot</span><span class="o">=</span><span class="n">per_shot</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">md</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="daq_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_scan.html#nabs.plans.daq_scan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+<span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_scan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scan through a multi-motor start, end, num trajectory with DAQ support.</span>
+
+<span class="sd">    This is an LCLS-I DAQ version of ``bluesky``&#39;s built-in</span>
+<span class="sd">    `bluesky.plans.scan` plan. It also returns the motors to their starting</span>
+<span class="sd">    points after the scan is complete.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detectors : list, optional</span>
+<span class="sd">        List of &#39;readable&#39; objects to read at every step.</span>
+
+<span class="sd">    *args :</span>
+<span class="sd">        For one dimension, ``motor, start, stop``.</span>
+<span class="sd">        In general:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            motor1, start1, stop1,</span>
+<span class="sd">            motor2, start2, start2,</span>
+<span class="sd">            ...,</span>
+<span class="sd">            motorN, startN, stopN</span>
+
+<span class="sd">        Motors can be any &#39;settable&#39; object (motor, temp controller, etc.)</span>
+
+<span class="sd">    num : integer</span>
+<span class="sd">        Number of points.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    per_step : callable, optional</span>
+<span class="sd">        Hook for customizing action of inner loop (messages per step).</span>
+<span class="sd">        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)</span>
+<span class="sd">        for details.</span>
+
+<span class="sd">    md : dict, optional</span>
+<span class="sd">        Additional metadata to include in the start document.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">scan_args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scan_args</span> <span class="o">=</span> <span class="n">args</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">scan_args</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span>
+                               <span class="n">per_step</span><span class="o">=</span><span class="n">per_step</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">md</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="daq_list_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_list_scan.html#nabs.plans.daq_list_scan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+<span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_list_scan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scan through a multi-motor list trajectory with DAQ support.</span>
+
+<span class="sd">    This is an LCLS-I DAQ version of ``bluesky``&#39;s built-in</span>
+<span class="sd">    `bluesky.plans.list_scan` plan. It also returns the motors</span>
+<span class="sd">    to their starting points after the scan is complete.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detectors : list, optional</span>
+<span class="sd">        List of &#39;readable&#39; objects to read at every step.</span>
+
+<span class="sd">    *args :</span>
+<span class="sd">        For one dimension, ``motor, [point1, point2, ....]``.</span>
+<span class="sd">        In general:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            motor1, [point1, point2, ...],</span>
+<span class="sd">            motor2, [point1, point2, ...],</span>
+<span class="sd">            ...,</span>
+<span class="sd">            motorN, [point1, point2, ...]</span>
+
+<span class="sd">        Motors can be any &#39;settable&#39; object (motor, temp controller, etc.)</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    per_step : callable, optional</span>
+<span class="sd">        Hook for customizing action of inner loop (messages per step).</span>
+<span class="sd">        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)</span>
+<span class="sd">        for details.</span>
+
+<span class="sd">    md : dict, optional</span>
+<span class="sd">        Additional metadata to include in the start document.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">scan_args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scan_args</span> <span class="o">=</span> <span class="n">args</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">list_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">scan_args</span><span class="p">,</span>
+                                    <span class="n">per_step</span><span class="o">=</span><span class="n">per_step</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">md</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="daq_ascan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_ascan.html#nabs.plans.daq_ascan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+<span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_ascan</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One-dimensional daq scan with absolute positions.</span>
+
+<span class="sd">    This moves a motor from start to end in nsteps steps, taking data in the</span>
+<span class="sd">    DAQ at every step, and returning the motor to its original position at</span>
+<span class="sd">    the end of the scan.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    motor : Movable</span>
+<span class="sd">        A movable object to scan.</span>
+
+<span class="sd">    start : int or float</span>
+<span class="sd">        The first point in the scan.</span>
+
+<span class="sd">    end : int or float</span>
+<span class="sd">        The last point in the scan.</span>
+
+<span class="sd">    nsteps : int</span>
+<span class="sd">        The number of points in the scan.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="daq_dscan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_dscan.html#nabs.plans.daq_dscan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+<span class="nd">@bpp</span><span class="o">.</span><span class="n">relative_set_decorator</span><span class="p">()</span>
+<span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_dscan</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One-dimensional daq scan with relative (delta) positions.</span>
+
+<span class="sd">    This moves a motor from current_pos + start to current_pos + end</span>
+<span class="sd">    in nsteps steps, taking data in the DAQ at every step, and</span>
+<span class="sd">    returning the motor to its original position at the end of the scan.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    motor : Movable</span>
+<span class="sd">        A movable object to scan.</span>
+
+<span class="sd">    start : int or float</span>
+<span class="sd">        The first point in the scan, relative to the current position.</span>
+
+<span class="sd">    end : int or float</span>
+<span class="sd">        The last point in the scan, relative to the current position.</span>
+
+<span class="sd">    nsteps : int</span>
+<span class="sd">        The number of points in the scan.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="daq_a2scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_a2scan.html#nabs.plans.daq_a2scan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+<span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_a2scan</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Two-dimensional daq scan with absolute positions.</span>
+
+<span class="sd">    This moves two motors from start to end in nsteps steps, taking data in</span>
+<span class="sd">    the DAQ at every step, and returning the motors to their original positions</span>
+<span class="sd">    at the end of the scan.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    m1 : Movable</span>
+<span class="sd">        The first movable object to scan.</span>
+
+<span class="sd">    a1 : int or float</span>
+<span class="sd">        The first point in the scan for m1.</span>
+
+<span class="sd">    b1 : int or float</span>
+<span class="sd">        The last point in the scan for m1.</span>
+
+<span class="sd">    m2 : Movable</span>
+<span class="sd">        The second movable object to scan.</span>
+
+<span class="sd">    a2 : int or float</span>
+<span class="sd">        The first point in the scan for m2.</span>
+
+<span class="sd">    b2 : int or float</span>
+<span class="sd">        The last point in the scan for m2.</span>
+
+<span class="sd">    nsteps : int</span>
+<span class="sd">        The number of points in the scan.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="daq_a3scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_a3scan.html#nabs.plans.daq_a3scan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
+<span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
+<span class="k">def</span> <span class="nf">daq_a3scan</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Three-dimensional daq scan with absolute positions.</span>
+
+<span class="sd">    This moves three motors from start to end in nsteps steps, taking data in</span>
+<span class="sd">    the DAQ at every step, and returning the motors to their original positions</span>
+<span class="sd">    at the end of the scan.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    m1 : Movable</span>
+<span class="sd">        The first movable object to scan.</span>
+
+<span class="sd">    a1 : int or float</span>
+<span class="sd">        The first point in the scan for m1.</span>
+
+<span class="sd">    b1 : int or float</span>
+<span class="sd">        The last point in the scan for m1.</span>
+
+<span class="sd">    m2 : Movable</span>
+<span class="sd">        The second movable object to scan.</span>
+
+<span class="sd">    a2 : int or float</span>
+<span class="sd">        The first point in the scan for m2.</span>
+
+<span class="sd">    b2 : int or float</span>
+<span class="sd">        The last point in the scan for m2.</span>
+
+<span class="sd">    m3 : Movable</span>
+<span class="sd">        The third movable object to scan.</span>
+
+<span class="sd">    a3 : int or float</span>
+<span class="sd">        The first point in the scan for m3.</span>
+
+<span class="sd">    b3 : int or float</span>
+<span class="sd">        The last point in the scan for m3.</span>
+
+<span class="sd">    nsteps : int</span>
+<span class="sd">        The number of points in the scan.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The events, duration, record, and use_l3t arguments come from the</span>
+<span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, SLAC National Accelerator Laboratory
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
