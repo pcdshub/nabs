@@ -8,6 +8,7 @@ v0.1.0 (2020-11-17)
 Features
 --------
 - Added the `nabs.plans` module with the following functions:
+
   - `nabs.plans.duration_scan`:
     A bluesky plan that moves a motor back and forth for a fixed duration.
   - `nabs.plans.delay_scan`:
@@ -29,7 +30,9 @@ Features
     A 2-dimensional `nabs.plans.daq_ascan`.
   - `nabs.plans.daq_a3scan`:
     A 3-dimensional `nabs.plans.daq_ascan`.
+
 - Added the `nabs.preprocessors` module with the following functions:
+
   - `nabs.preprocessors.daq_step_scan_wrapper`:
     A wrapper that mutates incoming messages from a plan to also include DAQ calib cycles as required for a step scan.
   - `nabs.preprocessors.daq_step_scan_decorator`:
