@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans.daq_scan &mdash; nabs 0.0.0+127.gfdc6fe0 documentation</title>
+  <title>nabs.plans.daq_scan &mdash; nabs 0.1.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.0.0+127.gfdc6fe0
+                0.1.0
               </div>
             
           
@@ -195,7 +195,7 @@
 <code class="sig-prename descclassname">nabs.plans.</code><code class="sig-name descname">daq_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">per_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">md</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plans.daq_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scan through a multi-motor start, end, num trajectory with DAQ support.</p>
 <p>This is an LCLS-I DAQ version of <code class="docutils literal notranslate"><span class="pre">bluesky</span></code>’s built-in
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.scan.html#bluesky.plans.scan" title="(in bluesky v1.6.6.post30+g43efe51)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.scan</span></code></a> plan. It also returns the motors to their starting
+<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.scan.html#bluesky.plans.scan" title="(in bluesky v1.6.7.post2+g888716e)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.scan</span></code></a> plan. It also returns the motors to their starting
 points after the scan is complete.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -221,7 +221,7 @@ we don’t want to accidentally skip recording good runs.</p></li>
 <li><p><strong>use_l3t</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not the use the l3t filter for the events argument. Defaults
 to False to avoid confusion from unconfigured filters.</p></li>
 <li><p><strong>per_step</strong> (<em>callable</em><em>, </em><em>optional</em>) – Hook for customizing action of inner loop (messages per step).
-See docstring of <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plan_stubs.one_nd_step.html#bluesky.plan_stubs.one_nd_step" title="(in bluesky v1.6.6.post30+g43efe51)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.one_nd_step</span></code></a> (the default)
+See docstring of <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plan_stubs.one_nd_step.html#bluesky.plan_stubs.one_nd_step" title="(in bluesky v1.6.7.post2+g888716e)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.one_nd_step</span></code></a> (the default)
 for details.</p></li>
 <li><p><strong>md</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional metadata to include in the start document.</p></li>
 </ul>
