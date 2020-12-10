@@ -211,7 +211,7 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
         we don't want to accidentally skip recording good runs.
     """
 
-    @nbpp.daq_during_decorator(record=record, controls=[time_motor])
+    @nbpp.daq_during_decorator(record=record)
     def inner_daq_delay_scan():
         return (yield from delay_scan(time_motor, time_points, sweep_time,
                                       duration=duration))
