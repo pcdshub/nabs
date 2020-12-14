@@ -192,6 +192,12 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     starting position at the end of the scan. It is the `delay_scan` with
     the DAQ added.
 
+    Unlike the majority of DAQ scans, this scan does not include the delay
+    stage as a control variable in the DAQ. This is because the "points" of the
+    scan are not relevant to the data: we only care about the intermediate
+    shots. In fact, reconfiguring the DAQ with the new controls positions only
+    slows us down and makes the data more annoying to analyze!
+
     Parameters
     ----------
     time_motor : `pcdsdevices.epics_motor.DelayNewport`
