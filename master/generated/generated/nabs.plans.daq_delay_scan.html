@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans.daq_delay_scan &mdash; nabs 0.1.0 documentation</title>
+  <title>nabs.plans.daq_delay_scan &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.0+5.g35d56e0
               </div>
             
           
@@ -203,6 +203,11 @@ introducing a delay.</p>
 velocity to match the configured sweep time and returns the motor to the
 starting position at the end of the scan. It is the <a class="reference internal" href="nabs.plans.delay_scan.html#nabs.plans.delay_scan" title="nabs.plans.delay_scan"><code class="xref any py py-func docutils literal notranslate"><span class="pre">delay_scan</span></code></a> with
 the DAQ added.</p>
+<p>Unlike the majority of DAQ scans, this scan does not include the delay
+stage as a control variable in the DAQ. This is because the “points” of the
+scan are not relevant to the data: we only care about the intermediate
+shots. In fact, reconfiguring the DAQ with the new controls positions only
+slows us down and makes the data more annoying to analyze!</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

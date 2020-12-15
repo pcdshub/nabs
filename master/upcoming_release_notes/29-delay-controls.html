@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>IssueNumber Title &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
+  <title>29 delay-controls &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
   
 
   
@@ -36,7 +36,8 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Upcoming Changes" href="../upcoming_changes.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,9 +96,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../api.html">Full API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Notes</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../releases.html">Release History</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../upcoming_changes.html">Upcoming Changes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../upcoming_changes.html">Upcoming Changes</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">29 delay-controls</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-changes">API Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             
@@ -144,13 +155,15 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>IssueNumber Title</li>
+          <li><a href="../upcoming_changes.html">Upcoming Changes</a> &raquo;</li>
+        
+      <li>29 delay-controls</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/upcoming_release_notes/template-short.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/upcoming_release_notes/29-delay-controls.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -163,8 +176,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="issuenumber-title">
-<h1>IssueNumber Title<a class="headerlink" href="#issuenumber-title" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="delay-controls">
+<h1>29 delay-controls<a class="headerlink" href="#delay-controls" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="api-changes">
 <h2>API Changes<a class="headerlink" href="#api-changes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -180,7 +193,9 @@
 <div class="section" id="bugfixes">
 <h2>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>N/A</p></li>
+<li><p>Fix issue where the stage in the daq_delay_scan was erroneously included
+in the DAQ control variables. This actually slows down the scan and dumps
+extra, redundant data into the data stream.</p></li>
 </ul>
 </div>
 <div class="section" id="maintenance">
@@ -202,6 +217,13 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../upcoming_changes.html" class="btn btn-neutral float-left" title="Upcoming Changes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans &mdash; nabs 0.1.0 documentation</title>
+  <title>nabs.plans &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.0+5.g35d56e0
               </div>
             
           
@@ -356,6 +356,12 @@
 <span class="sd">    starting position at the end of the scan. It is the `delay_scan` with</span>
 <span class="sd">    the DAQ added.</span>
 
+<span class="sd">    Unlike the majority of DAQ scans, this scan does not include the delay</span>
+<span class="sd">    stage as a control variable in the DAQ. This is because the &quot;points&quot; of the</span>
+<span class="sd">    scan are not relevant to the data: we only care about the intermediate</span>
+<span class="sd">    shots. In fact, reconfiguring the DAQ with the new controls positions only</span>
+<span class="sd">    slows us down and makes the data more annoying to analyze!</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    time_motor : `pcdsdevices.epics_motor.DelayNewport`</span>
@@ -375,7 +381,7 @@
 <span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="p">[</span><span class="n">time_motor</span><span class="p">])</span>
+    <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">inner_daq_delay_scan</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
                                       <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
