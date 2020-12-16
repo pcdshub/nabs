@@ -669,11 +669,11 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
     detectors : list of readables
         Objects to read into Python in the scan.
     x_motor : obj
-        Motor object coresponding to the x axes.
+        Motor object corresponding to the x axes.
     xx : list
-        List of all the x points (sampless) on the target grid.
+        List of all the x points (samples) on the target grid.
     y_motor : obj
-        Motor object coresponding to the y axes.
+        Motor object corresponding to the y axes.
     yy : list
         List of all the y points (samples) on the target grid.
     nsample : int, optional
@@ -738,11 +738,11 @@ def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
     detectors : list of readables
         Objects to read into Python in the scan.
     x_motor : obj
-        Motor object coresponding to the x axes.
+        Motor object corresponding to the x axes.
     xx : list
-        List of all the x points (sampless) on the target grid.
+        List of all the x points (samples) on the target grid.
     y_motor : obj
-        Motor object coresponding to the y axes.
+        Motor object corresponding to the y axes.
     yy : list
         List of all the y points (samples) on the target grid.
     nsample : int, optional
