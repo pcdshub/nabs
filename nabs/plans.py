@@ -653,3 +653,124 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
 
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
+
+
+def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
+                      per_step=None, md=None):
+    """
+    Scan over two variables in steps simultaneously.
+
+    This is a `nabs` version of ``bluesky``'s built-in
+    `bluesky.plans.list_scan` plan. It takes in consideration the number of
+    samples to be scanned out of the samples given in `xx` and `yy`.
+
+    Parameters
+    ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+    x_motor : obj
+        Motor object coresponding to the x axes.
+    xx : list
+        List of all the x points (sampless) on the target grid.
+    y_motor : obj
+        Motor object coresponding to the y axes.
+    yy : list
+        List of all the y points (samples) on the target grid.
+    nsample : int, optional
+        Indicates how many samples should be scanned. Defaults to `None`.
+        `None` will scan all points in `xx` and `yy`.
+    per_step : callable, optional
+        Hook for customizing action of inner loop (messages per step).
+        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
+        for details.
+    md : dict, optional
+        Additional metadata to include in the start document.
+
+    Examples
+    --------
+    >>> xx = [-100.0, -75.0, -50.0, -25.0, 0.0, 25.0]
+
+    >>> yy = [-100.0, -100.0, -100.0, -100.0, -100.0, -100.0]
+
+    >>> x_motor = FastMotor()
+
+    >>> y_motor = FastMotor()
+
+    >>> RE(fixed_target_scan([], x_motor, xx, y_motor, yy, nsample=4))
+
+    Transient Scan ID: 1     Time: 2020-12-16 11:51:41
+    Persistent Unique Scan ID: '8677bbbc-6801-4096-83f9-380ac4ee12a7'
+    New stream: 'primary'
+    +-----------+------------+------------+------------+
+    |   seq_num |       time |     motor1 |     motor2 |
+    +-----------+------------+------------+------------+
+    |         1 | 11:51:41.4 |   -100.000 |   -100.000 |
+    |         2 | 11:51:41.4 |    -75.000 |   -100.000 |
+    |         3 | 11:51:41.4 |    -50.000 |   -100.000 |
+    |         4 | 11:51:41.4 |    -25.000 |   -100.000 |
+    +-----------+------------+------------+------------+
+    generator list_scan ['8677bbbc'] (scan num: 1)
+    """
+
+    detectors = list(detectors)
+
+    # TODO: check to see if nsample is in range
+    # otherwise it will be an IndexError
+    if nsample:
+        x_points = xx[:nsample]
+        y_points = yy[:nsample]
+
+    yield from bp.list_scan(detectors, x_motor, x_points, y_motor, y_points)
+
+
+@nbpp.daq_step_scan_decorator
+def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
+                          per_step=None, md=None):
+    """
+    Scan over two variables in steps simultaneously with DAQ Support.
+
+    This is a `nabs` version of ``bluesky``'s built-in
+    `bluesky.plans.list_scan` plan. It takes in consideration the number of
+    samples to be scanned out of the samples given in `xx` and `yy`.
+
+    Parameters
+    ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+    x_motor : obj
+        Motor object coresponding to the x axes.
+    xx : list
+        List of all the x points (sampless) on the target grid.
+    y_motor : obj
+        Motor object coresponding to the y axes.
+    yy : list
+        List of all the y points (samples) on the target grid.
+    nsample : int, optional
+        Indicates how many samples should be scanned. Defaults to `None`.
+        `None` will scan all points in `xx` and `yy`.
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+
+    duration : int or float, optional
+        Duration of time to spend at each step. If omitted, uses the events
+        argument or the last configured value.
+
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+
+    use_l3t : bool, optional
+        Whether or not the use the l3t filter for the events argument. Defaults
+        to False to avoid confusion from unconfigured filters.
+
+    per_step : callable, optional
+        Hook for customizing action of inner loop (messages per step).
+        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
+        for details.
+
+    md : dict, optional
+        Additional metadata to include in the start document.
+    """
+    yield from fixed_target_scan(detectors, x_motor, xx, y_motor, yy,
+                                 nsample=nsample)
