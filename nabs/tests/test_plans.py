@@ -205,3 +205,39 @@ def test_daq_a3scan(RE, daq, hw):
                                      hw.motor2, 0, 10,
                                      hw.motor3, 0, 10, 11,
                                      events=1))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_fixed_target_scan(RE, hw):
+    logger.debug('test_fixed_target_scan')
+    x_motor = FastMotor()
+    y_motor = FastMotor()
+    xx = [-100.0, -75.0, -50.0, -25.0, 0.0, 25.0]
+    yy = [-100.0, -56.0, -100.0, -100.0, -100.0, -80.0]
+    nsample = 3
+    # scan a certain amount of samples
+    msgs = nbp.fixed_target_scan([], x_motor, xx, y_motor, yy, nsample)
+    moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
+    assert moves == [-100.0, -100.0, -75.0, -56.0, -50.0, -100.0]
+    # scan all
+    msgs = nbp.fixed_target_scan([hw.det], x_motor, xx, y_motor, yy)
+    moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
+    # if motor already at the position in list, it will not be set
+    assert moves == [-100.0, -100.0, -75.0, -56.0, -50.0, -100.0, -25.0,
+                     0.0, 25.0, -80.0]
+    # test index error
+    nsample = 30
+    msgs_err = nbp.fixed_target_scan([hw.det], x_motor, xx, y_motor, yy,
+                                     nsample=nsample)
+    with pytest.raises(IndexError):
+        RE(msgs_err)
+    RE(msgs)
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_fixed_target_scan(RE, daq, hw):
+    logger.debug('test_daq_fixed_target_scan')
+    xx = [-100.0, -75.0, -50.0, -25.0, 0.0, 25.0]
+    yy = [-100.0, -56.0, -100.0, -100.0, -100.0, -80.0]
+    daq_test(RE, daq, nbp.daq_fixed_target_scan([hw.det], hw.motor1, xx,
+                                                hw.motor2, yy, events=1))
