@@ -10,6 +10,7 @@ Plans preceded by "daq" incorporate running the LCLS DAQ in the plan.
 """
 import math
 import time
+import logging
 from collections import defaultdict
 from itertools import chain, cycle
 
@@ -20,6 +21,8 @@ from bluesky import plan_patterns
 from toolz import partition
 
 from . import preprocessors as nbpp
+
+logger = logging.getLogger(__name__)
 
 
 def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
@@ -713,14 +716,19 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
     """
 
     detectors = list(detectors)
+    if nsample and nsample > len(xx):
+        msg = ('The number of samples: %s is bigger then the available'
+               ' samples: %s. Please provide a number in range.',
+               nsample, len(xx))
+        logger.warning(msg)
+        raise IndexError(msg)
 
-    # TODO: check to see if nsample is in range
-    # otherwise it will be an IndexError
     if nsample:
-        x_points = xx[:nsample]
-        y_points = yy[:nsample]
+        xx = xx[:nsample]
+        yy = yy[:nsample]
 
-    yield from bp.list_scan(detectors, x_motor, x_points, y_motor, y_points)
+    yield from bp.list_scan(detectors, x_motor, xx, y_motor, yy,
+                            per_step=per_step, md=md)
 
 
 @nbpp.daq_step_scan_decorator
