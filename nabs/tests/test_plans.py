@@ -16,9 +16,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_duration_scan(RE, hw):
-    """
-    Run the duration scan and check the messages it creates.
-    """
+    """Run the duration scan and check the messages it creates."""
     logger.debug('test_duration_scan')
 
     # These will generate as many messages as they can in 0.01s
@@ -55,15 +53,13 @@ def time_motor():
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
-def test_delay_scan(RE, time_motor):
-    """
-    Check the delay scan, verify that velo is set appropriately.
-    """
+def test_delay_scan(RE, hw, time_motor):
+    """Check the delay scan, verify that velo is set appropriately."""
     logger.debug('test_delay_scan')
 
     # Speed of light is more or less 3e8
     goal = 1/(3e8)
-    msgs = nbp.delay_scan(time_motor, [0, goal], 1, duration=0.01)
+    msgs = nbp.delay_scan([hw.det], time_motor, [0, goal], 1, duration=0.01)
     moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
     # first point is the velo, which should be close to 1 with 1 bounce set
     assert np.isclose(moves[0], 1, rtol=1e-2)
@@ -76,14 +72,12 @@ def test_delay_scan(RE, time_motor):
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
-def test_daq_delay_scan(RE, daq, time_motor):
-    """
-    Check that daq_delay_scan's arguments all work.
-    """
+def test_daq_delay_scan(RE, daq, hw, time_motor):
+    """Check that daq_delay_scan's arguments all work."""
     logger.debug('test_daq_delay_scan')
 
-    msgs = list(nbp.daq_delay_scan(time_motor, [0, 1], 1, duration=0.01,
-                                   record=True))
+    msgs = list(nbp.daq_delay_scan([hw.det], time_motor, [0, 1], 1,
+                                   duration=0.01, record=True))
     configure_message = None
     for msg in msgs:
         if msg.command == 'configure' and msg.obj is daq:
@@ -111,6 +105,7 @@ def assert_scan_has_daq(msgs, daq):
     4. The DAQ is read
     5. The DAQ is unstaged (exactly once)
     """
+
     logger.debug('assert_scan_has_daq')
 
     message_types = defaultdict(int)
@@ -132,9 +127,7 @@ def assert_scan_has_daq(msgs, daq):
 
 
 def daq_test(RE, daq, plan):
-    """
-    Check the messages for daq and try to run the plan with RE.
-    """
+    """Check the messages for daq and try to run the plan with RE."""
     logger.debug('daq_test')
     msgs = list(plan)
     assert_scan_has_daq(msgs, daq)
@@ -176,17 +169,17 @@ def test_daq_list_scan(RE, daq, hw):
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_ascan(RE, daq, hw):
     logger.debug('test_daq_ascan')
-    daq_test(RE, daq, nbp.daq_ascan(hw.motor, 0, 10, 11, events=1))
+    daq_test(RE, daq, nbp.daq_ascan([hw.det], hw.motor, 0, 10, 11, events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_dscan(RE, daq, hw):
     logger.debug('test_daq_dscan')
-    daq_test(RE, daq, nbp.daq_dscan(hw.motor, 0, 10, 11, events=1))
+    daq_test(RE, daq, nbp.daq_dscan([hw.det], hw.motor, 0, 10, 11, events=1))
 
     # Quick sanity check on the deltas
     hw.motor.set(42)
-    msgs = list(nbp.daq_dscan(hw.motor, 0, 10, 11, events=1))
+    msgs = list(nbp.daq_dscan([hw.det], hw.motor, 0, 10, 11, events=1))
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     assert moves == list(range(42, 42 + 11)) + [42]
 
@@ -194,14 +187,15 @@ def test_daq_dscan(RE, daq, hw):
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_a2scan(RE, daq, hw):
     logger.debug('test_daq_a2scan')
-    daq_test(RE, daq, nbp.daq_a2scan(hw.motor1, 0, 10, hw.motor2, 0, 10, 11,
-                                     events=1))
+    daq_test(RE, daq, nbp.daq_a2scan([hw.det], hw.motor1, 0, 10, hw.motor2, 0,
+                                     10, 11, events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_daq_a3scan(RE, daq, hw):
     logger.debug('test_daq_a3scan')
-    daq_test(RE, daq, nbp.daq_a3scan(hw.motor1, 0, 10,
+    daq_test(RE, daq, nbp.daq_a3scan([hw.det],
+                                     hw.motor1, 0, 10,
                                      hw.motor2, 0, 10,
                                      hw.motor3, 0, 10, 11,
                                      events=1))
