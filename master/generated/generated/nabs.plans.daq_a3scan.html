@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans.daq_a3scan &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
+  <title>nabs.plans.daq_a3scan &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
   
 
   
@@ -30,7 +30,6 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                0.1.0+5.g35d56e0
+                0.1.0+9.ga2768b7
               </div>
             
           
@@ -192,7 +191,7 @@
 <h1>nabs.plans.daq_a3scan<a class="headerlink" href="#nabs-plans-daq-a3scan" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="nabs.plans.daq_a3scan">
-<code class="sig-prename descclassname">nabs.plans.</code><code class="sig-name descname">daq_a3scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m1</span></em>, <em class="sig-param"><span class="n">a1</span></em>, <em class="sig-param"><span class="n">b1</span></em>, <em class="sig-param"><span class="n">m2</span></em>, <em class="sig-param"><span class="n">a2</span></em>, <em class="sig-param"><span class="n">b2</span></em>, <em class="sig-param"><span class="n">m3</span></em>, <em class="sig-param"><span class="n">a3</span></em>, <em class="sig-param"><span class="n">b3</span></em>, <em class="sig-param"><span class="n">nsteps</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_a3scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plans.daq_a3scan" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">nabs.plans.</code><code class="sig-name descname">daq_a3scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">detectors</span></em>, <em class="sig-param"><span class="n">m1</span></em>, <em class="sig-param"><span class="n">a1</span></em>, <em class="sig-param"><span class="n">b1</span></em>, <em class="sig-param"><span class="n">m2</span></em>, <em class="sig-param"><span class="n">a2</span></em>, <em class="sig-param"><span class="n">b2</span></em>, <em class="sig-param"><span class="n">m3</span></em>, <em class="sig-param"><span class="n">a3</span></em>, <em class="sig-param"><span class="n">b3</span></em>, <em class="sig-param"><span class="n">nsteps</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_a3scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plans.daq_a3scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Three-dimensional daq scan with absolute positions.</p>
 <p>This moves three motors from start to end in nsteps steps, taking data in
 the DAQ at every step, and returning the motors to their original positions
@@ -200,6 +199,7 @@ at the end of the scan.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>detectors</strong> (<em>list of readables</em>) – Objects to read into Python in the scan.</p></li>
 <li><p><strong>m1</strong> (<em>Movable</em>) – The first movable object to scan.</p></li>
 <li><p><strong>a1</strong> (<em>int</em><em> or </em><em>float</em>) – The first point in the scan for m1.</p></li>
 <li><p><strong>b1</strong> (<em>int</em><em> or </em><em>float</em>) – The last point in the scan for m1.</p></li>

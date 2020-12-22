@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans.daq_delay_scan &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
+  <title>nabs.plans.daq_delay_scan &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
   
 
   
@@ -30,7 +30,6 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                0.1.0+5.g35d56e0
+                0.1.0+9.ga2768b7
               </div>
             
           
@@ -192,7 +191,7 @@
 <h1>nabs.plans.daq_delay_scan<a class="headerlink" href="#nabs-plans-daq-delay-scan" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="nabs.plans.daq_delay_scan">
-<code class="sig-prename descclassname">nabs.plans.</code><code class="sig-name descname">daq_delay_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_motor</span></em>, <em class="sig-param"><span class="n">time_points</span></em>, <em class="sig-param"><span class="n">sweep_time</span></em>, <em class="sig-param"><span class="n">duration</span><span class="o">=</span><span class="default_value">inf</span></em>, <em class="sig-param"><span class="n">record</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_delay_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plans.daq_delay_scan" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">nabs.plans.</code><code class="sig-name descname">daq_delay_scan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">detectors</span></em>, <em class="sig-param"><span class="n">time_motor</span></em>, <em class="sig-param"><span class="n">time_points</span></em>, <em class="sig-param"><span class="n">sweep_time</span></em>, <em class="sig-param"><span class="n">duration</span><span class="o">=</span><span class="default_value">inf</span></em>, <em class="sig-param"><span class="n">record</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_delay_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plans.daq_delay_scan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scan a laser delay timing motor with DAQ support.</p>
 <p>A delay scan is one that moves a
 <a class="reference external" href="https://pcdshub.github.io/pcdsdevices/generated/generated/pcdsdevices.epics_motor.DelayNewport.html#pcdsdevices.epics_motor.DelayNewport" title="(in PCDS Devices v2.10.0+88.g7e18030)"><code class="xref any docutils literal notranslate"><span class="pre">pcdsdevices.epics_motor.DelayNewport</span></code></a> back and forth.
@@ -211,6 +210,7 @@ slows us down and makes the data more annoying to analyze!</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>detectors</strong> (<em>list of readables</em>) – Objects to read into Python in the scan.</p></li>
 <li><p><strong>time_motor</strong> (<a class="reference external" href="https://pcdshub.github.io/pcdsdevices/generated/generated/pcdsdevices.epics_motor.DelayNewport.html#pcdsdevices.epics_motor.DelayNewport" title="(in PCDS Devices v2.10.0+88.g7e18030)"><code class="xref any docutils literal notranslate"><span class="pre">pcdsdevices.epics_motor.DelayNewport</span></code></a>) – The movable device in egu seconds.</p></li>
 <li><p><strong>time_points</strong> (<em>list of float</em>) – The times in second to move between.</p></li>
 <li><p><strong>sweep_time</strong> (<em>float</em>) – The duration we take to move from one end of the range to the other.</p></li>

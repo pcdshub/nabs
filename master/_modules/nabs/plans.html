@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
+  <title>nabs.plans &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
   
 
   
@@ -30,7 +30,6 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -60,7 +59,7 @@
             
             
               <div class="version">
-                0.1.0+5.g35d56e0
+                0.1.0+9.ga2768b7
               </div>
             
           
@@ -292,7 +291,8 @@
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="delay_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.delay_scan.html#nabs.plans.delay_scan">[docs]</a><span class="k">def</span> <span class="nf">delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+<div class="viewcode-block" id="delay_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.delay_scan.html#nabs.plans.delay_scan">[docs]</a><span class="k">def</span> <span class="nf">delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
+               <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A ``bluesky`` plan that sets up and executes the delay scan.</span>
 
@@ -310,6 +310,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
 <span class="sd">    time_motor : `pcdsdevices.epics_motor.DelayNewport`</span>
 <span class="sd">        The movable device in egu seconds.</span>
 
@@ -334,14 +337,14 @@
 
     <span class="k">def</span> <span class="nf">inner_delay_scan</span><span class="p">():</span>
         <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">abs_set</span><span class="p">(</span><span class="n">time_motor</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="n">velo</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">duration_scan</span><span class="p">([],</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">duration_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span>
                                          <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner_delay_scan</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="daq_delay_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan">[docs]</a><span class="k">def</span> <span class="nf">daq_delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-                   <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="daq_delay_scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan">[docs]</a><span class="k">def</span> <span class="nf">daq_delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
+                   <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan a laser delay timing motor with DAQ support.</span>
 
@@ -364,6 +367,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
 <span class="sd">    time_motor : `pcdsdevices.epics_motor.DelayNewport`</span>
 <span class="sd">        The movable device in egu seconds.</span>
 
@@ -383,8 +389,8 @@
 
     <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">inner_daq_delay_scan</span><span class="p">():</span>
-        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">delay_scan</span><span class="p">(</span><span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
-                                      <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span>
+                                      <span class="n">sweep_time</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner_daq_delay_scan</span><span class="p">())</span></div>
 
@@ -603,7 +609,7 @@
 
 <div class="viewcode-block" id="daq_ascan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_ascan.html#nabs.plans.daq_ascan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_ascan</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">daq_ascan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    One-dimensional daq scan with absolute positions.</span>
 
@@ -613,6 +619,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
 <span class="sd">    motor : Movable</span>
 <span class="sd">        A movable object to scan.</span>
 
@@ -647,13 +656,13 @@
 <span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="daq_dscan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_dscan.html#nabs.plans.daq_dscan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">relative_set_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_dscan</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">daq_dscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    One-dimensional daq scan with relative (delta) positions.</span>
 
@@ -663,6 +672,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
 <span class="sd">    motor : Movable</span>
 <span class="sd">        A movable object to scan.</span>
 
@@ -697,12 +709,12 @@
 <span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="daq_a2scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_a2scan.html#nabs.plans.daq_a2scan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_a2scan</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">daq_a2scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Two-dimensional daq scan with absolute positions.</span>
 
@@ -712,6 +724,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
 <span class="sd">    m1 : Movable</span>
 <span class="sd">        The first movable object to scan.</span>
 
@@ -755,12 +770,12 @@
 <span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="daq_a3scan"><a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_a3scan.html#nabs.plans.daq_a3scan">[docs]</a><span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_a3scan</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">daq_a3scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Three-dimensional daq scan with absolute positions.</span>
 
@@ -770,6 +785,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    detectors : list of readables</span>
+<span class="sd">        Objects to read into Python in the scan.</span>
+
 <span class="sd">    m1 : Movable</span>
 <span class="sd">        The first movable object to scan.</span>
 
@@ -822,7 +840,7 @@
 <span class="sd">    `nabs.preprocessors.daq_step_scan_decorator`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">([],</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
+    <span class="k">yield from</span> <span class="n">bp</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

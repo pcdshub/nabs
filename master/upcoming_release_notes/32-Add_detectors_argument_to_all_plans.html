@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.streams &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
+  <title>32 Add detectors argument to all plans &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
   
 
   
@@ -36,8 +36,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="nabs.streams.AverageStream" href="generated/nabs.streams.AverageStream.html" />
-    <link rel="prev" title="nabs.preprocessors.daq_step_scan_wrapper" href="generated/nabs.preprocessors.daq_step_scan_wrapper.html" /> 
+    <link rel="prev" title="29 delay-controls" href="29-delay-controls.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,23 +91,24 @@
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html">Optimization</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">Full API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="nabs.optimize.html">nabs.optimize</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nabs.plan_stubs.html">nabs.plan_stubs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nabs.plans.html">nabs.plans</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nabs.preprocessors.html">nabs.preprocessors</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">nabs.streams</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/nabs.streams.AverageStream.html">nabs.streams.AverageStream</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">Full API</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Notes</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../releases.html">Release History</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../upcoming_changes.html">Upcoming Changes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../upcoming_changes.html">Upcoming Changes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="29-delay-controls.html">29 delay-controls</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">32 Add detectors argument to all plans</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-changes">API Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             
@@ -155,15 +155,15 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../api.html">Full API</a> &raquo;</li>
+          <li><a href="../upcoming_changes.html">Upcoming Changes</a> &raquo;</li>
         
-      <li>nabs.streams</li>
+      <li>32 Add detectors argument to all plans</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/generated/nabs.streams.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/upcoming_release_notes/32-Add_detectors_argument_to_all_plans.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,21 +176,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-nabs.streams">
-<span id="nabs-streams"></span><h1>nabs.streams<a class="headerlink" href="#module-nabs.streams" title="Permalink to this headline">¶</a></h1>
-<p>Standard data streams for automated routines</p>
-<p class="rubric">Classes</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.streams.AverageStream.html#nabs.streams.AverageStream" title="nabs.streams.AverageStream"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AverageStream</span></code></a>([num])</p></td>
-<td><p>Stream that averages data points together</p></td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="add-detectors-argument-to-all-plans">
+<h1>32 Add detectors argument to all plans<a class="headerlink" href="#add-detectors-argument-to-all-plans" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="api-changes">
+<h2>API Changes<a class="headerlink" href="#api-changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>All plans now have a detectors argument to allow plotting during scans.
+If no plot is desired, simply pass in an empty list instead.</p></li>
+</ul>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>N/A</p></li>
+</ul>
+</div>
+<div class="section" id="bugfixes">
+<h2>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>N/A</p></li>
+</ul>
+</div>
+<div class="section" id="maintenance">
+<h2>Maintenance<a class="headerlink" href="#maintenance" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>N/A</p></li>
+</ul>
+</div>
+<div class="section" id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>ZryletTC</p></li>
+</ul>
+</div>
 </div>
 
 
@@ -201,10 +219,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/nabs.streams.AverageStream.html" class="btn btn-neutral float-right" title="nabs.streams.AverageStream" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="generated/nabs.preprocessors.daq_step_scan_wrapper.html" class="btn btn-neutral float-left" title="nabs.preprocessors.daq_step_scan_wrapper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="29-delay-controls.html" class="btn btn-neutral float-left" title="29 delay-controls" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

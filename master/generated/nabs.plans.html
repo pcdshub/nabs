@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>nabs.plans &mdash; nabs 0.1.0+5.g35d56e0 documentation</title>
+  <title>nabs.plans &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
   
 
   
@@ -30,7 +30,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                0.1.0+5.g35d56e0
+                0.1.0+9.ga2768b7
               </div>
             
           
@@ -191,7 +190,7 @@
 <p>Standalone <code class="docutils literal notranslate"><span class="pre">bluesky</span></code> plans for data collection.</p>
 <p>This is the LCLS counterpart to <code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans</span></code>.</p>
 <p>All plans in this module will work as-is when passed into a
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.run_engine.RunEngine.html#bluesky.run_engine.RunEngine" title="(in bluesky v1.6.7.post2+g888716e)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.run_engine.RunEngine</span></code></a>, including starting and stopping a run.</p>
+<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.run_engine.RunEngine.html#bluesky.run_engine.RunEngine" title="(in bluesky v1.6.7.post16+g6e799a77)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.run_engine.RunEngine</span></code></a>, including starting and stopping a run.</p>
 <p>Plans preceded by “daq” incorporate running the LCLS DAQ in the plan.</p>
 <p class="rubric">Functions</p>
 <table class="longtable docutils align-default">
@@ -200,22 +199,22 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_a2scan.html#nabs.plans.daq_a2scan" title="nabs.plans.daq_a2scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_a2scan</span></code></a>(m1, a1, b1, m2, a2, b2, nsteps)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_a2scan.html#nabs.plans.daq_a2scan" title="nabs.plans.daq_a2scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_a2scan</span></code></a>(detectors, m1, a1, b1, m2, a2, …)</p></td>
 <td><p>Two-dimensional daq scan with absolute positions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.daq_a3scan.html#nabs.plans.daq_a3scan" title="nabs.plans.daq_a3scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_a3scan</span></code></a>(m1, a1, b1, m2, a2, b2, m3, a3, …)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.daq_a3scan.html#nabs.plans.daq_a3scan" title="nabs.plans.daq_a3scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_a3scan</span></code></a>(detectors, m1, a1, b1, m2, a2, …)</p></td>
 <td><p>Three-dimensional daq scan with absolute positions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_ascan.html#nabs.plans.daq_ascan" title="nabs.plans.daq_ascan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_ascan</span></code></a>(motor, start, end, nsteps)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_ascan.html#nabs.plans.daq_ascan" title="nabs.plans.daq_ascan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_ascan</span></code></a>(detectors, motor, start, end, nsteps)</p></td>
 <td><p>One-dimensional daq scan with absolute positions.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.daq_count.html#nabs.plans.daq_count" title="nabs.plans.daq_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_count</span></code></a>([detectors, num, delay, per_shot, md])</p></td>
 <td><p>Take repeated DAQ runs with no motors.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan" title="nabs.plans.daq_delay_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_delay_scan</span></code></a>(time_motor, time_points, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan" title="nabs.plans.daq_delay_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_delay_scan</span></code></a>(detectors, time_motor, …[, …])</p></td>
 <td><p>Scan a laser delay timing motor with DAQ support.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.daq_dscan.html#nabs.plans.daq_dscan" title="nabs.plans.daq_dscan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_dscan</span></code></a>(motor, start, end, nsteps)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.daq_dscan.html#nabs.plans.daq_dscan" title="nabs.plans.daq_dscan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_dscan</span></code></a>(detectors, motor, start, end, nsteps)</p></td>
 <td><p>One-dimensional daq scan with relative (delta) positions.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.daq_list_scan.html#nabs.plans.daq_list_scan" title="nabs.plans.daq_list_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_list_scan</span></code></a>(*args[, per_step, md])</p></td>
@@ -224,7 +223,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.daq_scan.html#nabs.plans.daq_scan" title="nabs.plans.daq_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_scan</span></code></a>(*args[, num, per_step, md])</p></td>
 <td><p>Scan through a multi-motor start, end, num trajectory with DAQ support.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.delay_scan.html#nabs.plans.delay_scan" title="nabs.plans.delay_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delay_scan</span></code></a>(time_motor, time_points, sweep_time)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plans.delay_scan.html#nabs.plans.delay_scan" title="nabs.plans.delay_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delay_scan</span></code></a>(detectors, time_motor, …[, …])</p></td>
 <td><p>A <code class="docutils literal notranslate"><span class="pre">bluesky</span></code> plan that sets up and executes the delay scan.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plans.duration_scan.html#nabs.plans.duration_scan" title="nabs.plans.duration_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration_scan</span></code></a>(detectors, *args[, duration, …])</p></td>
