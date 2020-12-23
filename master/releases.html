@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Release History &mdash; nabs 0.1.0+9.ga2768b7 documentation</title>
+  <title>Release History &mdash; nabs 1.0.0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.1.0+9.ga2768b7
+                1.0.0
               </div>
             
           
@@ -98,11 +98,17 @@
 <p class="caption"><span class="caption-text">Developer Notes</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2020-12-22">v1.0.0 (2020-12-22)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-changes">API Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0-2020-11-17">v0.1.0 (2020-11-17)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Bugfixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-0-2018-04-19">v0.0.0 (2018-04-19)</a></li>
@@ -176,6 +182,31 @@
             
   <div class="section" id="release-history">
 <h1>Release History<a class="headerlink" href="#release-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v1-0-0-2020-12-22">
+<h2>v1.0.0 (2020-12-22)<a class="headerlink" href="#v1-0-0-2020-12-22" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="api-changes">
+<h3>API Changes<a class="headerlink" href="#api-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>All plans now have a detectors argument to allow plotting during scans.
+If no plot is desired, simply pass in an empty list instead.</p></li>
+</ul>
+</div>
+<div class="section" id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fix issue where the stage in the daq_delay_scan was erroneously included
+in the DAQ control variables. This actually slows down the scan and dumps
+extra, redundant data into the data stream.</p></li>
+</ul>
+</div>
+<div class="section" id="contributors">
+<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>zllentz</p></li>
+<li><p>ZryletTC</p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="v0-1-0-2020-11-17">
 <h2>v0.1.0 (2020-11-17)<a class="headerlink" href="#v0-1-0-2020-11-17" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="features">
@@ -220,8 +251,8 @@ A function decorator that modifies a plan to execute using the <a class="referen
 </li>
 </ul>
 </div>
-<div class="section" id="bugfixes">
-<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Bugfixes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix issues related to SignalRO moving around in the ophyd API</p></li>
 <li><p>Fix issues related to measure_average not working for integer values</p></li>
@@ -242,8 +273,8 @@ on these python versions.</p></li>
 <li><p>Fix issue with automated documentation uploads.</p></li>
 </ul>
 </div>
-<div class="section" id="contributors">
-<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Contributors<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>zllentz</p></li>
 </ul>

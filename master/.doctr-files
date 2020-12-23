@@ -37,8 +37,6 @@ master/_sources/optimize.rst.txt
 master/_sources/plans.rst.txt
 master/_sources/releases.rst.txt
 master/_sources/upcoming_changes.rst.txt
-master/_sources/upcoming_release_notes/29-delay-controls.rst.txt
-master/_sources/upcoming_release_notes/32-Add_detectors_argument_to_all_plans.rst.txt
 master/_sources/upcoming_release_notes/template-full.rst.txt
 master/_sources/upcoming_release_notes/template-short.rst.txt
 master/_static/basic.css
@@ -163,7 +161,5 @@ master/releases.html
 master/search.html
 master/searchindex.js
 master/upcoming_changes.html
-master/upcoming_release_notes/29-delay-controls.html
-master/upcoming_release_notes/32-Add_detectors_argument_to_all_plans.html
 master/upcoming_release_notes/template-full.html
 master/upcoming_release_notes/template-short.html
