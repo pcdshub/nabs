@@ -19,6 +19,7 @@ import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
+from bluesky.utils import Msg
 
 from . import preprocessors as nbpp
 
@@ -658,8 +659,8 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
 
 
-def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
-                      per_step=None, md=None):
+def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
+                      n1=0, n2=0, per_step=None, md=None):
     """
     Scan over two variables in steps simultaneously.
 
@@ -679,61 +680,49 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
         Motor object corresponding to the y axes.
     yy : list
         List of all the y points (samples) on the target grid.
-    nsample : int, optional
-        Indicates how many samples should be scanned. Defaults to `None`.
-        `None` will scan all points in `xx` and `yy`.
+    scan_motor : obj
+        The motor being scanned. It can be e.g., delay time, laser power, some
+        other motor position, etc.
+    ss : list
+        LIst of all the points (samples) for the scan_motor to go through.
+    n1 : int
+        Indicates how many samples should be scanned in the scan_motor.
+    n2 : int
+        Indicates how many shots should be taken, or how many samples should
+        be scanned on the grid.
     per_step : callable, optional
         Hook for customizing action of inner loop (messages per step).
         See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
         for details.
     md : dict, optional
         Additional metadata to include in the start document.
-
-    Examples
-    --------
-    >>> xx = [-100.0, -75.0, -50.0, -25.0, 0.0, 25.0]
-
-    >>> yy = [-100.0, -100.0, -100.0, -100.0, -100.0, -100.0]
-
-    >>> x_motor = FastMotor()
-
-    >>> y_motor = FastMotor()
-
-    >>> RE(fixed_target_scan([], x_motor, xx, y_motor, yy, nsample=4))
-
-    Transient Scan ID: 1     Time: 2020-12-16 11:51:41
-    Persistent Unique Scan ID: '8677bbbc-6801-4096-83f9-380ac4ee12a7'
-    New stream: 'primary'
-    +-----------+------------+------------+------------+
-    |   seq_num |       time |     motor1 |     motor2 |
-    +-----------+------------+------------+------------+
-    |         1 | 11:51:41.4 |   -100.000 |   -100.000 |
-    |         2 | 11:51:41.4 |    -75.000 |   -100.000 |
-    |         3 | 11:51:41.4 |    -50.000 |   -100.000 |
-    |         4 | 11:51:41.4 |    -25.000 |   -100.000 |
-    +-----------+------------+------------+------------+
-    generator list_scan ['8677bbbc'] (scan num: 1)
     """
 
     detectors = list(detectors)
-    if nsample and nsample > len(xx):
-        msg = ('The number of samples: %s is bigger then the available'
-               ' samples: %s. Please provide a number in range.',
-               nsample, len(xx))
-        logger.warning(msg)
-        raise IndexError(msg)
+    # detectors = [daq, sequencer]
 
-    if nsample:
-        xx = xx[:nsample]
-        yy = yy[:nsample]
+    # @bpp.reset_positions_decorator(motors)
+    # @bpp.relative_set_decorator(motors)
+    def inner_scan():
+        for i in range(n1):
+            #  scan_motor.move_to_step(N)
+            # yield from bp.list_scan([], scan_motor, [ss[i]])
+            yield from bp.list_scan([], scan_motor, ss)
+            for j in range(n2):
+                # xy.moveToNextTarget()
+                # yield from bp.list_scan([], x_motor, [xx[j]], y_motor,
+                #                                       [yy[j]])
+                yield from bp.list_scan([], x_motor, xx, y_motor, yy)
+                # pp.get_burst(1)
+                yield Msg('open_run')
+                yield from bps.trigger_and_read(detectors + [x_motor, y_motor,
+                                                             scan_motor])
+                yield Msg('close_run')
+    return (yield from inner_scan())
 
-    yield from bp.list_scan(detectors, x_motor, xx, y_motor, yy,
-                            per_step=per_step, md=md)
 
-
-@nbpp.daq_step_scan_decorator
-def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
-                          per_step=None, md=None):
+def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
+                          n1=0, n2=0, per_step=None, md=None, record=True):
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
@@ -753,32 +742,28 @@ def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, nsample=None,
         Motor object corresponding to the y axes.
     yy : list
         List of all the y points (samples) on the target grid.
-    nsample : int, optional
-        Indicates how many samples should be scanned. Defaults to `None`.
-        `None` will scan all points in `xx` and `yy`.
-    events : int, optional
-        Number of events to take at each step. If omitted, uses the
-        duration argument or the last configured value.
-
-    duration : int or float, optional
-        Duration of time to spend at each step. If omitted, uses the events
-        argument or the last configured value.
-
-    record : bool, optional
-        Whether or not to record the run in the DAQ. Defaults to True because
-        we don't want to accidentally skip recording good runs.
-
-    use_l3t : bool, optional
-        Whether or not the use the l3t filter for the events argument. Defaults
-        to False to avoid confusion from unconfigured filters.
-
+    scan_motor : obj
+        The motor being scanned. It can be e.g., delay time, laser power, some
+        other motor position, etc.
+    ss : list
+        LIst of all the points (samples) for the scan_motor to go through.
+    n1 : int
+        Indicates how many samples should be scanned in the scan_motor.
+    n2 : int
+        Indicates how many shots should be taken, or how many samples should
+        be scanned on the grid.
     per_step : callable, optional
         Hook for customizing action of inner loop (messages per step).
         See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
         for details.
-
     md : dict, optional
         Additional metadata to include in the start document.
     """
-    yield from fixed_target_scan(detectors, x_motor, xx, y_motor, yy,
-                                 nsample=nsample)
+    control_devices = [x_motor, y_motor, scan_motor, detectors]
+
+    @nbpp.daq_during_decorator(record=record, controls=control_devices)
+    def inner_daq_fixed_target_scan():
+        yield from fixed_target_scan(list(detectors), x_motor, xx, y_motor, yy,
+                                     scan_motor, ss, n1, n2)
+
+    return (yield from inner_daq_fixed_target_scan())
