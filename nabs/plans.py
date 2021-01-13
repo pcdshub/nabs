@@ -701,22 +701,21 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
     detectors = list(detectors)
     # detectors = [daq, sequencer]
 
-    # @bpp.reset_positions_decorator(motors)
-    # @bpp.relative_set_decorator(motors)
     def inner_scan():
+        # starting from the beginning of the list.
+        next_target = 0
         for i in range(n1):
             #  scan_motor.move_to_step(N)
-            # yield from bp.list_scan([], scan_motor, [ss[i]])
-            yield from bp.list_scan([], scan_motor, ss)
+            yield from bp.list_scan([], scan_motor, [ss[i]])
             for j in range(n2):
                 # xy.moveToNextTarget()
-                # yield from bp.list_scan([], x_motor, [xx[j]], y_motor,
-                #                                       [yy[j]])
-                yield from bp.list_scan([], x_motor, xx, y_motor, yy)
+                yield from bp.list_scan([], x_motor, [xx[next_target]],
+                                        y_motor, [yy[next_target]])
+                next_target += 1
                 # pp.get_burst(1)
                 yield Msg('open_run')
-                yield from bps.trigger_and_read(detectors + [x_motor, y_motor,
-                                                             scan_motor])
+                yield from bps.trigger_and_read(detectors + [x_motor,
+                                                y_motor, scan_motor])
                 yield Msg('close_run')
     return (yield from inner_scan())
 
