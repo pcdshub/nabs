@@ -19,7 +19,7 @@ import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
-from bluesky.utils import Msg
+
 
 from . import preprocessors as nbpp
 
@@ -660,7 +660,7 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
 
 def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
-                      n1=0, n2=0, per_step=None, md=None):
+                      n1=0, n_targets=0):
     """
     Scan over two variables in steps simultaneously.
 
@@ -699,25 +699,42 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
     """
 
     detectors = list(detectors)
-    # detectors = [daq, sequencer]
+    # detectors = [daq, seq]
+    if n_targets and n_targets > len(xx):
+        msg = ('The number of samples: %s is bigger then the available'
+               ' samples: %s. Please provide a number in range.',
+               n_targets, len(xx))
+        logger.warning(msg)
+        raise IndexError(msg)
 
+    # TODO: check if xx, yy divisible by n_targets?? or handle if not....
+    # # n_targets == n_shots
     def inner_scan():
-        # starting from the beginning of the list.
-        next_target = 0
-        for i in range(n1):
-            #  scan_motor.move_to_step(N)
-            yield from bp.list_scan([], scan_motor, [ss[i]])
-            for j in range(n2):
-                # xy.moveToNextTarget()
-                yield from bp.list_scan([], x_motor, [xx[next_target]],
-                                        y_motor, [yy[next_target]])
-                next_target += 1
-                # pp.get_burst(1)
-                yield Msg('open_run')
-                yield from bps.trigger_and_read(detectors + [x_motor,
-                                                y_motor, scan_motor])
-                yield Msg('close_run')
+        for j in range(n1):
+            yield from bp.list_scan([], scan_motor, [ss[j]])
+            x_pos = xx[(j * n_targets):((j + 1) * n_targets)]
+            y_pos = yy[(j * n_targets):((j + 1) * n_targets)]
+            yield from bp.list_scan(detectors, x_motor, x_pos, y_motor, y_pos)
     return (yield from inner_scan())
+
+    # def inner_scan():
+    #     # starting from the beginning of the list.
+    #     next_target = 0
+    #     for i in range(n1):
+    #         # scan_motor.move_to_step(N)
+    #         yield from bp.list_scan([], scan_motor, [ss[i]])
+    #         # yield from bp.count([detectors], scan_motor, i)
+    #         for j in range(n_targets):
+    #             # xy.moveToNextTarget()
+    #             yield from bp.list_scan(detectors, x_motor,
+    #                                     [xx[next_target]],
+    #                                     y_motor, [yy[next_target]])
+    #             next_target += 1
+    #             # pp.get_burst(1)
+    #             # assuming the decotrator will be the sequencer here with
+    #             # a PP.burst sequence....
+    #             # yield from bps.trigger(detectors)
+    # return (yield from inner_scan())
 
 
 def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
