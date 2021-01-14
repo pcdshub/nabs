@@ -1,3 +1,5 @@
+from ophyd.sim import make_fake_device, NullStatus
+from pcdsdevices.sequencer import EventSequencer
 import logging
 from collections import defaultdict
 
@@ -207,37 +209,63 @@ def test_daq_a3scan(RE, daq, hw):
                                      events=1))
 
 
+FakeSequencer = make_fake_device(EventSequencer)
+
+
+# Simulated Sequencer for use in scans
+class SimSequencer(FakeSequencer):
+    """Simulated Sequencer usable in bluesky plans"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Forces an immediate stop on complete
+        self.play_mode.put(2)
+        # Initialize all signals to *something* to appease bluesky
+        # Otherwise, these are all None which is invalid
+        self.play_control.sim_put(0)
+        self.sequence_length.sim_put(0)
+        self.current_step.sim_put(0)
+        self.play_count.sim_put(0)
+        self.play_status.sim_put(0)
+        self.sync_marker.sim_put(0)
+        self.next_sync.sim_put(0)
+        self.pulse_req.sim_put(0)
+        self.sequence_owner.sim_put(0)
+        self.sequence.ec_array.sim_put([0] * 2048)
+        self.sequence.bd_array.sim_put([0] * 2048)
+        self.sequence.fd_array.sim_put([0] * 2048)
+        self.sequence.bc_array.sim_put([0] * 2048)
+
+        # pp burst seq
+        pp_burst_seq = [[94, 0, 0, 0]]
+        self.sequence.put_seq(pp_burst_seq)
+
+    def kickoff(self):
+        super().kickoff()
+        return NullStatus()
+
+
+@pytest.fixture(scope='function')
+def sequence():
+    seq = FakeSequencer('ECS:TST:100', name='seq')
+    # Running forever
+    seq.play_mode.put(0)
+    seq.play_control.put(0)
+    return seq
+
+
 @pytest.mark.timeout(PLAN_TIMEOUT)
-def test_fixed_target_scan(RE, hw):
+def test_fixed_target_scan(RE, hw, sequence):
     logger.debug('test_fixed_target_scan')
     x_motor = FastMotor()
     y_motor = FastMotor()
-    xx = [-100.0, -75.0, -50.0, -25.0, 0.0, 25.0]
-    yy = [-100.0, -56.0, -100.0, -100.0, -100.0, -80.0]
-    nsample = 3
-    # scan a certain amount of samples
-    msgs = nbp.fixed_target_scan([], x_motor, xx, y_motor, yy, nsample)
-    moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
-    assert moves == [-100.0, -100.0, -75.0, -56.0, -50.0, -100.0]
-    # scan all
-    msgs = nbp.fixed_target_scan([hw.det], x_motor, xx, y_motor, yy)
-    moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
-    # if motor already at the position in list, it will not be set
-    assert moves == [-100.0, -100.0, -75.0, -56.0, -50.0, -100.0, -25.0,
-                     0.0, 25.0, -80.0]
-    # test index error
-    nsample = 30
-    msgs_err = nbp.fixed_target_scan([hw.det], x_motor, xx, y_motor, yy,
-                                     nsample=nsample)
-    with pytest.raises(IndexError):
-        RE(msgs_err)
-    RE(msgs)
+    scan_motor = FastMotor()
+    xx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    yy = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ss = [1, 2, 3, 4, 5]
+    msgs = nbp.fixed_target_scan([sequence], x_motor, xx, y_motor, yy,
+                                 scan_motor, ss, n1=2, n_targets=3)
+    moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    assert moves == [1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 5, 5, 6, 6]
 
-
-@pytest.mark.timeout(PLAN_TIMEOUT)
-def test_daq_fixed_target_scan(RE, daq, hw):
-    logger.debug('test_daq_fixed_target_scan')
-    xx = [-100.0, -75.0, -50.0, -25.0, 0.0, 25.0]
-    yy = [-100.0, -56.0, -100.0, -100.0, -100.0, -80.0]
-    daq_test(RE, daq, nbp.daq_fixed_target_scan([hw.det], hw.motor1, xx,
-                                                hw.motor2, yy, events=1))
+    # for msg in msgs:
+    # print(msg.command, msg.args, msg, msg.obj, msg.run, msg.kwargs)
