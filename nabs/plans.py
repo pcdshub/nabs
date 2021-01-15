@@ -660,7 +660,7 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
 
 def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
-                      n1=0, n2=0):
+                      n1, n2):
     """
     Scan over two variables in steps simultaneously.
 
@@ -690,12 +690,6 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
     n2 : int
         Indicates how many shots should be taken, or how many samples should
         be scanned on the grid.
-    per_step : callable, optional
-        Hook for customizing action of inner loop (messages per step).
-        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
-        for details.
-    md : dict, optional
-        Additional metadata to include in the start document.
     """
 
     detectors = list(detectors)
@@ -710,7 +704,7 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
 
     def inner_scan():
         for j in range(n1):
-            yield from bp.list_scan([], scan_motor, [ss[j]])
+            yield from bp.list_scan([], scan_motor, ss[j:(j+1)])
             x_pos = xx[(j * n2):((j + 1) * n2)]
             y_pos = yy[(j * n2):((j + 1) * n2)]
             yield from bp.list_scan(detectors, x_motor, x_pos, y_motor, y_pos)
@@ -718,7 +712,7 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
 
 
 def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
-                          n1=0, n2=0, record=True, events=None):
+                          n1, n2, record=True, events=None):
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
@@ -748,12 +742,6 @@ def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
     n2 : int
         Indicates how many shots should be taken, or how many samples should
         be scanned on the grid.
-    per_step : callable, optional
-        Hook for customizing action of inner loop (messages per step).
-        See docstring of `bluesky.plan_stubs.one_nd_step` (the default)
-        for details.
-    md : dict, optional
-        Additional metadata to include in the start document.
     """
     control_devices = [x_motor, y_motor, scan_motor]
 

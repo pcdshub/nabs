@@ -270,7 +270,7 @@ def test_fixed_target_scan(RE, hw, sequence):
     with pytest.raises(IndexError):
         RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
                                  hw.motor2, yy, hw.motor, ss=ss,
-                                 n1=5, n2=3))
+                                 n1=5, n2=1))
     with pytest.raises(IndexError):
         RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
                                  hw.motor2, yy, hw.motor, ss=ss,
