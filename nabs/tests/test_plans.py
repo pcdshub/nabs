@@ -237,6 +237,9 @@ class SimSequencer(FakeSequencer):
 
         # pp burst seq
         pp_burst_seq = [[94, 0, 0, 0]]
+        # Run sequence once
+        self.sequence.play_mode.put(0)
+        # free_seq = [[98, 0, 0, 0]]
         self.sequence.put_seq(pp_burst_seq)
 
     def kickoff(self):
@@ -247,8 +250,7 @@ class SimSequencer(FakeSequencer):
 @pytest.fixture(scope='function')
 def sequence():
     seq = FakeSequencer('ECS:TST:100', name='seq')
-    # Running forever
-    seq.play_mode.put(0)
+    seq.play_mode.put(2)
     seq.play_control.put(0)
     return seq
 
@@ -256,16 +258,42 @@ def sequence():
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_fixed_target_scan(RE, hw, sequence):
     logger.debug('test_fixed_target_scan')
-    x_motor = FastMotor()
-    y_motor = FastMotor()
-    scan_motor = FastMotor()
     xx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     yy = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    ss = [1, 2, 3, 4, 5]
-    msgs = nbp.fixed_target_scan([sequence], x_motor, xx, y_motor, yy,
-                                 scan_motor, ss, n1=2, n_targets=3)
+    ss = [1, 2, 3, 4]
+    msgs = list(nbp.fixed_target_scan([sequence], hw.motor1, xx, hw.motor2, yy,
+                                      hw.motor, ss=ss, n1=2, n2=3))
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     assert moves == [1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 5, 5, 6, 6]
+    RE(msgs)
 
-    # for msg in msgs:
-    # print(msg.command, msg.args, msg, msg.obj, msg.run, msg.kwargs)
+    with pytest.raises(IndexError):
+        RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
+                                 hw.motor2, yy, hw.motor, ss=ss,
+                                 n1=5, n2=3))
+    with pytest.raises(IndexError):
+        RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
+                                 hw.motor2, yy, hw.motor, ss=ss,
+                                 n1=2, n2=9))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_fixed_target_scan(RE, daq, hw, sequence):
+    logger.debug('test_daq_fixed_target_scan')
+    xx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    yy = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ss = [1, 2, 3, 4]
+
+    msgs = list(nbp.daq_fixed_target_scan([sequence], hw.motor1, xx,
+                                          hw.motor2, yy, hw.motor, ss,
+                                          n1=2, n2=3, events=1))
+    configure_message = None
+    for msg in msgs:
+        if msg.command == 'configure' and msg.obj is daq:
+            configure_message = msg
+            break
+
+    assert configure_message.kwargs['record'] is True
+    assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
+                                                    hw.motor]
+    RE(msgs)
