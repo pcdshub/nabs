@@ -9,7 +9,7 @@ from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
 from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
-
+from bluesky.simulators import summarize_plan
 import nabs.plans as nbp
 
 PLAN_TIMEOUT = 60
@@ -263,9 +263,11 @@ def test_fixed_target_scan(RE, hw, sequence):
     ss = [1, 2, 3, 4]
     msgs = list(nbp.fixed_target_scan([sequence], hw.motor1, xx, hw.motor2, yy,
                                       hw.motor, ss=ss, n1=2, n2=3))
+
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     assert moves == [1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 5, 5, 6, 6]
     RE(msgs)
+    summarize_plan(msgs)
 
     with pytest.raises(IndexError):
         RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
@@ -291,9 +293,11 @@ def test_daq_fixed_target_scan(RE, daq, hw, sequence):
     for msg in msgs:
         if msg.command == 'configure' and msg.obj is daq:
             configure_message = msg
+            print(configure_message)
             break
 
     assert configure_message.kwargs['record'] is True
     assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
                                                     hw.motor]
     RE(msgs)
+    summarize_plan(msgs)
