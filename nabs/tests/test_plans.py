@@ -266,6 +266,7 @@ def test_fixed_target_scan(RE, hw, sequence):
 
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     assert moves == [1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 5, 5, 6, 6]
+
     RE(msgs)
     summarize_plan(msgs)
 
@@ -293,7 +294,6 @@ def test_daq_fixed_target_scan(RE, daq, hw, sequence):
     for msg in msgs:
         if msg.command == 'configure' and msg.obj is daq:
             configure_message = msg
-            print(configure_message)
             break
 
     assert configure_message.kwargs['record'] is True

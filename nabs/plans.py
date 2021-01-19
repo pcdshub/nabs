@@ -19,7 +19,6 @@ import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
-from bluesky.utils import Msg
 
 
 from . import preprocessors as nbpp
@@ -685,7 +684,7 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
         The motor being scanned. It can be e.g., delay time, laser power, some
         other motor position, etc.
     ss : list
-        LIst of all the points (samples) for the scan_motor to go through.
+        List of all the points (samples) for the scan_motor to go through.
     n1 : int
         Indicates how many samples should be scanned in the scan_motor.
     n2 : int
@@ -693,7 +692,6 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
         be scanned on the grid.
     """
     detectors = list(detectors)
-    motors = [x_motor, y_motor, scan_motor]
 
     if (n1 > len(ss)):
         raise IndexError(f'The number of n1 {n1} is bigger than scan_motor '
@@ -703,24 +701,17 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
                          f' bigger than the available samples: {len(xx)}. '
                          'Please provide a number in range.')
 
-    @bpp.stage_decorator(detectors + motors)
     def inner_scan():
         yield from bps.open_run(md={})
-
         for j in range(n1):
-            yield Msg('set', scan_motor, ss[j], group='A')
-            yield Msg('wait', group='A')
-            yield Msg('create', name=f'{scan_motor}')
-            yield Msg('read', scan_motor)
-            yield Msg('save')
-            yield Msg('checkpoint')
-            # yield from bpp.stub_wrapper(bp.list_scan(detectors, scan_motor,
-            #                             ss[j:(j + 1)]))
+            yield from bps.create(name='scan_motor')
+            yield from bps.mv(scan_motor, ss[j])
+            yield from bps.read(scan_motor)
+            yield from bps.save()
             x_pos = xx[(j * n2):((j + 1) * n2)]
             y_pos = yy[(j * n2):((j + 1) * n2)]
             yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
                                         x_pos, y_motor, y_pos))
-
         yield from bps.close_run()
     return (yield from inner_scan())
 
