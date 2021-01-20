@@ -691,7 +691,7 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
         Indicates how many shots should be taken, or how many samples should
         be scanned on the grid.
     """
-    detectors = list(detectors)
+    detectors = list(detectors) + [scan_motor]
 
     if (n1 > len(ss)):
         raise IndexError(f'The number of n1 {n1} is bigger than scan_motor '
@@ -704,10 +704,8 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
     def inner_scan():
         yield from bps.open_run(md={})
         for j in range(n1):
-            yield from bps.create(name='scan_motor')
             yield from bps.mv(scan_motor, ss[j])
             yield from bps.read(scan_motor)
-            yield from bps.save()
             x_pos = xx[(j * n2):((j + 1) * n2)]
             y_pos = yy[(j * n2):((j + 1) * n2)]
             yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
