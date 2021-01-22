@@ -665,23 +665,21 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     Scan over two variables in steps simultaneously.
 
     This is a `nabs` version of ``bluesky``'s built-in
-    `bluesky.plans.list_scan` plan. It takes in consideration the number of
-    samples to be scanned out of the samples given in `xx` and `yy`.
+    `bluesky.plans.list_scan` plan.
+    This scan is designed to be used with 3 motors, the x and y motors that
+    move to a designaget target on a sample wafer, and one scan_motor that can
+    be delay time, laser power or some other motor positions.
 
     Parameters
     ----------
     sample : str
         The name of the sample we're interested in.
-    detectors : list of readable
+    detectors : list
         Objects to read into Python in the scan.
     x_motor : obj
         Motor object corresponding to the x axes.
-    xx : list
-        List of all the x points (samples) on the target grid.
     y_motor : obj
         Motor object corresponding to the y axes.
-    yy : list
-        List of all the y points (samples) on the target grid.
     scan_motor : obj
         The motor being scanned. It can be e.g., delay time, laser power, some
         other motor position, etc.
@@ -690,6 +688,8 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     n_shots : int
         Indicates how many shots should be taken, or how many samples should
         be scanned on the grid.
+    path : str
+        Path where the sample file is located.
     """
 
     # TODO: remember what targets have been shot -
@@ -741,26 +741,30 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
 
     Parameters
     ----------
-    detectors : list of readables
+    sample : str
+        The name of the sample we're interested in.
+    detectors : list
         Objects to read into Python in the scan.
     x_motor : obj
         Motor object corresponding to the x axes.
-    xx : list
-        List of all the x points (samples) on the target grid.
     y_motor : obj
         Motor object corresponding to the y axes.
-    yy : list
-        List of all the y points (samples) on the target grid.
     scan_motor : obj
         The motor being scanned. It can be e.g., delay time, laser power, some
         other motor position, etc.
     ss : list
-        LIst of all the points (samples) for the scan_motor to go through.
-    n1 : int
-        Indicates how many samples should be scanned in the scan_motor.
-    n2 : int
+        List of all the points (samples) for the scan_motor to go through.
+    n_shots : int
         Indicates how many shots should be taken, or how many samples should
         be scanned on the grid.
+    path : str
+        Path where the sample file is located.
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
     """
     control_devices = [x_motor, y_motor, scan_motor]
 
