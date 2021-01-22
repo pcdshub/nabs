@@ -1,5 +1,3 @@
-from ophyd.sim import make_fake_device, NullStatus
-from pcdsdevices.sequencer import EventSequencer
 import logging
 from collections import defaultdict
 
@@ -11,6 +9,8 @@ from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
 from bluesky.simulators import summarize_plan
 import nabs.plans as nbp
+
+from nabs.plan_stubs import get_sample_info
 
 PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
@@ -209,87 +209,110 @@ def test_daq_a3scan(RE, daq, hw):
                                      events=1))
 
 
-FakeSequencer = make_fake_device(EventSequencer)
-
-
-# Simulated Sequencer for use in scans
-class SimSequencer(FakeSequencer):
-    """Simulated Sequencer usable in bluesky plans"""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Forces an immediate stop on complete
-        self.play_mode.put(2)
-        # Initialize all signals to *something* to appease bluesky
-        # Otherwise, these are all None which is invalid
-        self.play_control.sim_put(0)
-        self.sequence_length.sim_put(0)
-        self.current_step.sim_put(0)
-        self.play_count.sim_put(0)
-        self.play_status.sim_put(0)
-        self.sync_marker.sim_put(0)
-        self.next_sync.sim_put(0)
-        self.pulse_req.sim_put(0)
-        self.sequence_owner.sim_put(0)
-        self.sequence.ec_array.sim_put([0] * 2048)
-        self.sequence.bd_array.sim_put([0] * 2048)
-        self.sequence.fd_array.sim_put([0] * 2048)
-        self.sequence.bc_array.sim_put([0] * 2048)
-
-        # pp burst seq
-        pp_burst_seq = [[94, 0, 0, 0]]
-        # Run sequence once
-        self.sequence.play_mode.put(0)
-        # free_seq = [[98, 0, 0, 0]]
-        self.sequence.put_seq(pp_burst_seq)
-
-    def kickoff(self):
-        super().kickoff()
-        return NullStatus()
-
-
 @pytest.fixture(scope='function')
-def sequence():
-    seq = FakeSequencer('ECS:TST:100', name='seq')
-    seq.play_mode.put(2)
-    seq.play_control.put(0)
-    return seq
+def sample_file(tmp_path):
+    path = tmp_path / "sub"
+    path.mkdir()
+    sample_file = path / "samples.yml"
+    sample_file.write_text("""
+test_sample:
+  time_created: '2021-01-22 14:29:29.681059'
+  top_left:
+  - -20.59374999999996
+  - 26.41445312499999
+  top_right:
+  - -19.838671874999946
+  - 26.408203124999986
+  bottom_right:
+  - -19.426171874999945
+  - 51.39570312500023
+  bottom_left:
+  - -20.176171875000115
+  - 51.414453125000215
+  M: 101
+  N: 4
+  coefficients:
+  - -20.59374999999996
+  - 0.7550781250000149
+  - 0.4175781249998458
+  - -0.005078124999844391
+  - 26.41445312499999
+  - -0.006250000000004974
+  - 25.000000000000224
+  - -0.012499999999977973
+  last_shot_index: -1
+  xx:
+  - -20.59374999999996
+  - -20.342057291666624
+  - -20.090364583333283
+  - -19.838671874999946
+  - -20.589574218749963
+  - -20.33789843749996
+  - -20.08622265624995
+  - -19.834546874999948
+  yy:
+  - 26.41445312499999
+  - 26.412369791666656
+  - 26.41028645833332
+  - 26.408203124999986
+  - 26.664453124999994
+  - 26.66232812499999
+  - 26.660203124999992
+  - 26.65807812499999
+    """)
+    return sample_file
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
-def test_fixed_target_scan(RE, hw, sequence):
+def test_fixed_target_scan(RE, hw, sample_file):
     logger.debug('test_fixed_target_scan')
-    xx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    yy = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    ss = [1, 2, 3, 4]
-    msgs = list(nbp.fixed_target_scan([sequence], hw.motor1, xx, hw.motor2, yy,
-                                      hw.motor, ss=ss, n1=2, n2=3))
+    ss = [1, 2]
+
+    msgs = list(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
+                                      x_motor=hw.motor1, y_motor=hw.motor2,
+                                      scan_motor=hw.motor3, ss=ss,
+                                      n_shots=3, path=sample_file))
+    sample_info = get_sample_info('test_sample', sample_file)
+    assert sample_info[2] == 5
+    expected_moves = [1,                    # scan_motor[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656,   # y[1]
+                      -20.090364583333283,  # x[2]
+                      26.41028645833332,    # y[2]
+                      2,                    # scan_motor[1]
+                      -19.838671874999946,  # x[3]
+                      26.408203124999986,   # y[3]
+                      -20.589574218749963,  # x[4]
+                      26.664453124999994,   # y[4]
+                      -20.33789843749996,   # x[5]
+                      26.66232812499999]    # y[5]
 
     moves = [msg.args[0] for msg in msgs if msg.command == 'set']
-    assert moves == [1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 5, 5, 6, 6]
+    assert moves == expected_moves
 
     RE(msgs)
     summarize_plan(msgs)
 
     with pytest.raises(IndexError):
-        RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
-                                 hw.motor2, yy, hw.motor, ss=ss,
-                                 n1=5, n2=1))
-    with pytest.raises(IndexError):
-        RE(nbp.fixed_target_scan([hw.det4], hw.motor1, xx,
-                                 hw.motor2, yy, hw.motor, ss=ss,
-                                 n1=2, n2=9))
+        RE(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
+                                 x_motor=hw.motor1, y_motor=hw.motor2,
+                                 scan_motor=hw.motor3, ss=ss,
+                                 n_shots=10, path=sample_file))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
-def test_daq_fixed_target_scan(RE, daq, hw, sequence):
+def test_daq_fixed_target_scan(RE, daq, hw, sample_file):
     logger.debug('test_daq_fixed_target_scan')
-    xx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    yy = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    ss = [1, 2, 3, 4]
+    ss = [1, 2]
 
-    msgs = list(nbp.daq_fixed_target_scan([sequence], hw.motor1, xx,
-                                          hw.motor2, yy, hw.motor, ss,
-                                          n1=2, n2=3, events=1))
+    msgs = list(nbp.daq_fixed_target_scan(sample='test_sample',
+                                          detectors=[hw.det],
+                                          x_motor=hw.motor1, y_motor=hw.motor2,
+                                          scan_motor=hw.motor3, ss=ss,
+                                          n_shots=3, path=sample_file,
+                                          record=True, events=1))
     configure_message = None
     for msg in msgs:
         if msg.command == 'configure' and msg.obj is daq:
@@ -298,6 +321,6 @@ def test_daq_fixed_target_scan(RE, daq, hw, sequence):
 
     assert configure_message.kwargs['record'] is True
     assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
-                                                    hw.motor]
+                                                    hw.motor3]
     RE(msgs)
     summarize_plan(msgs)
