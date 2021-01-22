@@ -660,7 +660,7 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
 
 def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
-                      n_shots):
+                      n_shots, path):
     """
     Scan over two variables in steps simultaneously.
 
@@ -698,11 +698,12 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     # TODO: maybe some validation for the path
 
     # TODO: take this test _path out and figure out where it goes
-    _path = '/home/cristina/workspace/pcdsdevices/samples.yml'
+    #  _path = '/home/cristina/workspace/pcdsdevices/samples.yml'
+
     global _last_index
     detectors = list(detectors) + [scan_motor]
 
-    _, _, last_shot_index, xx, yy = get_sample_info(sample, _path)
+    _, _, last_shot_index, xx, yy = get_sample_info(sample, path)
     _last_index = last_shot_index
     if (last_shot_index + (n_shots * len(ss))) >= len(xx):
         raise IndexError('The number of n_shots * len(ss): '
@@ -725,12 +726,12 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
                                                      x_pos, y_motor, y_pos))
             _last_index = _last_index + n_shots
         yield from bps.close_run()
-        update_sample(sample, _path, _last_index)
+        update_sample(sample, path, _last_index)
     return (yield from inner_scan())
 
 
-def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
-                          n1, n2, record=True, events=None):
+def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
+                          n_shots, path, record=True, events=None):
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
@@ -765,9 +766,9 @@ def daq_fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
 
     @nbpp.daq_during_decorator(record=record, controls=control_devices)
     def inner_daq_fixed_target_scan():
-        yield from fixed_target_scan(detectors=detectors, x_motor=x_motor,
-                                     xx=xx, y_motor=y_motor, yy=yy,
-                                     scan_motor=scan_motor, ss=ss, n1=n1,
-                                     n2=n2)
+        yield from fixed_target_scan(sample=sample, detectors=detectors,
+                                     x_motor=x_motor, y_motor=y_motor,
+                                     scan_motor=scan_motor, ss=ss,
+                                     n_shots=n_shots, path=path)
 
     return (yield from inner_daq_fixed_target_scan())
