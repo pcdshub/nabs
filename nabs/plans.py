@@ -19,7 +19,7 @@ import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
-
+import yaml
 
 from . import preprocessors as nbpp
 
@@ -659,8 +659,8 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
 
 
-def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
-                      n1, n2):
+def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
+                      n_shots):
     """
     Scan over two variables in steps simultaneously.
 
@@ -670,7 +670,9 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
 
     Parameters
     ----------
-    detectors : list of readables
+    sample : str
+        The name of the sample we're interested in.
+    detectors : list of readable
         Objects to read into Python in the scan.
     x_motor : obj
         Motor object corresponding to the x axes.
@@ -685,31 +687,130 @@ def fixed_target_scan(detectors, x_motor, xx, y_motor, yy, scan_motor, ss,
         other motor position, etc.
     ss : list
         List of all the points (samples) for the scan_motor to go through.
-    n1 : int
-        Indicates how many samples should be scanned in the scan_motor.
-    n2 : int
+    n_shots : int
         Indicates how many shots should be taken, or how many samples should
         be scanned on the grid.
     """
+
+    # TODO: remember what targets have been shot -
+    # display this in a little window
+    # TODO: if a run gets terminated, remember where to continue
+
+    _path = '/home/cristina/workspace/pcdsdevices/samples.yml'
+    _last_index = 0
+
+    def update_sample(sample_name, path, last_shot_index):
+        """
+        Update the current sample information after a run.
+
+        Parameters
+        ----------
+        sample_name : str
+            A name to identify the sample grid, should be snake_case style.
+        path : str
+            Path to the `.yml` file. Defaults to the path defined when
+            creating this object.
+        last_shot_index : int
+            Indicated the position in the list of the last shot target,
+            where the first index in the list is 0.
+
+        """
+        global _last_index
+        _last_index = last_shot_index
+        data = {"last_shot_index": last_shot_index}
+        with open(path, 'r+') as sample_file:
+            yaml_dict = yaml.safe_load(sample_file) or {}
+            yaml_dict[sample].update(data)
+        with open(path, 'w') as sample_file:
+            yaml.safe_dump(yaml_dict, sample_file,
+                           sort_keys=False, default_flow_style=False)
+
+    def get_sample_info(sample_name, path=None):
+        """
+        Given a sample name, get the m and n points, as well as the coeffs.
+
+        Parameters
+        ----------
+        sample_name : str
+            The name of the sample to get the mapped points from. To see the
+            available mapped samples call the `mapped_samples()` method.
+        path : str, optional
+            Path to the samples yaml file.
+        """
+        path = path or _path
+        sample = {}
+        global _last_index
+
+        with open(path) as sample_file:
+            try:
+                data = yaml.safe_load(sample_file)
+            except yaml.YAMLError as err:
+                logger.error('Error when loading the samples yaml file: %s',
+                             err)
+                raise err
+        if data is None:
+            logger.warning('The file is empty, no sample grid yet. '
+                           'Please use `save_presets` to insert grids '
+                           'in the file.')
+            sample = {}
+        try:
+            sample = data[str(sample_name)]
+        except Exception as err:
+            logger.error('The sample %s might not exist in the file.',
+                         sample_name)
+            raise err
+
+        m_points, n_points = 0, 0
+        xx, yy = [], []
+        last_shot_index = 1, 1
+        if sample:
+            try:
+                m_points = sample['M']
+                n_points = sample['N']
+                last_shot_index = sample['last_shot_index']
+                xx = sample['xx']
+                yy = sample['yy']
+                _last_index = last_shot_index
+            except Exception as ex:
+                logger.error('Something went wrong when getting the '
+                             'information for sample %s. %s', sample_name, ex)
+                raise ex
+        else:
+            err_msg = ('This sample probably does not exist. Please call'
+                       ' mapped_samples() to see which ones are available.')
+            logger.error(err_msg)
+            raise Exception(err_msg)
+
+        return m_points, n_points, last_shot_index, xx, yy
+
     detectors = list(detectors) + [scan_motor]
 
-    if (n1 > len(ss)):
-        raise IndexError(f'The number of n1 {n1} is bigger than scan_motor '
-                         f'steps {len(ss)}. Please provide a number in range.')
-    if (n2 * n1) > len(xx):
-        raise IndexError(f'The number of n_targets * n1: {n2 * n1} is'
+    m_points, n_points, last_shot_index, xx, yy = get_sample_info(sample,
+                                                                  _path)
+    if (last_shot_index + (n_shots * len(ss))) >= len(xx):
+        raise IndexError('The number of n_shots * len(ss): '
+                         f'{last_shot_index + (n_shots * len(ss))} is'
                          f' bigger than the available samples: {len(xx)}. '
                          'Please provide a number in range.')
 
     def inner_scan():
+        global _last_index
         yield from bps.open_run(md={})
-        for j in range(n1):
-            yield from bps.mv(scan_motor, ss[j])
+        for i in range(len(ss)):
+            yield from bps.mv(scan_motor, ss[i])
             yield from bps.read(scan_motor)
-            x_pos = xx[(j * n2):((j + 1) * n2)]
-            y_pos = yy[(j * n2):((j + 1) * n2)]
+
+            x_pos = xx[(_last_index * n_shots):(
+                (_last_index + 1) * n_shots)]
+            y_pos = yy[(_last_index * n_shots):(
+                (_last_index + 1) * n_shots)]
             yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
-                                        x_pos, y_motor, y_pos))
+                                                     x_pos, y_motor, y_pos))
+            _last_index = _last_index + n_shots
+            # TODO I might have to update this after the close run -
+            # because it adds delay but what if the run will be stopped?
+            update_sample(sample, _path, _last_index - 1)
+
         yield from bps.close_run()
     return (yield from inner_scan())
 
