@@ -717,15 +717,15 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
             yield from bps.mv(scan_motor, ss[i])
             yield from bps.read(scan_motor)
 
-            x_pos = xx[(_last_index):(
+            x_pos = xx[(_last_index + 1):(
                 (_last_index + 1) + n_shots)]
-            y_pos = yy[(_last_index):(
+            y_pos = yy[(_last_index + 1):(
                 (_last_index + 1) + n_shots)]
             yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
                                                      x_pos, y_motor, y_pos))
             _last_index = _last_index + n_shots
         yield from bps.close_run()
-        update_sample(sample, _path, _last_index - 1)
+        update_sample(sample, _path, _last_index)
     return (yield from inner_scan())
 
 

@@ -87,7 +87,7 @@ def update_sample(sample_name, path, last_shot_index):
 
     """
     data = {"last_shot_index": last_shot_index}
-    with open(path, 'r+') as sample_file:
+    with open(path) as sample_file:
         yaml_dict = yaml.safe_load(sample_file) or {}
         yaml_dict[sample_name].update(data)
     with open(path, 'w') as sample_file:
