@@ -11,6 +11,7 @@ import logging
 from bluesky.plan_stubs import subscribe
 from bluesky.plans import count
 from bluesky.preprocessors import stub_wrapper
+import yaml
 
 from nabs.streams import AverageStream
 
@@ -67,3 +68,73 @@ def measure_average(detectors, num, delay=None, stream=None):
     yield from stub_wrapper(count(detectors, num=num, delay=delay))
     # Return the measured average as a dictionary for use in adaptive plans
     return stream.last_event
+
+
+def update_sample(sample_name, path, last_shot_index):
+    """
+    Update the current sample information after a run.
+
+    Parameters
+    ----------
+    sample_name : str
+        A name to identify the sample grid, should be snake_case style.
+    path : str
+        Path to the `.yml` file. Defaults to the path defined when
+        creating this object.
+    last_shot_index : int
+        Indicated the position in the list of the last shot target,
+        where the first index in the list is 0.
+
+    """
+    data = {"last_shot_index": last_shot_index}
+    with open(path, 'r+') as sample_file:
+        yaml_dict = yaml.safe_load(sample_file) or {}
+        yaml_dict[sample_name].update(data)
+    with open(path, 'w') as sample_file:
+        yaml.safe_dump(yaml_dict, sample_file,
+                       sort_keys=False, default_flow_style=False)
+
+
+def get_sample_info(sample_name, path):
+    """
+    Get some information about a saved sample.
+
+    Given a sample name, get the m and n points, as well as the
+    last_shot_index and the x, y grid points.
+
+    Parameters
+    ----------
+    sample_name : str
+        The name of the sample to get the mapped points from. To see the
+        available mapped samples call the `mapped_samples()` method.
+    path : str, optional
+        Path to the samples yaml file.
+
+    Returns
+    -------
+    data : tuple
+        Returns m_points, n_points, last_shot_index, xx, yy
+    """
+    data = None
+    with open(path) as sample_file:
+        try:
+            data = yaml.safe_load(sample_file)
+        except yaml.YAMLError as err:
+            logger.error('Error when loading the samples yaml file: %s',
+                         err)
+            raise err
+    if data is None:
+        raise Exception('The file is empty, no sample grid yet. '
+                        'Please use `save_presets` to insert grids '
+                        'in the file.')
+    try:
+        sample = data[str(sample_name)]
+        m_points = sample['M']
+        n_points = sample['N']
+        last_shot_index = sample['last_shot_index']
+        xx = sample['xx']
+        yy = sample['yy']
+        return m_points, n_points, last_shot_index, xx, yy
+    except Exception:
+        err_msg = (f'This sample {sample_name} might not exist in the file.')
+        raise Exception(err_msg)
