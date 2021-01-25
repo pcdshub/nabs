@@ -738,7 +738,7 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
 
 def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
                           n_shots, path, record=True, events=None,
-                          sanke_like=True):
+                          snake_like=True):
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
@@ -783,6 +783,7 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         yield from fixed_target_scan(sample=sample, detectors=detectors,
                                      x_motor=x_motor, y_motor=y_motor,
                                      scan_motor=scan_motor, ss=ss,
-                                     n_shots=n_shots, path=path)
+                                     n_shots=n_shots, path=path,
+                                     snake_like=snake_like)
 
     return (yield from inner_daq_fixed_target_scan())
