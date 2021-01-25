@@ -5,7 +5,8 @@ import pytest
 from bluesky.callbacks import CallbackCounter
 from bluesky.plan_stubs import close_run, open_run
 
-from nabs.plan_stubs import measure_average, update_sample, get_sample_info
+from nabs.plan_stubs import (measure_average, update_sample, get_sample_info,
+                             snake_grid_list)
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ def test_update_sample(sample_file):
 
 def test_get_sample_info(sample_file):
     # expected values:
-    m_points_expected = 101
+    m_points_expected = 2
     n_points_expected = 4
     last_shot_index_expected = -1
     xx_expected = [-20.59374999999996,
@@ -79,3 +80,35 @@ def test_get_sample_info(sample_file):
     with pytest.raises(Exception):
         get_sample_info(
             sample_name='test_sample', path='bad_file_path')
+
+
+def test_snake_like_list():
+    xx = np.array([[0, 0.25, 0.5, 0.75, 1.0],
+                   [0, 0.25, 0.5, 0.75, 1.0],
+                   [0, 0.25, 0.5, 0.75, 1.0],
+                   [0, 0.25, 0.5, 0.75, 1.0],
+                   [0, 0.25, 0.5, 0.75, 1.0]])
+    yy = np.array([[0.0, 0.0, 0.0, 0.0, 0.0],
+                   [0.25, 0.25, 0.25, 0.25, 0.25],
+                   [0.5, 0.5, 0.5, 0.5, 0.5],
+                   [0.75, 0.75, 0.75, 0.75, 0.75],
+                   [1.0, 1.0, 1.0, 1.0, 1.0]])
+
+    # expected values:
+    xx_expected = [0, 0.25, 0.5, 0.75, 1.0,
+                   1.0, 0.75, 0.5, 0.25, 0,
+                   0, 0.25, 0.5, 0.75, 1.0,
+                   1.0, 0.75, 0.5, 0.25, 0,
+                   0, 0.25, 0.5, 0.75, 1.0]
+    yy_expected = [0.0, 0.0, 0.0, 0.0, 0.0,
+                   0.25, 0.25, 0.25, 0.25, 0.25,
+                   0.5, 0.5, 0.5, 0.5, 0.5,
+                   0.75, 0.75, 0.75, 0.75, 0.75,
+                   1.0, 1.0, 1.0, 1.0, 1.0]
+
+    xx_res = snake_grid_list(xx)
+    # the y values are basically stying the same
+    # so there is no need to even run thm through this function
+    yy_res = snake_grid_list(yy)
+    assert xx_res == xx_expected
+    assert yy_res == yy_expected

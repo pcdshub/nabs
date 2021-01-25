@@ -19,8 +19,9 @@ import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
+import numpy as np
 
-from .plan_stubs import update_sample, get_sample_info
+from .plan_stubs import update_sample, get_sample_info, snake_grid_list
 from . import preprocessors as nbpp
 
 logger = logging.getLogger(__name__)
@@ -660,7 +661,7 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
 
 def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
-                      n_shots, path):
+                      n_shots, path, snake_like=True):
     """
     Scan over two variables in steps simultaneously.
 
@@ -690,6 +691,9 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         be scanned on the grid.
     path : str
         Path where the sample file is located.
+    snake_like : bool, optional
+        Indicates if the scanning should be following a snake-like pattern.
+        Defaluts to `True`.
     """
 
     # TODO: remember what targets have been shot -
@@ -703,7 +707,9 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     global _last_index
     detectors = list(detectors) + [scan_motor]
 
-    _, _, last_shot_index, xx, yy = get_sample_info(sample, path)
+    rows, columns, last_shot_index, xx, yy = get_sample_info(sample, path)
+    if snake_like:
+        xx = snake_grid_list(np.array(xx).reshape(rows, columns))
     _last_index = last_shot_index
     if (last_shot_index + (n_shots * len(ss))) >= len(xx):
         raise IndexError('The number of n_shots * len(ss): '
@@ -731,7 +737,8 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
 
 
 def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
-                          n_shots, path, record=True, events=None):
+                          n_shots, path, record=True, events=None,
+                          sanke_like=True):
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
@@ -765,6 +772,9 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     events : int, optional
         Number of events to take at each step. If omitted, uses the
         duration argument or the last configured value.
+    snake_like : bool, optional
+        Indicates if the scanning should be following a snake-like pattern.
+        Defaluts to `True`.
     """
     control_devices = [x_motor, y_motor, scan_motor]
 
