@@ -213,12 +213,15 @@ def test_daq_a3scan(RE, daq, hw):
 def test_fixed_target_scan(RE, hw, sample_file):
     logger.debug('test_fixed_target_scan')
     ss = [1, 2]
-
+    sample_info = get_sample_info('test_sample', sample_file)
+    # assert that the last_shot_index starts at -1
+    assert sample_info[2] == -1
     msgs = list(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
                                       x_motor=hw.motor1, y_motor=hw.motor2,
                                       scan_motor=hw.motor3, ss=ss,
                                       n_shots=3, path=sample_file,
                                       snake_like=False))
+    # assert that the last_shot_index has been updated to 5
     sample_info = get_sample_info('test_sample', sample_file)
     assert sample_info[2] == 5
     expected_moves = [1,                    # scan_motor[0]

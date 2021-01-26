@@ -697,9 +697,6 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         Defaluts to `True`.
     """
 
-    # TODO: remember what targets have been shot -
-    # display this in a little window - bit mapping?
-
     global _last_index
     detectors = list(detectors) + [scan_motor]
 
@@ -715,32 +712,33 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
                          f' bigger than the available samples: {len(xx)}. '
                          'Please provide a number in range.')
 
+    def finalize():
+        current_position = x_motor.position
+        try:
+            last_shot = xx.index(current_position)
+            logger.info('Updating last_shot_index to: %s', last_shot)
+            update_sample(sample, path, int(last_shot))
+        except Exception:
+            logger.warning('Could not find the index in the targets list for'
+                           'the current motor value: %d', current_position)
+        yield from bps.null()
+
+    @bpp.run_decorator()
     def inner_scan():
         global _last_index
-        try:
-            yield from bps.open_run(md={})
-            for i in range(len(ss)):
-                yield from bps.mv(scan_motor, ss[i])
-                yield from bps.read(scan_motor)
+        for i in range(len(ss)):
+            yield from bps.mv(scan_motor, ss[i])
 
-                x_pos = xx[(_last_index + 1):(
-                    (_last_index + 1) + n_shots)]
-                y_pos = yy[(_last_index + 1):(
-                    (_last_index + 1) + n_shots)]
-                yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
-                                            x_pos, y_motor, y_pos))
+            x_pos = xx[(_last_index + 1):(
+                (_last_index + 1) + n_shots)]
+            y_pos = yy[(_last_index + 1):(
+                (_last_index + 1) + n_shots)]
+            yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
+                                        x_pos, y_motor, y_pos))
 
-                _last_index = _last_index + n_shots
-            yield from bps.close_run()
-            update_sample(sample, path, _last_index)
-        except Exception:
-            # if getting here most likely the RunEngine has been aborted
-            # or stopped. Get the last position of the motor, and make
-            # that the last_index_shot
-            current_position = x_motor.position
-            last_shot = xx.index(current_position)
-            update_sample(sample, path, int(last_shot))
-    return (yield from inner_scan())
+            _last_index = _last_index + n_shots
+        update_sample(sample, path, _last_index)
+    return (yield from bpp.finalize_wrapper(inner_scan(), finalize()))
 
 
 def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
