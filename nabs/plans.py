@@ -21,6 +21,7 @@ from bluesky import plan_patterns
 from toolz import partition
 import numpy as np
 
+
 from .plan_stubs import update_sample, get_sample_info, snake_grid_list
 from . import preprocessors as nbpp
 
@@ -698,11 +699,6 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
 
     # TODO: remember what targets have been shot -
     # display this in a little window - bit mapping?
-    # TODO: if a run gets terminated, remember where to continue
-    # TODO: maybe some validation for the path
-
-    # TODO: take this test _path out and figure out where it goes
-    #  _path = '/home/cristina/workspace/pcdsdevices/samples.yml'
 
     global _last_index
     detectors = list(detectors) + [scan_motor]
@@ -710,29 +706,40 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     rows, columns, last_shot_index, xx, yy = get_sample_info(sample, path)
     if snake_like:
         xx = snake_grid_list(np.array(xx).reshape(rows, columns))
+
     _last_index = last_shot_index
     if (last_shot_index + (n_shots * len(ss))) >= len(xx):
-        raise IndexError('The number of n_shots * len(ss): '
-                         f'{last_shot_index + (n_shots * len(ss))} is'
+        raise IndexError('The number of last_shot_index + n_shots * len(ss): '
+                         f'{last_shot_index} + {n_shots} * {len(ss)}= '
+                         f'{last_shot_index + (n_shots * len(ss))}: '
                          f' bigger than the available samples: {len(xx)}. '
                          'Please provide a number in range.')
 
     def inner_scan():
         global _last_index
-        yield from bps.open_run(md={})
-        for i in range(len(ss)):
-            yield from bps.mv(scan_motor, ss[i])
-            yield from bps.read(scan_motor)
+        try:
+            yield from bps.open_run(md={})
+            for i in range(len(ss)):
+                yield from bps.mv(scan_motor, ss[i])
+                yield from bps.read(scan_motor)
 
-            x_pos = xx[(_last_index + 1):(
-                (_last_index + 1) + n_shots)]
-            y_pos = yy[(_last_index + 1):(
-                (_last_index + 1) + n_shots)]
-            yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
-                                                     x_pos, y_motor, y_pos))
-            _last_index = _last_index + n_shots
-        yield from bps.close_run()
-        update_sample(sample, path, _last_index)
+                x_pos = xx[(_last_index + 1):(
+                    (_last_index + 1) + n_shots)]
+                y_pos = yy[(_last_index + 1):(
+                    (_last_index + 1) + n_shots)]
+                yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
+                                            x_pos, y_motor, y_pos))
+
+                _last_index = _last_index + n_shots
+            yield from bps.close_run()
+            update_sample(sample, path, _last_index)
+        except Exception:
+            # if getting here most likely the RunEngine has been aborted
+            # or stopped. Get the last position of the motor, and make
+            # that the last_index_shot
+            current_position = x_motor.position
+            last_shot = xx.index(current_position)
+            update_sample(sample, path, int(last_shot))
     return (yield from inner_scan())
 
 
