@@ -7,8 +7,13 @@ def show_shot_targets(sample_name, path, snake_like=True):
     """
     Display a plot with targets.
 
-    Displays a scatter plot with the targets that have been shot and the
-    targets that are still available.
+    This class is used in conjunction witht the `XYGridStage` object from
+    `pcdsdevices` as well as the `fixed_target_scan` from `nabs.plans`.
+    It displays a scatter plot with the targets that have been scanned (& shot)
+    with `fixed_target_scan`, and the targets that are still available.
+    It uses the information saved in an yaml file for a specific sample
+    to get the x and y positions as well as the last target that has been shot.
+    This information is saved with the help of the `XYGridStage` object.
 
     Parameters
     ----------
@@ -18,9 +23,11 @@ def show_shot_targets(sample_name, path, snake_like=True):
         The path of the sample file.
     snake_like : bool
         Indicates if the targets have been shot in a snake_like pattern.
-        # TODO this is a bad assumption - but most likely they will be
+        Defaults to `True`.
+        TODO this is a bad assumption - but most likely they will be
         shot in a snake-like pattern....
     """
+    plt.clf()
     m_points, n_points, last_shot_index, xx, yy = get_sample_info(sample_name,
                                                                   path)
 
@@ -34,6 +41,7 @@ def show_shot_targets(sample_name, path, snake_like=True):
     # snake_like:
     if snake_like:
         x_temp = snake_grid_list(np.array(x_temp).reshape(m_points, n_points))
+
     show_last_shot = True
     if last_shot_index == -1:
         # all should be available
