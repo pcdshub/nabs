@@ -10,8 +10,6 @@ from pcdsdevices.sim import FastMotor
 from bluesky.simulators import summarize_plan
 import nabs.plans as nbp
 
-from nabs.plan_stubs import get_sample_info
-
 PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
 
@@ -213,56 +211,11 @@ def test_daq_a3scan(RE, daq, hw):
 def test_fixed_target_scan(RE, hw, sample_file):
     logger.debug('test_fixed_target_scan')
     ss = [1, 2]
-    sample_info = get_sample_info('test_sample', sample_file)
-    # assert that the last_shot_index starts at -1
-    assert sample_info[2] == -1
-    msgs = list(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
-                                      x_motor=hw.motor1, y_motor=hw.motor2,
-                                      scan_motor=hw.motor3, ss=ss,
-                                      n_shots=3, path=sample_file,
-                                      snake_like=False))
-    # assert that the last_shot_index has been updated to 5
-    sample_info = get_sample_info('test_sample', sample_file)
-    assert sample_info[2] == 5
-    expected_moves = [1,                    # scan_motor[0]
-                      -20.59374999999996,   # x[0]
-                      26.41445312499999,    # y[0]
-                      -20.342057291666624,  # x[1]
-                      26.412369791666656,   # y[1]
-                      -20.090364583333283,  # x[2]
-                      26.41028645833332,    # y[2]
-                      2,                    # scan_motor[1]
-                      -19.838671874999946,  # x[3]
-                      26.408203124999986,   # y[3]
-                      -20.589574218749963,  # x[4]
-                      26.664453124999994,   # y[4]
-                      -20.33789843749996,   # x[5]
-                      26.66232812499999]    # y[5]
-
-    moves = [msg.args[0] for msg in msgs if msg.command == 'set']
-    assert moves == expected_moves
-
-    RE(msgs)
-    summarize_plan(msgs)
-
-    with pytest.raises(IndexError):
-        RE(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
-                                 x_motor=hw.motor1, y_motor=hw.motor2,
-                                 scan_motor=hw.motor3, ss=ss,
-                                 n_shots=10, path=sample_file))
-
-
-@pytest.mark.timeout(PLAN_TIMEOUT)
-def test_fixed_target_scan_snake_like(RE, hw, sample_file):
-    logger.debug('test_fixed_target_scan')
-    ss = [1, 2]
 
     msgs = list(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
                                       x_motor=hw.motor1, y_motor=hw.motor2,
                                       scan_motor=hw.motor3, ss=ss,
                                       n_shots=3, path=sample_file))
-    sample_info = get_sample_info('test_sample', sample_file)
-    assert sample_info[2] == 5
     expected_moves = [1,                    # scan_motor[0]
                       -20.59374999999996,   # x[0]
                       26.41445312499999,    # y[0]
@@ -283,6 +236,12 @@ def test_fixed_target_scan_snake_like(RE, hw, sample_file):
 
     RE(msgs)
     summarize_plan(msgs)
+
+    with pytest.raises(IndexError):
+        RE(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
+                                 x_motor=hw.motor1, y_motor=hw.motor2,
+                                 scan_motor=hw.motor3, ss=ss,
+                                 n_shots=10, path=sample_file))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)

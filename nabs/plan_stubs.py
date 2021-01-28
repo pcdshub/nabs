@@ -12,7 +12,6 @@ from bluesky.plan_stubs import subscribe
 from bluesky.plans import count
 from bluesky.preprocessors import stub_wrapper
 import yaml
-from itertools import chain
 
 from nabs.streams import AverageStream
 
@@ -71,9 +70,12 @@ def measure_average(detectors, num, delay=None, stream=None):
     return stream.last_event
 
 
-def update_sample(sample_name, path, last_shot_index):
+def update_sample(sample_name, path, n_shots):
     """
     Update the current sample information after a run.
+
+    Updates the `status` values of each target in the sample,
+    from `False` to `True` to indicate that it is shot.
 
     Parameters
     ----------
@@ -82,14 +84,43 @@ def update_sample(sample_name, path, last_shot_index):
     path : str
         Path to the `.yml` file. Defaults to the path defined when
         creating this object.
-    last_shot_index : int
-        Indicated the position in the list of the last shot target,
-        where the first index in the list is 0.
+    n_shots : int
+        Indicates how many targets have been shot.
 
     """
-    # try to convert to int before writing it to file
-    last_shot_index = int(last_shot_index)
-    data = {"last_shot_index": last_shot_index}
+    info = get_sample_targets(sample_name, path)
+    data = {}
+    # list of dictionaries
+    xx = info[0]
+    yy = info[1]
+    # find the index of the targets that is next to be shot
+    x_index = next((index for (index, d) in enumerate(xx)
+                    if d["status"] is False), None)
+    if x_index is None:
+        raise IndexError('Could not get a target index that has not been shot,'
+                         ' probably all targets were shot from this sample?')
+
+    temp_x, temp_y = [], []
+    for i in range(n_shots):
+        # update the status for the next target where the status is False
+        x_target = next((item for item in xx if item['status'] is False), None)
+        y_target = next((item for item in yy if item["status"] is False), None)
+        # should not be getting here but just in case:
+        if x_target is None:
+            raise IndexError('Could not update the status of targets. '
+                             'Probably all targets from this sample were shot '
+                             'already....')
+        x_target['status'] = True
+        y_target['status'] = True
+        temp_x.append(x_target)
+        temp_y.append(y_target)
+
+    # update the list original list of target
+    xx[x_index:(x_index + len(temp_x))] = temp_x
+    yy[x_index:(x_index + len(temp_y))] = temp_y
+    data['xx'] = xx
+    data['yy'] = yy
+
     with open(path) as sample_file:
         yaml_dict = yaml.safe_load(sample_file) or {}
         yaml_dict[sample_name].update(data)
@@ -98,12 +129,12 @@ def update_sample(sample_name, path, last_shot_index):
                        sort_keys=False, default_flow_style=False)
 
 
-def get_sample_info(sample_name, path):
+def get_sample_targets(sample_name, path):
     """
-    Get some information about a saved sample.
+    Get the `xx` and `yy` target information from a saved sample.
 
-    Given a sample name, get the m and n points, as well as the
-    last_shot_index and the x, y grid points.
+    Given a sample name, get the x, y grid points that are mapped for that
+    sample.
 
     Parameters
     ----------
@@ -115,8 +146,8 @@ def get_sample_info(sample_name, path):
 
     Returns
     -------
-    data : tuple
-        Returns m_points, n_points, last_shot_index, xx, yy
+    `xx`, `yy` : tuple
+        Returns two lists of dictionaries, with information about the targets.
     """
     data = None
     with open(path) as sample_file:
@@ -132,42 +163,9 @@ def get_sample_info(sample_name, path):
                         'in the file.')
     try:
         sample = data[str(sample_name)]
-        m_points = sample['M']
-        n_points = sample['N']
-        last_shot_index = sample['last_shot_index']
         xx = sample['xx']
         yy = sample['yy']
-        return m_points, n_points, last_shot_index, xx, yy
+        return xx, yy
     except Exception:
         err_msg = (f'This sample {sample_name} might not exist in the file.')
         raise Exception(err_msg)
-
-
-def snake_grid_list(points):
-    """
-    Flatten them into lists with snake_like pattern coordinate points.
-    [[1, 2], [3, 4]] => [1, 2, 4, 3]
-
-    Parameters
-    ----------
-    points : array
-        Array containing the grid points for an axis with shape MxN.
-
-    Returns
-    -------
-    flat_points : list
-        List of all the grid points folowing a snake-like pattern.
-    """
-    temp_points = []
-    for i in range(points.shape[0]):
-        if i % 2 == 0:
-            temp_points.append(points[i])
-        else:
-            t = points[i]
-            tt = t[::-1]
-            temp_points.append(tt)
-    flat_points = list(chain.from_iterable(temp_points))
-    # convert the numpy.float64 to normal float to be able to easily
-    # save them in the yaml file
-    flat_points = [float(v) for v in flat_points]
-    return flat_points

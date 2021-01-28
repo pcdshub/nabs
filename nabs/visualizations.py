@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
-import numpy as np
-from .plan_stubs import get_sample_info, snake_grid_list
+from .plan_stubs import get_sample_targets
 
 
-def show_shot_targets(sample_name, path, snake_like=True):
+def show_shot_targets(sample_name, path):
     """
     Display a plot with targets.
 
@@ -21,54 +20,36 @@ def show_shot_targets(sample_name, path, snake_like=True):
         The name of the sample file to plot the graph for.
     path : str
         The path of the sample file.
-    snake_like : bool
-        Indicates if the targets have been shot in a snake_like pattern.
-        Defaults to `True`.
-        TODO this is a bad assumption - but most likely they will be
-        shot in a snake-like pattern....
+    mn_format : bool
+        Indicates if the graph should be represented in terms of M and N
+        points rather than x and y positions.
     """
     plt.clf()
-    m_points, n_points, last_shot_index, xx, yy = get_sample_info(sample_name,
-                                                                  path)
+    xx, yy = get_sample_targets(sample_name, path)
 
-    # plot it in terms of M and N points (rows and columns)
-    x = np.linspace(1, n_points, n_points)
-    y = np.linspace(1, m_points, m_points)
-    xm, ym = np.meshgrid(x, y)
+    # find the index of the next target to be shot
+    # if can't find it, assume all targets were shot
+    x_index = next((index for (index, d) in enumerate(xx)
+                   if d['status'] is False), len(xx))
 
-    x_temp = xm.flatten()
-    y_temp = ym.flatten()
-    # snake_like:
-    if snake_like:
-        x_temp = snake_grid_list(np.array(x_temp).reshape(m_points, n_points))
-
-    show_last_shot = True
-    if last_shot_index == -1:
-        # all should be available
-        x_available = x_temp
-        y_available = y_temp
-        x_shot, y_shot = [], []
-        show_last_shot = False
-    else:
-        x_available = x_temp[last_shot_index:]
-        y_available = y_temp[last_shot_index:]
-        x_shot = x_temp[:last_shot_index]
-        y_shot = y_temp[:last_shot_index]
-
-    plt.plot(x_available, y_available, 'o', color='blue', markersize=1,
+    xx_shot = [item['pos'] for item in xx if item['status'] is True]
+    yy_shot = [item['pos'] for item in yy if item['status'] is True]
+    xx_available = [item['pos'] for item in xx if item['status'] is False]
+    yy_available = [item['pos'] for item in yy if item['status'] is False]
+    plt.plot(xx_available, yy_available, 'o', color='blue', markersize=1,
              label="available")
-    plt.plot(x_shot, y_shot, 'o', color='orange', markersize=1, label="shot")
-    # invert the axis to reflect the experiment setup
+    plt.plot(xx_shot, yy_shot, 'o', color='orange', markersize=1, label="shot")
     plt.gca().invert_yaxis()
-    plt.xlabel('X Targets (N)')
-    plt.ylabel('Y Targets (M)')
-    if show_last_shot:
-        plt.plot(x_temp[last_shot_index], y_temp[last_shot_index],
+    plt.xlabel('X Target Positions')
+    plt.ylabel('Y Target Positions')
+    last_shot_index = x_index - 1
+    if (last_shot_index) > 0:
+        plt.plot(xx_shot[-1], yy_shot[-1],
                  '*', color='red', markersize=2, label='last shot index')
-        last_shot_pos = xx[last_shot_index], yy[last_shot_index]
+        last_shot_pos = xx_shot[last_shot_index], yy_shot[last_shot_index]
 
         plt.annotate(f" {last_shot_pos[0]}\n {last_shot_pos[1]}",
-                     (x_temp[last_shot_index], y_temp[last_shot_index]),
+                     (xx_shot[last_shot_index], yy_shot[last_shot_index]),
                      size=8, color='red')
 
     plt.legend(bbox_to_anchor=(0.15, -0.05), loc='upper center', ncol=3)

@@ -22,7 +22,7 @@ from toolz import partition
 import numpy as np
 
 
-from .plan_stubs import update_sample, get_sample_info, snake_grid_list
+from .plan_stubs import update_sample, get_sample_targets
 from . import preprocessors as nbpp
 
 logger = logging.getLogger(__name__)
@@ -662,7 +662,7 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
 
 def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
-                      n_shots, path, snake_like=True):
+                      n_shots, path):
     """
     Scan over two variables in steps simultaneously.
 
@@ -692,58 +692,56 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         be scanned on the grid.
     path : str
         Path where the sample file is located.
-    snake_like : bool, optional
-        Indicates if the scanning should be following a snake-like pattern.
-        Defaluts to `True`.
     """
-
-    global _last_index
     detectors = list(detectors) + [scan_motor]
 
-    rows, columns, last_shot_index, xx, yy = get_sample_info(sample, path)
-    if snake_like:
-        xx = snake_grid_list(np.array(xx).reshape(rows, columns))
+    xx, yy = get_sample_targets(sample, path)
+    cycle_xx = cycle(xx)
+    cycle_yy = cycle(yy)
 
-    _last_index = last_shot_index
-    if (last_shot_index + (n_shots * len(ss))) >= len(xx):
-        raise IndexError('The number of last_shot_index + n_shots * len(ss): '
-                         f'{last_shot_index} + {n_shots} * {len(ss)}= '
-                         f'{last_shot_index + (n_shots * len(ss))}: '
+    # find the index of the next target to be shot (status is False)
+    next_index = next((index for (index, d) in enumerate(xx)
+                      if d['status'] is False), None)
+    if next_index is None:
+        raise IndexError('Could not get a target index that has not been shot,'
+                         ' probably all targets were shot from this sample?')
+
+    if ((next_index - 1) + (n_shots * len(ss))) >= len(xx):
+        raise IndexError('The number of last shot + n_shots * len(ss): '
+                         f'{next_index - 1} + {n_shots} * {len(ss)}= '
+                         f'{next_index - 1 + (n_shots * len(ss))}: '
                          f' bigger than the available samples: {len(xx)}. '
                          'Please provide a number in range.')
 
-    def finalize():
-        current_position = x_motor.position
-        try:
-            last_shot = xx.index(current_position)
-            logger.info('Updating last_shot_index to: %s', last_shot)
-            update_sample(sample, path, int(last_shot))
-        except Exception:
-            logger.warning('Could not find the index in the targets list for'
-                           'the current motor value: %d', current_position)
-        yield from bps.null()
-
     @bpp.run_decorator()
     def inner_scan():
-        global _last_index
-        for i in range(len(ss)):
-            yield from bps.mv(scan_motor, ss[i])
-
-            x_pos = xx[(_last_index + 1):(
-                (_last_index + 1) + n_shots)]
-            y_pos = yy[(_last_index + 1):(
-                (_last_index + 1) + n_shots)]
-            yield from bpp.stub_wrapper(bp.list_scan(detectors, x_motor,
-                                        x_pos, y_motor, y_pos))
-
-            _last_index = _last_index + n_shots
-        update_sample(sample, path, _last_index)
-    return (yield from bpp.finalize_wrapper(inner_scan(), finalize()))
+        try:
+            for i in range(len(ss)):
+                yield from bps.mv(scan_motor, ss[i])
+                for j in range(n_shots):
+                    x = (next(item['pos']
+                         for item in cycle_xx if item["status"] is False))
+                    y = (next(item['pos']
+                         for item in cycle_yy if item["status"] is False))
+                    yield from bpp.stub_wrapper(bp.list_scan(detectors,
+                                                x_motor, [x], y_motor, [y]))
+            update_sample(sample, path, (n_shots * len(ss)))
+        except Exception:
+            current_position = x_motor.position
+            try:
+                last_index = next((index for (index, d) in enumerate(xx)
+                                  if np.isclose(d["pos"], current_position)))
+                update_sample(sample, path, int(last_index),
+                              (last_index - next_index + 1))
+            except Exception:
+                logger.warning('Could not find the index in the targets list '
+                               'for the current motor value: %d',
+                               current_position)
+    return (yield from inner_scan())
 
 
 def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
-                          n_shots, path, record=True, events=None,
-                          snake_like=True):
+                          n_shots, path, record=True, events=None):
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
@@ -777,9 +775,6 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     events : int, optional
         Number of events to take at each step. If omitted, uses the
         duration argument or the last configured value.
-    snake_like : bool, optional
-        Indicates if the scanning should be following a snake-like pattern.
-        Defaluts to `True`.
     """
     control_devices = [x_motor, y_motor, scan_motor]
 
@@ -788,7 +783,6 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         yield from fixed_target_scan(sample=sample, detectors=detectors,
                                      x_motor=x_motor, y_motor=y_motor,
                                      scan_motor=scan_motor, ss=ss,
-                                     n_shots=n_shots, path=path,
-                                     snake_like=snake_like)
+                                     n_shots=n_shots, path=path)
 
     return (yield from inner_daq_fixed_target_scan())
