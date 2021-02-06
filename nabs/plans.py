@@ -134,7 +134,8 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     return (yield from inner())
 
 
-def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
+def delay_scan(detectors, time_motor, time_points, sweep_time,
+               duration=math.inf):
     """
     A ``bluesky`` plan that sets up and executes the delay scan.
 
@@ -152,6 +153,9 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
 
     Parameters
     ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+
     time_motor : `pcdsdevices.epics_motor.DelayNewport`
         The movable device in egu seconds.
 
@@ -176,14 +180,14 @@ def delay_scan(time_motor, time_points, sweep_time, duration=math.inf):
 
     def inner_delay_scan():
         yield from bps.abs_set(time_motor.motor.velocity, velo)
-        return (yield from duration_scan([], time_motor, time_points,
+        return (yield from duration_scan(detectors, time_motor, time_points,
                                          duration=duration))
 
     return (yield from inner_delay_scan())
 
 
-def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
-                   record=True):
+def daq_delay_scan(detectors, time_motor, time_points, sweep_time,
+                   duration=math.inf, record=True):
     """
     Scan a laser delay timing motor with DAQ support.
 
@@ -198,8 +202,17 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
     starting position at the end of the scan. It is the `delay_scan` with
     the DAQ added.
 
+    Unlike the majority of DAQ scans, this scan does not include the delay
+    stage as a control variable in the DAQ. This is because the "points" of the
+    scan are not relevant to the data: we only care about the intermediate
+    shots. In fact, reconfiguring the DAQ with the new controls positions only
+    slows us down and makes the data more annoying to analyze!
+
     Parameters
     ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+
     time_motor : `pcdsdevices.epics_motor.DelayNewport`
         The movable device in egu seconds.
 
@@ -217,10 +230,10 @@ def daq_delay_scan(time_motor, time_points, sweep_time, duration=math.inf,
         we don't want to accidentally skip recording good runs.
     """
 
-    @nbpp.daq_during_decorator(record=record, controls=[time_motor])
+    @nbpp.daq_during_decorator(record=record)
     def inner_daq_delay_scan():
-        return (yield from delay_scan(time_motor, time_points, sweep_time,
-                                      duration=duration))
+        return (yield from delay_scan(detectors, time_motor, time_points,
+                                      sweep_time, duration=duration))
 
     return (yield from inner_daq_delay_scan())
 
@@ -439,7 +452,7 @@ def daq_list_scan(*args, per_step=None, md=None):
 
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
-def daq_ascan(motor, start, end, nsteps):
+def daq_ascan(detectors, motor, start, end, nsteps):
     """
     One-dimensional daq scan with absolute positions.
 
@@ -449,6 +462,9 @@ def daq_ascan(motor, start, end, nsteps):
 
     Parameters
     ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+
     motor : Movable
         A movable object to scan.
 
@@ -483,13 +499,13 @@ def daq_ascan(motor, start, end, nsteps):
     `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
-    yield from bp.scan([], motor, start, end, nsteps)
+    yield from bp.scan(detectors, motor, start, end, nsteps)
 
 
 @bpp.reset_positions_decorator()
 @bpp.relative_set_decorator()
 @nbpp.daq_step_scan_decorator
-def daq_dscan(motor, start, end, nsteps):
+def daq_dscan(detectors, motor, start, end, nsteps):
     """
     One-dimensional daq scan with relative (delta) positions.
 
@@ -499,6 +515,9 @@ def daq_dscan(motor, start, end, nsteps):
 
     Parameters
     ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+
     motor : Movable
         A movable object to scan.
 
@@ -533,12 +552,12 @@ def daq_dscan(motor, start, end, nsteps):
     `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
-    yield from bp.scan([], motor, start, end, nsteps)
+    yield from bp.scan(detectors, motor, start, end, nsteps)
 
 
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
-def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
+def daq_a2scan(detectors, m1, a1, b1, m2, a2, b2, nsteps):
     """
     Two-dimensional daq scan with absolute positions.
 
@@ -548,6 +567,9 @@ def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
 
     Parameters
     ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+
     m1 : Movable
         The first movable object to scan.
 
@@ -591,12 +613,12 @@ def daq_a2scan(m1, a1, b1, m2, a2, b2, nsteps):
     `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
-    yield from bp.scan([], m1, a1, b1, m2, a2, b2, nsteps)
+    yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, nsteps)
 
 
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
-def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
+def daq_a3scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
     Three-dimensional daq scan with absolute positions.
 
@@ -606,6 +628,9 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
     Parameters
     ----------
+    detectors : list of readables
+        Objects to read into Python in the scan.
+
     m1 : Movable
         The first movable object to scan.
 
@@ -658,7 +683,7 @@ def daq_a3scan(m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     `nabs.preprocessors.daq_step_scan_decorator`.
     """
 
-    yield from bp.scan([], m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
+    yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
 
 
 def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,

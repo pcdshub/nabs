@@ -2,6 +2,26 @@ Release History
 ###############
 
 
+v1.0.0 (2020-12-22)
+===================
+
+API Changes
+-----------
+- All plans now have a detectors argument to allow plotting during scans.
+  If no plot is desired, simply pass in an empty list instead.
+
+Bugfixes
+--------
+- Fix issue where the stage in the daq_delay_scan was erroneously included
+  in the DAQ control variables. This actually slows down the scan and dumps
+  extra, redundant data into the data stream.
+
+Contributors
+------------
+- zllentz
+- ZryletTC
+
+
 v0.1.0 (2020-11-17)
 ===================
 
