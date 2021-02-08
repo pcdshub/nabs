@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Plans and Data Collection &mdash; nabs 1.0.0 documentation</title>
+  <title>Plans and Data Collection &mdash; nabs 1.0.0+32.g5558804 documentation</title>
   
 
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -51,7 +54,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> nabs
+            <a href="index.html" class="icon icon-home"> nabs
           
 
           
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0.0+32.g5558804
               </div>
             
           
@@ -144,6 +147,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -155,7 +160,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/plans.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -182,18 +187,18 @@ collecting and event-matching data at high rates.</p>
 <div class="section" id="implementation">
 <h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://blueskyproject.io/bluesky">bluesky</a> module features a
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.preprocessors.plan_mutator.html#bluesky.preprocessors.plan_mutator" title="(in bluesky v1.6.7.post16+g6e799a77)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.preprocessors.plan_mutator</span></code></a> concept, which allows
+<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.preprocessors.plan_mutator.html#bluesky.preprocessors.plan_mutator" title="(in bluesky v1.6.7.post23+g0a91b8b8)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.preprocessors.plan_mutator</span></code></a> concept, which allows
 us to intercept messages and modify what execution instructions the
 run engine receives. In this way, we can “magically” include <code class="docutils literal notranslate"><span class="pre">DAQ</span></code>
 support in any existing <a class="reference external" href="https://blueskyproject.io/bluesky">bluesky</a>
 plan in a standardized way.</p>
-<p>See <a class="reference internal" href="generated/nabs.preprocessors.html#module-nabs.preprocessors" title="nabs.preprocessors"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">nabs.preprocessors</span></code></a> for the various magic methods we use to
+<p>See <code class="xref any docutils literal notranslate"><span class="pre">nabs.preprocessors</span></code> for the various magic methods we use to
 hook the <code class="docutils literal notranslate"><span class="pre">DAQ</span></code> into any <a class="reference external" href="https://blueskyproject.io/bluesky">bluesky</a>
 plan.</p>
 </div>
 <div class="section" id="selected-plans">
 <h2>Selected Plans<a class="headerlink" href="#selected-plans" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="generated/nabs.plans.html#module-nabs.plans" title="nabs.plans"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">nabs.plans</span></code></a> for a full listing of these functions and their API.
+<p>See <code class="xref any docutils literal notranslate"><span class="pre">nabs.plans</span></code> for a full listing of these functions and their API.
 This section will draw attention to the most useful plans and examples.</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -211,37 +216,29 @@ This section will draw attention to the most useful plans and examples.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="optimize.html" class="btn btn-neutral float-right" title="Optimization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to nabs’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="optimize.html" class="btn btn-neutral float-right" title="Optimization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to nabs’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, SLAC National Accelerator Laboratory
+        &#169; Copyright 2021, SLAC National Accelerator Laboratory.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

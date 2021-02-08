@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>nabs.plan_stubs &mdash; nabs 1.0.0 documentation</title>
+  <title>nabs.plan_stubs &mdash; nabs 1.0.0+32.g5558804 documentation</title>
   
 
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -36,7 +39,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="nabs.plan_stubs.measure_average" href="generated/nabs.plan_stubs.measure_average.html" />
+    <link rel="next" title="nabs.plan_stubs.get_sample_targets" href="generated/nabs.plan_stubs.get_sample_targets.html" />
     <link rel="prev" title="nabs.optimize.walk_to_target" href="generated/nabs.optimize.walk_to_target.html" /> 
 </head>
 
@@ -51,7 +54,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> nabs
+            <a href="../index.html" class="icon icon-home"> nabs
           
 
           
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0.0+32.g5558804
               </div>
             
           
@@ -96,11 +99,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">Full API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="nabs.optimize.html">nabs.optimize</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">nabs.plan_stubs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/nabs.plan_stubs.get_sample_targets.html">nabs.plan_stubs.get_sample_targets</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/nabs.plan_stubs.measure_average.html">nabs.plan_stubs.measure_average</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/nabs.plan_stubs.update_sample.html">nabs.plan_stubs.update_sample</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="nabs.plans.html">nabs.plans</a></li>
-<li class="toctree-l2"><a class="reference internal" href="nabs.preprocessors.html">nabs.preprocessors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="nabs.streams.html">nabs.streams</a></li>
 </ul>
 </li>
@@ -149,6 +152,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -162,7 +167,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/generated/nabs.plan_stubs.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -189,8 +194,14 @@ are intended as building blocks for other complete plans.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plan_stubs.measure_average.html#nabs.plan_stubs.measure_average" title="nabs.plan_stubs.measure_average"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_average</span></code></a>(detectors, num[, delay, stream])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plan_stubs.get_sample_targets.html#nabs.plan_stubs.get_sample_targets" title="nabs.plan_stubs.get_sample_targets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sample_targets</span></code></a>(sample_name, path)</p></td>
+<td><p>Get the <code class="xref any docutils literal notranslate"><span class="pre">xx</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">yy</span></code> target information from a saved sample.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/nabs.plan_stubs.measure_average.html#nabs.plan_stubs.measure_average" title="nabs.plan_stubs.measure_average"><code class="xref py py-obj docutils literal notranslate"><span class="pre">measure_average</span></code></a>(detectors, num[, delay, stream])</p></td>
 <td><p>Measure an average over a number of shots from a set of detectors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/nabs.plan_stubs.update_sample.html#nabs.plan_stubs.update_sample" title="nabs.plan_stubs.update_sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_sample</span></code></a>(sample_name, path, n_shots)</p></td>
+<td><p>Update the current sample information after a run.</p></td>
 </tr>
 </tbody>
 </table>
@@ -201,37 +212,29 @@ are intended as building blocks for other complete plans.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="generated/nabs.plan_stubs.measure_average.html" class="btn btn-neutral float-right" title="nabs.plan_stubs.measure_average" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="generated/nabs.optimize.walk_to_target.html" class="btn btn-neutral float-left" title="nabs.optimize.walk_to_target" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="generated/nabs.plan_stubs.get_sample_targets.html" class="btn btn-neutral float-right" title="nabs.plan_stubs.get_sample_targets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="generated/nabs.optimize.walk_to_target.html" class="btn btn-neutral float-left" title="nabs.optimize.walk_to_target" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, SLAC National Accelerator Laboratory
+        &#169; Copyright 2021, SLAC National Accelerator Laboratory.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

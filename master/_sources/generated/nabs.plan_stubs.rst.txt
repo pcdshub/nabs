@@ -10,7 +10,9 @@
    .. autosummary::
       :toctree: generated
    
+      get_sample_targets
       measure_average
+      update_sample
    
    
 

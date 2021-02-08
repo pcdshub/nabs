@@ -1,6 +1,0 @@
-nabs.plans.daq\_ascan
-=====================
-
-.. currentmodule:: nabs.plans
-
-.. autofunction:: daq_ascan

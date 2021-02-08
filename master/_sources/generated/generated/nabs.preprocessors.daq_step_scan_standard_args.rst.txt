@@ -1,6 +1,0 @@
-nabs.preprocessors.daq\_step\_scan\_standard\_args
-==================================================
-
-.. currentmodule:: nabs.preprocessors
-
-.. autofunction:: daq_step_scan_standard_args
