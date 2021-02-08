@@ -7,7 +7,7 @@ from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
 from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
-
+from bluesky.simulators import summarize_plan
 import nabs.plans as nbp
 
 PLAN_TIMEOUT = 60
@@ -199,3 +199,144 @@ def test_daq_a3scan(RE, daq, hw):
                                      hw.motor2, 0, 10,
                                      hw.motor3, 0, 10, 11,
                                      events=1))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_fixed_target_scan(RE, hw, sample_file):
+    logger.debug('test_fixed_target_scan')
+    ss = [1, 2]
+
+    msgs = list(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
+                                      x_motor=hw.motor1, y_motor=hw.motor2,
+                                      scan_motor=hw.motor3, ss=ss,
+                                      n_shots=3, path=sample_file))
+    expected_moves = [1,                    # scan_motor[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656,   # y[1]
+                      -20.090364583333283,  # x[2]
+                      26.41028645833332,    # y[2]
+                      2,                    # scan_motor[1]
+                      -19.838671874999946,  # x[3]
+                      26.408203124999986,   # y[3]
+                      -19.834546874999948,  # x[4]
+                      26.664453124999994,   # y[4]
+                      -20.08622265624995,   # x[5]
+                      26.66232812499999]    # y[5]
+
+    moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    assert moves == expected_moves
+
+    RE(msgs)
+    summarize_plan(msgs)
+
+    with pytest.raises(IndexError):
+        RE(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
+                                 x_motor=hw.motor1, y_motor=hw.motor2,
+                                 scan_motor=hw.motor3, ss=ss,
+                                 n_shots=10, path=sample_file))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_fixed_target_multi_scan(RE, hw, sample_file):
+    logger.debug('test_fixed_target_multi_scan')
+    ss = [1, 2]
+
+    msgs = list(nbp.fixed_target_multi_scan(sample='test_sample',
+                                            detectors=[hw.det],
+                                            x_motor=hw.motor1,
+                                            y_motor=hw.motor2,
+                                            scan_motor=hw.motor3, ss=ss,
+                                            n_shots=3, path=sample_file))
+    expected_moves = [1,                    # scan_motor[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      2,                    # scan_motor[1]
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656,
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656,
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656]   # y[1]
+
+    moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    reads = [msg for msg in msgs if msg.command == 'read']
+    assert moves == expected_moves
+    assert len(reads) == 24
+
+    RE(msgs)
+    summarize_plan(msgs)
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_fixed_target_scan(RE, daq, hw, sample_file):
+    logger.debug('test_daq_fixed_target_scan')
+    ss = [1, 2]
+
+    msgs = list(nbp.daq_fixed_target_scan(sample='test_sample',
+                                          detectors=[hw.det],
+                                          x_motor=hw.motor1, y_motor=hw.motor2,
+                                          scan_motor=hw.motor3, ss=ss,
+                                          n_shots=3, path=sample_file,
+                                          record=True, events=1))
+    configure_message = None
+    for msg in msgs:
+        if msg.command == 'configure' and msg.obj is daq:
+            configure_message = msg
+            break
+
+    assert configure_message.kwargs['record'] is True
+    assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
+                                                    hw.motor3]
+    RE(msgs)
+    summarize_plan(msgs)
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
+    logger.debug('test_daq_fixed_target_scan')
+    ss = [1, 2]
+
+    msgs = list(nbp.daq_fixed_target_multi_scan(sample='test_sample',
+                                                detectors=[hw.det],
+                                                x_motor=hw.motor1,
+                                                y_motor=hw.motor2,
+                                                scan_motor=hw.motor3, ss=ss,
+                                                n_shots=3, path=sample_file,
+                                                record=True, events=1))
+    configure_message = None
+    for msg in msgs:
+        if msg.command == 'configure' and msg.obj is daq:
+            configure_message = msg
+            break
+
+    assert configure_message.kwargs['record'] is True
+    assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
+                                                    hw.motor3]
+
+    expected_moves = [1,                    # scan_motor[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      -20.59374999999996,   # x[0]
+                      26.41445312499999,    # y[0]
+                      2,                    # scan_motor[1]
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656,
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656,
+                      -20.342057291666624,  # x[1]
+                      26.412369791666656]   # y[1]
+
+    moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    reads = [msg for msg in msgs if msg.command == 'read']
+    assert moves == expected_moves
+    assert len(reads) == 24
+    RE(msgs)
+    summarize_plan(msgs)

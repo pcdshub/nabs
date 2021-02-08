@@ -10,6 +10,7 @@ Plans preceded by "daq" incorporate running the LCLS DAQ in the plan.
 """
 import math
 import time
+import logging
 from collections import defaultdict
 from itertools import chain, cycle
 
@@ -18,8 +19,13 @@ import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky import plan_patterns
 from toolz import partition
+import numpy as np
 
+
+from .plan_stubs import update_sample, get_sample_targets
 from . import preprocessors as nbpp
+
+logger = logging.getLogger(__name__)
 
 
 def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
@@ -678,3 +684,223 @@ def daq_a3scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     """
 
     yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
+
+
+def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
+                      n_shots, path):
+    """
+    Scan over two variables in steps simultaneously.
+
+    This is a `nabs` version of ``bluesky``'s built-in
+    `bluesky.plans.list_scan` plan.
+    This scan is designed to be used with 3 motors, the x and y motors that
+    move to a designaget target on a sample wafer, and one scan_motor that can
+    be delay time, laser power or some other motor positions.
+
+    Parameters
+    ----------
+    sample : str
+        The name of the sample we're interested in.
+    detectors : list
+        Objects to read into Python in the scan.
+    x_motor : obj
+        Motor object corresponding to the x axes.
+    y_motor : obj
+        Motor object corresponding to the y axes.
+    scan_motor : obj
+        The motor being scanned. It can be e.g., delay time, laser power, some
+        other motor position, etc.
+    ss : list
+        List of all the points (samples) for the scan_motor to go through.
+    n_shots : int
+        Indicates how many shots should be taken, or how many samples should
+        be scanned on the grid.
+    path : str
+        Path where the sample file is located.
+    """
+    detectors = list(detectors) + [scan_motor]
+
+    xx, yy = get_sample_targets(sample, path)
+    cycle_xx = cycle(xx)
+    cycle_yy = cycle(yy)
+
+    # find the index of the next target to be shot (status is False)
+    next_index = next((index for (index, d) in enumerate(xx)
+                      if d['status'] is False), None)
+    if next_index is None:
+        raise IndexError('Could not get a target index that has not been shot,'
+                         ' probably all targets were shot from this sample?')
+
+    if ((next_index - 1) + (n_shots * len(ss))) >= len(xx):
+        raise IndexError('The number of last shot + n_shots * len(ss): '
+                         f'{next_index - 1} + {n_shots} * {len(ss)}= '
+                         f'{next_index - 1 + (n_shots * len(ss))}: '
+                         f' bigger than the available samples: {len(xx)}. '
+                         'Please provide a number in range.')
+
+    @bpp.run_decorator()
+    def inner_scan():
+        try:
+            for i in range(len(ss)):
+                yield from bps.mv(scan_motor, ss[i])
+                for j in range(n_shots):
+                    x = (next(item['pos']
+                         for item in cycle_xx if item["status"] is False))
+                    y = (next(item['pos']
+                         for item in cycle_yy if item["status"] is False))
+                    yield from bpp.stub_wrapper(bp.list_scan(detectors,
+                                                x_motor, [x], y_motor, [y]))
+            update_sample(sample, path, (n_shots * len(ss)))
+        except Exception:
+            current_position = x_motor.position
+            try:
+                last_index = next((index for (index, d) in enumerate(xx)
+                                  if np.isclose(d["pos"], current_position)))
+                update_sample(sample, path, (last_index - next_index + 1))
+            except Exception:
+                logger.warning('Could not find the index in the targets list '
+                               'for the current motor value: %d',
+                               current_position)
+    return (yield from inner_scan())
+
+
+def fixed_target_multi_scan(sample, detectors, x_motor, y_motor, scan_motor,
+                            ss, n_shots, path):
+    """
+    Scan over three variables in steps simultaneously.
+
+    This function allows for multiple shots at the same target.
+
+    This is a `nabs` version of ``bluesky``'s built-in
+    `bluesky.plans.list_scan` plan.
+    This scan is designed to be used with 3 motors, the x and y motors that
+    move to a designaget target on a sample wafer, and one scan_motor that can
+    be delay time, laser power or some other motor positions.
+
+    Parameters
+    ----------
+    sample : str
+        The name of the sample we're interested in.
+    detectors : list
+        Objects to read into Python in the scan.
+    x_motor : obj
+        Motor object corresponding to the x axes.
+    y_motor : obj
+        Motor object corresponding to the y axes.
+    scan_motor : obj
+        The motor being scanned. It can be e.g., delay time, laser power, some
+        other motor position, etc.
+    ss : list
+        List of all the points (samples) for the scan_motor to go through.
+    n_shots : int
+        Indicates how many shots should be taken at one position.
+    path : str
+        Path where the sample file is located.
+    """
+    detectors = list(detectors) + [scan_motor]
+
+    xx, yy = get_sample_targets(sample, path)
+    # find the index of the next target to be shot (status is False)
+    next_index = next((index for (index, d) in enumerate(xx)
+                       if d['status'] is False), None)
+    if next_index is None:
+        raise IndexError('Could not get a target index that has not been shot,'
+                         ' probably all targets were shot from this sample?')
+
+    if ((next_index - 1) + (len(ss))) >= len(xx):
+        raise IndexError('The number of next to be shot + n_shots * len(ss): '
+                         f'{next_index} + {len(ss)}= '
+                         f'{next_index + (len(ss))}: '
+                         f' bigger than the available samples: {len(xx)}. '
+                         'Please provide a number in range.')
+
+    @bpp.run_decorator()
+    def inner_scan():
+        try:
+            temp_index = next_index - 1
+            for i in range(len(ss)):
+                temp_index += 1
+                yield from bps.mv(scan_motor, ss[i])
+                for j in range(n_shots):
+                    x = next((d['pos'] for (index, d) in enumerate(xx)
+                              if index == temp_index))
+                    y = next((d['pos'] for (index, d) in enumerate(yy)
+                              if index == temp_index))
+                    yield from bpp.stub_wrapper(bp.list_scan(detectors,
+                                                x_motor, [x], y_motor, [y]))
+            update_sample(sample, path, (len(ss)))
+        except Exception:
+            current_position = x_motor.position
+            try:
+                last_index = next((index for (index, d) in enumerate(xx)
+                                   if np.isclose(d["pos"], current_position)))
+                update_sample(sample, path, (last_index - next_index + 1))
+            except Exception:
+                logger.warning('Could not find the index in the targets list '
+                               'for the current motor value: %s',
+                               current_position)
+    return (yield from inner_scan())
+
+
+def daq_fixed_target_multi_scan(sample, detectors, x_motor, y_motor,
+                                scan_motor, ss, n_shots, path, record=True,
+                                events=None):
+
+    control_devices = [x_motor, y_motor, scan_motor]
+
+    @nbpp.daq_during_decorator(record=record, controls=control_devices)
+    def inner_daq_fixed_target_scan():
+        yield from fixed_target_multi_scan(sample=sample, detectors=detectors,
+                                           x_motor=x_motor, y_motor=y_motor,
+                                           scan_motor=scan_motor, ss=ss,
+                                           n_shots=n_shots, path=path)
+
+    return (yield from inner_daq_fixed_target_scan())
+
+
+def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
+                          n_shots, path, record=True, events=None):
+    """
+    Scan over two variables in steps simultaneously with DAQ Support.
+
+    This is a `nabs` version of ``bluesky``'s built-in
+    `bluesky.plans.list_scan` plan. It takes in consideration the number of
+    samples to be scanned out of the samples given in `xx` and `yy`.
+
+    Parameters
+    ----------
+    sample : str
+        The name of the sample we're interested in.
+    detectors : list
+        Objects to read into Python in the scan.
+    x_motor : obj
+        Motor object corresponding to the x axes.
+    y_motor : obj
+        Motor object corresponding to the y axes.
+    scan_motor : obj
+        The motor being scanned. It can be e.g., delay time, laser power, some
+        other motor position, etc.
+    ss : list
+        List of all the points (samples) for the scan_motor to go through.
+    n_shots : int
+        Indicates how many shots should be taken, or how many samples should
+        be scanned on the grid.
+    path : str
+        Path where the sample file is located.
+    record : bool, optional
+        Whether or not to record the run in the DAQ. Defaults to True because
+        we don't want to accidentally skip recording good runs.
+    events : int, optional
+        Number of events to take at each step. If omitted, uses the
+        duration argument or the last configured value.
+    """
+    control_devices = [x_motor, y_motor, scan_motor]
+
+    @nbpp.daq_during_decorator(record=record, controls=control_devices)
+    def inner_daq_fixed_target_scan():
+        yield from fixed_target_scan(sample=sample, detectors=detectors,
+                                     x_motor=x_motor, y_motor=y_motor,
+                                     scan_motor=scan_motor, ss=ss,
+                                     n_shots=n_shots, path=path)
+
+    return (yield from inner_daq_fixed_target_scan())
