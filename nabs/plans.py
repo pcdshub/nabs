@@ -910,7 +910,7 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
 
 
 def basic_target_scan(dets, stage, start_m, start_n, n_shots,
-                      n_targets):
+                      n_targets, scan_motor, ss):
     """
     Scan through XYTargetStage targets.
 
@@ -936,7 +936,7 @@ def basic_target_scan(dets, stage, start_m, start_n, n_shots,
     n_targets : int
         How many targets do we want to shoot.
     """
-    dets = list(dets)
+    dets = list(dets) + [scan_motor]
     m_points, n_points = stage.m_n_points
 
     if start_m > m_points or start_n > n_points:
@@ -947,11 +947,11 @@ def basic_target_scan(dets, stage, start_m, start_n, n_shots,
     m_avail = m_points - (start_m - 1)
     n_avail = n_points - (start_n - 1)
     current_available = m_avail * n_avail
-    if n_targets > current_available:
+    if n_targets * len(ss) > current_available:
         raise IndexError('The number of targets requested to be shot is larger'
                          ' than the remaining shots after the starting points:'
                          f' available: {current_available}, '
-                         f' requested: {n_targets}')
+                         f' requested: {n_targets * len(ss)}')
     # try to find the m_end and n_end points based on
     # how many targets the user wants to shoot - the shooting will
     # be done row by row
@@ -980,23 +980,25 @@ def basic_target_scan(dets, stage, start_m, start_n, n_shots,
         for vals in gen:
             row, col = vals
             if (arr[row - 1][col - 1] == start_n) and row == start_m:
-                for i in range(n_targets):
-                    x, y = stage.compute_mapped_point(row, col)
+                for j in range(len(ss)):
+                    yield from bpp.stub_wrapper(bps.mv(scan_motor, ss[j]))
+                    for i in range(n_targets):
+                        x, y = stage.compute_mapped_point(row, col)
 
-                    for shots in range(n_shots):
-                        yield from bpp.stub_wrapper(bp.list_scan(dets,
-                                                    stage.x, [x],
-                                                    stage.y, [y]))
+                        for shots in range(n_shots):
+                            yield from bpp.stub_wrapper(bp.list_scan(dets,
+                                                        stage.x, [x],
+                                                        stage.y, [y]))
 
-                    if (row == m_points and col == n_points):
-                        # break the loop here, we went through all points
-                        break
-                    row, col = next(gen)
+                        if (row == m_points and col == n_points):
+                            # break the loop here, we went through all points
+                            break
+                        row, col = next(gen)
     return (yield from inner_scan())
 
 
 def daq_basic_target_scan(dets, stage, start_m, start_n, n_shots,
-                          n_targets, record=True, events=None):
+                          n_targets, scan_motor, ss, record=True, events=None):
     """
     Scan through XYTargetStage targets with daq.
 
@@ -1008,44 +1010,7 @@ def daq_basic_target_scan(dets, stage, start_m, start_n, n_shots,
     def inner_daq_basic_target_scan():
         yield from basic_target_scan(dets=dets, stage=stage, start_m=start_m,
                                      start_n=start_n, n_shots=n_shots,
-                                     n_targets=n_targets)
+                                     n_targets=n_targets,
+                                     scan_motor=scan_motor, ss=ss)
 
     return (yield from inner_daq_basic_target_scan())
-
-
-def extra_motor_scan(dets, stage, start_m, start_n, n_shots,
-                     n_targets, extra_motor, extra_points):
-    """
-    Scan through XYTargetStage targets with extra motor.
-    """
-    dets = list(dets) + [extra_motor]
-
-    @bpp.run_decorator()
-    def inner_scan():
-        for i in range(len(extra_points)):
-            yield from bpp.stub_wrapper(bps.mv(extra_motor, extra_points[i]))
-            yield from bpp.stub_wrapper(basic_target_scan(dets=dets,
-                                        stage=stage, start_m=start_m,
-                                        start_n=start_n, n_shots=n_shots,
-                                        n_targets=n_targets))
-
-    return (yield from inner_scan())
-
-
-def daq_extra_motor_scan(dets, stage, start_m, start_n, n_shots,
-                         n_targets, extra_motor, extra_points,
-                         record=True, events=None):
-    """
-    Scan through XYTargetStage targets with extra motor and daq.
-    """
-    control_devices = [extra_motor, stage.x, stage.y]
-
-    @nbpp.daq_during_decorator(record=record, controls=control_devices)
-    def inner_daq_extra_motor_scan():
-        yield from extra_motor_scan(dets=dets, stage=stage, start_m=start_m,
-                                    start_n=start_n, n_shots=n_shots,
-                                    n_targets=n_targets,
-                                    extra_motor=extra_motor,
-                                    extra_points=extra_points)
-
-    return (yield from inner_daq_extra_motor_scan())
