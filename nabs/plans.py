@@ -13,6 +13,7 @@ import time
 import logging
 from collections import defaultdict
 from itertools import chain, cycle
+from pcdsdevices.targets import snake_grid_list
 
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
@@ -910,7 +911,7 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
 
 
 def basic_target_scan(dets, stage, start_m, start_n, n_shots,
-                      n_targets, scan_motor, ss):
+                      n_targets, scan_motor, ss, snake_like=True):
     """
     Scan through XYTargetStage targets.
 
@@ -935,6 +936,14 @@ def basic_target_scan(dets, stage, start_m, start_n, n_shots,
         How many shots should be taken at each sample.
     n_targets : int
         How many targets do we want to shoot.
+    scan_motor : obj
+        The motor being scanned. It can be e.g., delay time, laser power, some
+        other motor position, etc.
+    ss : list
+        List of all the points (samples) for the scan_motor to go through.
+    snake_like : bool, optional
+        Indicates if the targets should be shot in a snake_like pattern.
+        Defaults to `True`.
     """
     dets = list(dets) + [scan_motor]
     m_points, n_points = stage.m_n_points
@@ -952,65 +961,67 @@ def basic_target_scan(dets, stage, start_m, start_n, n_shots,
                          ' than the remaining shots after the starting points:'
                          f' available: {current_available}, '
                          f' requested: {n_targets * len(ss)}')
-    # try to find the m_end and n_end points based on
-    # how many targets the user wants to shoot - the shooting will
-    # be done row by row
-    temp_x = np.arange(1, m_points + 1, 1)
-    temp_y = np.arange(1, n_points + 1, 1)
 
-    arr = [[i for i in temp_y] for j in temp_x]
+    x_pos, y_pos = stage.compute_mapped_point(start_m, start_n,
+                                              compute_all=True)
+
+    start_x, start_y = stage.compute_mapped_point(start_m, start_n)
+
+    # convert to original shape
+    xx = np.array(x_pos).reshape(m_points, n_points)
+    yy = np.array(y_pos).reshape(m_points, n_points)
+    if snake_like is True:
+        xx = snake_grid_list(xx)
+        yy = snake_grid_list(yy)
+        # convert back to original shape
+        xx = np.array(xx).reshape(m_points, n_points)
+        yy = np.array(yy).reshape(m_points, n_points)
 
     def row_col():
-        for row in range(1, len(arr) + 1):
-            try:
-                if row == m_points:
-                    for col in range(1, len(arr[row - 1]) + 1):
-                        yield row, col
-                    if ((row) == m_points and col == n_points):
-                        return
-                for col in range(1, len(arr[row]) + 1):
-                    yield row, col
-            except StopIteration:
-                return
+        for row_x, row_y in zip(range(len(xx)), range(len(yy))):
+            for col_x, col_y in zip(xx[row_x], yy[row_y]):
+                yield col_x, col_y
 
     gen = row_col()
 
     @bpp.run_decorator()
     def inner_scan():
         for vals in gen:
-            row, col = vals
-            if (arr[row - 1][col - 1] == start_n) and row == start_m:
+            col_x, col_y = vals
+            # start to shoot from here
+            if col_x == start_x and col_y == start_y:
                 for j in range(len(ss)):
                     yield from bpp.stub_wrapper(bps.mv(scan_motor, ss[j]))
                     for i in range(n_targets):
-                        x, y = stage.compute_mapped_point(row, col)
-
                         for shots in range(n_shots):
                             yield from bpp.stub_wrapper(bp.list_scan(dets,
-                                                        stage.x, [x],
-                                                        stage.y, [y]))
-
-                        if (row == m_points and col == n_points):
-                            # break the loop here, we went through all points
+                                                                     stage.x,
+                                                                     [col_x],
+                                                                     stage.y,
+                                                                     [col_y]))
+                        # break the loop here, we went through all points
+                        if i == n_targets-1:
                             break
-                        row, col = next(gen)
+                        col_x, col_y = next(gen)
     return (yield from inner_scan())
 
 
 def daq_basic_target_scan(dets, stage, start_m, start_n, n_shots,
-                          n_targets, scan_motor, ss, record=True, events=None):
+                          n_targets, scan_motor, ss, snake_like=True,
+                          record=True, events=None):
     """
     Scan through XYTargetStage targets with daq.
 
     See `basic_target_scan` for more info.
     """
-    control_devices = [stage.x, stage.y]
+    control_devices = [stage.x, stage.y, scan_motor]
 
     @nbpp.daq_during_decorator(record=record, controls=control_devices)
     def inner_daq_basic_target_scan():
         yield from basic_target_scan(dets=dets, stage=stage, start_m=start_m,
                                      start_n=start_n, n_shots=n_shots,
                                      n_targets=n_targets,
-                                     scan_motor=scan_motor, ss=ss)
+                                     scan_motor=scan_motor, ss=ss,
+                                     snake_like=snake_like)
 
     return (yield from inner_daq_basic_target_scan())

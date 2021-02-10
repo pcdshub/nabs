@@ -359,25 +359,25 @@ def fake_grid_stage(sample_file, hw):
 
 def test_basic_target_scan(fake_grid_stage, RE, hw):
     stage = fake_grid_stage
-    ss = [1, 2]
+    ss = [1]
     plan = list(nbp.basic_target_scan(dets=[hw.det4],
                                       stage=stage,
                                       start_m=1,
                                       start_n=1,
                                       n_shots=1,
-                                      n_targets=202,
+                                      n_targets=100,
                                       scan_motor=hw.motor3,
-                                      ss=ss))
+                                      ss=ss, snake_like=True))
     RE(plan)
     summarize_plan(plan)
 
 
 def test_basic_target_scan_with_daq(fake_grid_stage, daq, RE, hw):
     stage = fake_grid_stage
-    ss = [1, 2]
+    ss = [1]
     plan = list(nbp.daq_basic_target_scan(dets=[hw.det4],
                                           stage=stage,
-                                          start_m=1,
+                                          start_m=101,
                                           start_n=1,
                                           n_shots=1,
                                           n_targets=4,
@@ -391,5 +391,6 @@ def test_basic_target_scan_with_daq(fake_grid_stage, daq, RE, hw):
             break
 
     assert configure_message.kwargs['record'] is True
-    assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2]
+    assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
+                                                    hw.motor3]
     summarize_plan(plan)
