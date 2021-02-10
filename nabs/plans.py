@@ -980,15 +980,18 @@ def basic_target_scan(dets, stage, start_m, start_n, n_shots,
         for vals in gen:
             row, col = vals
             if (arr[row - 1][col - 1] == start_n) and row == start_m:
-                for i in range(1, n_targets + 1):
+                for i in range(n_targets):
                     x, y = stage.compute_mapped_point(row, col)
-                    row, col = next(gen)
 
                     for shots in range(n_shots):
                         yield from bpp.stub_wrapper(bp.list_scan(dets,
                                                     stage.x, [x],
                                                     stage.y, [y]))
 
+                    if (row == m_points and col == n_points):
+                        # break the loop here, we went through all points
+                        break
+                    row, col = next(gen)
     return (yield from inner_scan())
 
 

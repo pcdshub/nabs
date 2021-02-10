@@ -361,10 +361,10 @@ def test_basic_target_scan(fake_grid_stage, RE, hw):
     stage = fake_grid_stage
     plan = list(nbp.basic_target_scan(dets=[hw.det4],
                                       stage=stage,
-                                      start_m=1,
-                                      start_n=1,
+                                      start_m=101,
+                                      start_n=3,
                                       n_shots=1,
-                                      n_targets=4))
+                                      n_targets=2))
     RE(plan)
     summarize_plan(plan)
 
@@ -377,6 +377,7 @@ def test_basic_target_scan_with_daq(fake_grid_stage, daq, RE, hw):
                                           start_n=1,
                                           n_shots=1,
                                           n_targets=4))
+
     RE(plan)
     for msg in plan:
         if msg.command == 'configure' and msg.obj is daq:
@@ -393,10 +394,9 @@ def test_extra_motor_scan(fake_grid_stage, RE, hw):
     extra_points = [1, 2, 3]
     plan = list(nbp.extra_motor_scan(dets=[hw.det4], stage=stage,
                                      start_m=1, start_n=1,
-                                     n_shots=1, n_targets=1,
+                                     n_shots=1, n_targets=2,
                                      extra_motor=hw.motor3,
                                      extra_points=extra_points))
-
     RE(plan)
     summarize_plan(plan)
 
