@@ -731,7 +731,10 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         raise IndexError('Could not get a target index that has not been shot,'
                          ' probably all targets were shot from this sample?')
 
-    if ((next_index - 1) + (n_shots * len(ss))) >= len(xx):
+    # TODO this are changes made by Takahiro, keeping here for now
+    # if ((next_index - 1) + (n_shots * len(ss))) >= len(xx):
+    # if ((next_index - 1) + (n_shots * len(ss))) >= len(xx):#for only Run195
+    if ((next_index - 2) + (n_shots * len(ss))) >= len(xx):
         raise IndexError('The number of last shot + n_shots * len(ss): '
                          f'{next_index - 1} + {n_shots} * {len(ss)}= '
                          f'{next_index - 1 + (n_shots * len(ss))}: '
@@ -807,7 +810,7 @@ def fixed_target_multi_scan(sample, detectors, x_motor, y_motor, scan_motor,
         raise IndexError('Could not get a target index that has not been shot,'
                          ' probably all targets were shot from this sample?')
 
-    if ((next_index - 1) + (len(ss))) >= len(xx):
+    if ((next_index - 1) + (n_shots * len(ss))) >= len(xx):
         raise IndexError('The number of next to be shot + n_shots * len(ss): '
                          f'{next_index} + {len(ss)}= '
                          f'{next_index + (len(ss))}: '
@@ -904,3 +907,142 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
                                      n_shots=n_shots, path=path)
 
     return (yield from inner_daq_fixed_target_scan())
+
+
+def basic_target_scan(dets, stage, start_m, start_n, n_shots,
+                      n_targets):
+    """
+    Scan through XYTargetStage targets.
+
+    Scan throuhg targets given a start position, the number of targets to scan,
+    and how many shots to take per target.
+    The XYTargetStage class has utilities for redefining a skewed motor grid
+    in terms of indices, and this is used in full here.
+    Under the hood, gets the motor positions from the stage (`XYGridStage`)
+    and picks the appropriate starting point and trajectory based on the input.
+
+    Parameters
+    ----------
+    dets : list
+        Objects to read into Python in the scan.
+    stage : obj
+        XYTargetStage
+    start_m : int
+        The row index that we want to start from. First row starts at 1.
+    start_n : int
+        The column index that we want to start from. First column starts at 1.
+    n_shots : int
+        How many shots should be taken at each sample.
+    n_targets : int
+        How many targets do we want to shoot.
+    """
+    dets = list(dets)
+    m_points, n_points = stage.m_n_points
+
+    if start_m > m_points or start_n > n_points:
+        raise IndexError('The values of start_m or start_n are probably bigger'
+                         ' than the curren sample M, N points: '
+                         f'{m_points, n_points}')
+
+    m_avail = m_points - (start_m - 1)
+    n_avail = n_points - (start_n - 1)
+    current_available = m_avail * n_avail
+    if n_targets > current_available:
+        raise IndexError('The number of targets requested to be shot is larger'
+                         ' than the remaining shots after the starting points:'
+                         f' available: {current_available}, '
+                         f' requested: {n_targets}')
+    # try to find the m_end and n_end points based on
+    # how many targets the user wants to shoot - the shooting will
+    # be done row by row
+    temp_x = np.arange(1, m_points + 1, 1)
+    temp_y = np.arange(1, n_points + 1, 1)
+
+    arr = [[i for i in temp_y] for j in temp_x]
+
+    def row_col():
+        for row in range(1, len(arr) + 1):
+            try:
+                if row == m_points:
+                    for col in range(1, len(arr[row - 1]) + 1):
+                        yield row, col
+                    if ((row) == m_points and col == n_points):
+                        return
+                for col in range(1, len(arr[row]) + 1):
+                    yield row, col
+            except StopIteration:
+                return
+
+    gen = row_col()
+
+    @bpp.run_decorator()
+    def inner_scan():
+        for vals in gen:
+            row, col = vals
+            if (arr[row - 1][col - 1] == start_n) and row == start_m:
+                for i in range(1, n_targets + 1):
+                    x, y = stage.compute_mapped_point(row, col)
+                    row, col = next(gen)
+
+                    for shots in range(n_shots):
+                        yield from bpp.stub_wrapper(bp.list_scan(dets,
+                                                    stage.x, [x],
+                                                    stage.y, [y]))
+
+    return (yield from inner_scan())
+
+
+def daq_basic_target_scan(dets, stage, start_m, start_n, n_shots,
+                          n_targets, record=True, events=None):
+    """
+    Scan through XYTargetStage targets with daq.
+
+    See `basic_target_scan` for more info.
+    """
+    control_devices = [stage.x, stage.y]
+
+    @nbpp.daq_during_decorator(record=record, controls=control_devices)
+    def inner_daq_basic_target_scan():
+        yield from basic_target_scan(dets=dets, stage=stage, start_m=start_m,
+                                     start_n=start_n, n_shots=n_shots,
+                                     n_targets=n_targets)
+
+    return (yield from inner_daq_basic_target_scan())
+
+
+def extra_motor_scan(dets, stage, start_m, start_n, n_shots,
+                     n_targets, extra_motor, extra_points):
+    """
+    Scan through XYTargetStage targets with extra motor.
+    """
+    dets = list(dets) + [extra_motor]
+
+    @bpp.run_decorator()
+    def inner_scan():
+        for i in range(len(extra_points)):
+            yield from bpp.stub_wrapper(bps.mv(extra_motor, extra_points[i]))
+            yield from bpp.stub_wrapper(basic_target_scan(dets=dets,
+                                        stage=stage, start_m=start_m,
+                                        start_n=start_n, n_shots=n_shots,
+                                        n_targets=n_targets))
+
+    return (yield from inner_scan())
+
+
+def daq_extra_motor_scan(dets, stage, start_m, start_n, n_shots,
+                         n_targets, extra_motor, extra_points,
+                         record=True, events=None):
+    """
+    Scan through XYTargetStage targets with extra motor and daq.
+    """
+    control_devices = [extra_motor, stage.x, stage.y]
+
+    @nbpp.daq_during_decorator(record=record, controls=control_devices)
+    def inner_daq_extra_motor_scan():
+        yield from extra_motor_scan(dets=dets, stage=stage, start_m=start_m,
+                                    start_n=start_n, n_shots=n_shots,
+                                    n_targets=n_targets,
+                                    extra_motor=extra_motor,
+                                    extra_points=extra_points)
+
+    return (yield from inner_daq_extra_motor_scan())

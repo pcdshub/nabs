@@ -35,7 +35,7 @@ def daq(RE):
 def sample_file(tmp_path):
     path = tmp_path / "sub"
     path.mkdir()
-    sample_file = path / "samples.yml"
+    sample_file = path / "test_sample.yml"
     sample_file.write_text("""
 test_sample:
   time_created: '2021-01-22 14:29:29.681059'

@@ -9,6 +9,8 @@ from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
 from bluesky.simulators import summarize_plan
 import nabs.plans as nbp
+from pcdsdevices.targets import XYGridStage
+from ophyd.sim import make_fake_device
 
 PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
@@ -340,3 +342,82 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     assert len(reads) == 24
     RE(msgs)
     summarize_plan(msgs)
+
+
+@pytest.fixture(scope='function')
+def fake_grid_stage(sample_file, hw):
+    FakeGridStage = make_fake_device(XYGridStage)
+    x_motor = hw.motor1
+    y_motor = hw.motor2
+    grid = FakeGridStage(
+        x_motor=x_motor,
+        y_motor=y_motor, m_points=101, n_points=4,
+        path=sample_file.parent)
+    grid.load('test_sample')
+    return grid
+
+
+def test_basic_target_scan(fake_grid_stage, RE, hw):
+    stage = fake_grid_stage
+    plan = list(nbp.basic_target_scan(dets=[hw.det4],
+                                      stage=stage,
+                                      start_m=1,
+                                      start_n=1,
+                                      n_shots=1,
+                                      n_targets=4))
+    RE(plan)
+    summarize_plan(plan)
+
+
+def test_basic_target_scan_with_daq(fake_grid_stage, daq, RE, hw):
+    stage = fake_grid_stage
+    plan = list(nbp.daq_basic_target_scan(dets=[hw.det4],
+                                          stage=stage,
+                                          start_m=1,
+                                          start_n=1,
+                                          n_shots=1,
+                                          n_targets=4))
+    RE(plan)
+    for msg in plan:
+        if msg.command == 'configure' and msg.obj is daq:
+            configure_message = msg
+            break
+
+    assert configure_message.kwargs['record'] is True
+    assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2]
+    summarize_plan(plan)
+
+
+def test_extra_motor_scan(fake_grid_stage, RE, hw):
+    stage = fake_grid_stage
+    extra_points = [1, 2, 3]
+    plan = list(nbp.extra_motor_scan(dets=[hw.det4], stage=stage,
+                                     start_m=1, start_n=1,
+                                     n_shots=1, n_targets=1,
+                                     extra_motor=hw.motor3,
+                                     extra_points=extra_points))
+
+    RE(plan)
+    summarize_plan(plan)
+
+
+def test_extra_motor_scan_with_daq(fake_grid_stage, daq, RE, hw):
+    stage = fake_grid_stage
+    extra_points = [1, 2, 3]
+    plan = list(nbp.daq_extra_motor_scan(dets=[hw.det4], stage=stage,
+                                         start_m=1, start_n=1,
+                                         n_shots=1, n_targets=1,
+                                         extra_motor=hw.motor3,
+                                         extra_points=extra_points))
+
+    for msg in plan:
+        if msg.command == 'configure' and msg.obj is daq:
+            configure_message = msg
+            break
+
+    assert configure_message.kwargs['record'] is True
+    assert configure_message.kwargs['controls'] == [hw.motor3, hw.motor1,
+                                                    hw.motor2]
+
+    RE(plan)
+    summarize_plan(plan)
