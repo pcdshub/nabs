@@ -359,15 +359,15 @@ def fake_grid_stage(sample_file, hw):
 
 def test_basic_target_scan(fake_grid_stage, RE, hw):
     stage = fake_grid_stage
-    ss = [1]
+    ss = [1, 2]
     plan = list(nbp.basic_target_scan(dets=[hw.det4],
                                       stage=stage,
                                       start_m=1,
                                       start_n=1,
-                                      n_shots=1,
-                                      n_targets=100,
+                                      n_shots=2,
+                                      n_targets=1,
                                       scan_motor=hw.motor3,
-                                      ss=ss, snake_like=True))
+                                      ss=ss))
     RE(plan)
     summarize_plan(plan)
 
