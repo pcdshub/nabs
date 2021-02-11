@@ -374,13 +374,13 @@ def test_basic_target_scan(fake_grid_stage, RE, hw):
 
 def test_basic_target_scan_with_daq(fake_grid_stage, daq, RE, hw):
     stage = fake_grid_stage
-    ss = [1]
+    ss = [1, 2]
     plan = list(nbp.daq_basic_target_scan(dets=[hw.det4],
                                           stage=stage,
-                                          start_m=101,
+                                          start_m=1,
                                           start_n=1,
-                                          n_shots=1,
-                                          n_targets=4,
+                                          n_shots=2,
+                                          n_targets=3,
                                           scan_motor=hw.motor3,
                                           ss=ss))
 
