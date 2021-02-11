@@ -1,0 +1,502 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>nabs.optimize &mdash; nabs 1.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> nabs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../plans.html">Plans and Data Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimize.html">Optimization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Full API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../upcoming_changes.html">Upcoming Changes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nabs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>nabs.optimize</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for nabs.optimize</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Support for generic optimization routines through ``bluesky``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
+<span class="kn">import</span> <span class="nn">bluesky.preprocessors</span> <span class="k">as</span> <span class="nn">bpp</span>
+<span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">golden_ratio</span>
+
+<span class="kn">from</span> <span class="nn">nabs.plan_stubs</span> <span class="kn">import</span> <span class="n">measure_average</span>
+<span class="kn">from</span> <span class="nn">nabs.streams</span> <span class="kn">import</span> <span class="n">AverageStream</span>
+<span class="kn">from</span> <span class="nn">nabs.utils</span> <span class="kn">import</span> <span class="n">ErrorSignal</span><span class="p">,</span> <span class="n">InvertedSignal</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="minimize"><a class="viewcode-back" href="../../generated/generated/nabs.optimize.minimize.html#nabs.optimize.minimize">[docs]</a><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimize the value of an `ophyd.signal.Signal`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add plan name into metadata</span>
+    <span class="n">_md</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;minimize&#39;</span><span class="p">}</span>
+    <span class="n">_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;md&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="c1"># Run the plan</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">optimize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">maximize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="maximize"><a class="viewcode-back" href="../../generated/generated/nabs.optimize.maximize.html#nabs.optimize.maximize">[docs]</a><span class="k">def</span> <span class="nf">maximize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maximize the value of an `ophyd.signal.Signal`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add plan name into metadata</span>
+    <span class="n">_md</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;maximize&#39;</span><span class="p">}</span>
+    <span class="n">_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;md&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="c1"># Run the plan</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">optimize</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">maximize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="walk_to_target"><a class="viewcode-back" href="../../generated/generated/nabs.optimize.walk_to_target.html#nabs.optimize.walk_to_target">[docs]</a><span class="k">def</span> <span class="nf">walk_to_target</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Walk the motor until a signal reaches our target</span>
+
+<span class="sd">    Similar to the `maximize` and `minimize`. There are options</span>
+<span class="sd">    for multiple algorithms to dictate the scanning procedure. This may change</span>
+<span class="sd">    the interpretation of values passed into this scanning procedure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal : `ophyd.signal.Signal`</span>
+<span class="sd">        Signal to maximize</span>
+
+<span class="sd">    motor : `ophyd.ophydobj.OphydObject`</span>
+<span class="sd">        Any set-able object</span>
+
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        The tolerance in which our motor is</span>
+
+<span class="sd">    average : int, optional</span>
+<span class="sd">        Choice to take an average of points at each point in the scan</span>
+
+<span class="sd">    limits : tuple, optional</span>
+<span class="sd">        Limit the region the scan will search within. If this is not provided,</span>
+<span class="sd">        the soft limits of the signal will be used. In this case, these must be</span>
+<span class="sd">        configured or the scan will not be allowed to continue.</span>
+
+<span class="sd">    method : str, optional</span>
+<span class="sd">        Choice of optimization methods</span>
+
+<span class="sd">    md : dict, optional</span>
+<span class="sd">        metadata</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add walk information to metadata</span>
+    <span class="n">_md</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;walk_to_target&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">target</span><span class="p">}</span>
+    <span class="n">_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;md&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="c1"># Create a signal whose value is the absolute error</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">ErrorSignal</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">minimize</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="optimize"><a class="viewcode-back" href="../../generated/generated/nabs.optimize.optimize.html#nabs.optimize.optimize">[docs]</a><span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span>
+             <span class="n">average</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;golden&#39;</span><span class="p">,</span>
+             <span class="n">maximize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic optimization method</span>
+
+<span class="sd">    This method serves as the switchyard for various methods and requirements</span>
+<span class="sd">    necessary to maximize or minimize.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Decide the limits</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">limits</span><span class="p">:</span>
+        <span class="c1"># Use the motor limits</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="s1">&#39;limits&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">motor</span><span class="o">.</span><span class="n">limits</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No limits provided. &quot;</span>
+                           <span class="s2">&quot;Using the motor soft limits </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span>
+                           <span class="n">motor</span><span class="o">.</span><span class="n">limits</span><span class="p">)</span>
+            <span class="n">limits</span> <span class="o">=</span> <span class="n">motor</span><span class="o">.</span><span class="n">limits</span>
+        <span class="c1"># No provided limits or motor limits. Not allowed.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No limits provided or set on motor&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create an inverted signal if we need to maximize</span>
+    <span class="k">if</span> <span class="n">maximize</span><span class="p">:</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">signal</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">InvertedSignal</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+    <span class="c1"># Create plan metadata</span>
+    <span class="n">_md</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;detectors&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">signal</span><span class="p">],</span>
+           <span class="s1">&#39;motors&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">motor</span><span class="p">],</span>
+           <span class="s1">&#39;plan_args&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;signal&#39;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="n">signal</span><span class="p">),</span>
+                         <span class="s1">&#39;motor&#39;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="n">motor</span><span class="p">),</span>
+                         <span class="s1">&#39;tolerance&#39;</span><span class="p">:</span> <span class="n">tolerance</span><span class="p">,</span>
+                         <span class="s1">&#39;average&#39;</span><span class="p">:</span> <span class="n">average</span><span class="p">,</span>
+                         <span class="s1">&#39;limits&#39;</span><span class="p">:</span> <span class="n">limits</span><span class="p">,</span>
+                         <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">method</span><span class="p">,</span>
+                         <span class="s1">&#39;maximize&#39;</span><span class="p">:</span> <span class="n">maximize</span><span class="p">},</span>
+           <span class="s1">&#39;plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;optimize&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;hints&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">motor</span><span class="o">.</span><span class="n">hints</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">],</span> <span class="s1">&#39;primary&#39;</span><span class="p">)]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_md</span><span class="p">[</span><span class="s1">&#39;hints&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;dimensions&#39;</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span>
+
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">stage_decorator</span><span class="p">([</span><span class="n">signal</span><span class="p">,</span> <span class="n">motor</span><span class="p">])</span>
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">inner_optimize</span><span class="p">():</span>
+        <span class="c1"># Golden Section Search</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;golden&#39;</span><span class="p">:</span>
+            <span class="c1"># Search the system for the minimum</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">golden_section_search</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span>
+                                                   <span class="n">average</span><span class="o">=</span><span class="n">average</span><span class="p">,</span>
+                                                   <span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">)</span>
+            <span class="c1"># Go to the minimum of the range</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Moving motor to center of discovered range ...&quot;</span><span class="p">)</span>
+            <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown optimization methodology </span><span class="si">{!r}</span><span class="s2">&quot;</span>
+                             <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">inner_optimize</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="golden_section_search"><a class="viewcode-back" href="../../generated/generated/nabs.optimize.golden_section_search.html#nabs.optimize.golden_section_search">[docs]</a><span class="k">def</span> <span class="nf">golden_section_search</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">limits</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use golden-section search to find the extrema of a signal</span>
+
+<span class="sd">    The algorithm is fed the starting range in which the extrema is contained</span>
+<span class="sd">    within and a tolerance in which we would like to know the position of the</span>
+<span class="sd">    extrema. For the algorithm to succeed it is a requirement that the</span>
+<span class="sd">    underlying distribution is unimodal. After beginning the scan, &quot;probe&quot;</span>
+<span class="sd">    points will be chosen to help determine how to narrow the range which</span>
+<span class="sd">    contains the extrema. These probes are chosen using the golden ratio so the</span>
+<span class="sd">    scan will complete in a deterministic number of iterations based on the</span>
+<span class="sd">    starting range and desired resolution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal : `ophyd.signal.Signal`</span>
+<span class="sd">        Signal whose distribution we are investigating</span>
+
+<span class="sd">    motor : `ophyd.ophydobj.OphydObject`</span>
+<span class="sd">        Object that is ``set`` to probe different points of the distribution.</span>
+
+<span class="sd">    tolerance : float</span>
+<span class="sd">        The size of the range we would like to narrow the position of our</span>
+<span class="sd">        extrema. Note that this is not the tolerance that we will know the</span>
+<span class="sd">        &quot;value&quot; of the extrema, but instead the resolution we will be sure that</span>
+<span class="sd">        it lies within on the &quot;x&quot; axis</span>
+
+<span class="sd">    limits : tuple</span>
+<span class="sd">        Starting bounds that we know the extrema lie within</span>
+
+<span class="sd">    average : int, optional</span>
+<span class="sd">        Option to average the signal we are reading to limit the affect of</span>
+<span class="sd">        noise on our measurements</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bounds : tuple</span>
+<span class="sd">        The range in which we have determined the extrema to lie within.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This is boiler plate code and should be packaged into a</span>
+    <span class="c1"># pre-processor, for now we repeat it as to not subscribe numerous</span>
+    <span class="c1"># streams</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="n">average</span> <span class="ow">or</span> <span class="mi">1</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="n">AverageStream</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">average</span><span class="p">)</span>
+    <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">start</span><span class="p">({</span><span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+
+    <span class="c1"># Measurement plan</span>
+    <span class="k">def</span> <span class="nf">measure_probe</span><span class="p">(</span><span class="n">position</span><span class="p">):</span>
+        <span class="c1"># Move motor</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+        <span class="c1"># Return measurement</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">measure_average</span><span class="p">([</span><span class="n">signal</span><span class="p">,</span> <span class="n">motor</span><span class="p">],</span> <span class="n">average</span><span class="p">,</span>
+                                         <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found a values of </span><span class="si">%r</span><span class="s2"> at </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span>
+                     <span class="n">ret</span><span class="p">[</span><span class="n">signal</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">position</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="n">signal</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="c1"># If we have already found what we are looking for stop the scan</span>
+    <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">limits</span>
+    <span class="n">region_size</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="k">if</span> <span class="n">region_size</span> <span class="o">&lt;=</span> <span class="n">tolerance</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="c1"># Determine the number of steps to converge</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tolerance</span><span class="o">/</span><span class="n">region_size</span><span class="p">)</span>
+                  <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">golden_ratio</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Beginning golden-section search, &quot;</span>
+                 <span class="s2">&quot;narrowing extrema location to </span><span class="si">%r</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot;will require </span><span class="si">%r</span><span class="s2"> steps&quot;</span><span class="p">,</span>
+                 <span class="n">tolerance</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="c1"># Place holders for probe values</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">region_size</span><span class="o">/</span><span class="n">golden_ratio</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">region_size</span><span class="o">/</span><span class="n">golden_ratio</span>
+    <span class="c1"># Examine our new probe locations</span>
+    <span class="n">low_probe</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">measure_probe</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">high_probe</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">measure_probe</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="c1"># Begin iteratively narrowing range</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Iteration </span><span class="si">%s</span><span class="s2">: Extrema is between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                     <span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">low_probe</span> <span class="o">&lt;</span> <span class="n">high_probe</span><span class="p">:</span>
+            <span class="c1"># Readjust region of interest</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">c</span>
+            <span class="n">high_probe</span> <span class="o">=</span> <span class="n">low_probe</span>
+            <span class="n">region_size</span> <span class="o">/=</span> <span class="n">golden_ratio</span>
+            <span class="c1"># Calculate next probe</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">region_size</span><span class="o">/</span><span class="n">golden_ratio</span>
+            <span class="c1"># Measure next probe</span>
+            <span class="n">low_probe</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">measure_probe</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Readjust region of interest</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">c</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="n">low_probe</span> <span class="o">=</span> <span class="n">high_probe</span>
+            <span class="n">region_size</span> <span class="o">/=</span> <span class="n">golden_ratio</span>
+            <span class="c1"># Calculate next probe</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">region_size</span><span class="o">/</span><span class="n">golden_ratio</span>
+            <span class="c1"># Measure next probe</span>
+            <span class="n">high_probe</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">measure_probe</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="c1"># Return the final banding region</span>
+    <span class="k">if</span> <span class="n">low_probe</span> <span class="o">&lt;</span> <span class="n">high_probe</span><span class="p">:</span>
+        <span class="n">final_region</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">final_region</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Extrema determined to be within </span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span>
+                 <span class="n">final_region</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">final_region</span></div>
+
+
+<span class="c1"># Add the optimization docstring to both minimize and maximize</span>
+<span class="n">optimize_opts</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Parameters</span>
+<span class="s2">    ----------</span>
+<span class="s2">    signal : `ophyd.signal.Signal`</span>
+<span class="s2">        Signal to maximize</span>
+
+<span class="s2">    motor : `ophyd.ophydobj.OphydObject`</span>
+<span class="s2">        Any set-able object</span>
+
+<span class="s2">    tolerance : float, optional</span>
+<span class="s2">        The tolerance in which our motor is</span>
+
+<span class="s2">    average : int, optional</span>
+<span class="s2">        Choice to take an average of points at each point in the scan</span>
+
+<span class="s2">    limits : tuple, optional</span>
+<span class="s2">        Limit the region the scan will search within. If this is not provided,</span>
+<span class="s2">        the soft limits of the signal will be used. In this case, these must be</span>
+<span class="s2">        configured or the scan will not be allowed to continue.</span>
+
+<span class="s2">    method : str, optional</span>
+<span class="s2">        Choice of optimization methods</span>
+
+<span class="s2">    md : dict, optional</span>
+<span class="s2">        metadata</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">maximize</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="n">optimize_opts</span>
+<span class="n">maximize</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">optimize</span><span class="p">)</span>
+<span class="n">minimize</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="n">optimize_opts</span>
+<span class="n">minimize</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">optimize</span><span class="p">)</span>
+<span class="n">optimize</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="n">optimize_opts</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, SLAC National Accelerator Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
