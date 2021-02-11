@@ -1,6 +1,20 @@
 Release History
 ###############
 
+v1.1.0 (2021-02-10)
+===================
+
+Features
+--------
+- Add a new plan for fixed target scanning, as used in XPP for the start of
+  lu8318. This uses the ``XYGridStage`` from ``pcdsdevices`` to scan motors
+  across a skewed path grid. It is feature-rich with things like path
+  memory and incorporating a third motor.
+
+Contributors
+------------
+- cristinasewell
+
 
 v1.0.0 (2020-12-22)
 ===================

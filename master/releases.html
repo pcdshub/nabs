@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Release History &mdash; nabs 1.0.0+32.g5558804 documentation</title>
+  <title>Release History &mdash; nabs 1.1.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.0.0+32.g5558804
+                1.1.0
               </div>
             
           
@@ -101,17 +101,22 @@
 <p class="caption"><span class="caption-text">Developer Notes</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release History</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2020-12-22">v1.0.0 (2020-12-22)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#api-changes">API Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-1-0-2021-02-10">v1.1.0 (2021-02-10)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2020-12-22">v1.0.0 (2020-12-22)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-changes">API Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Contributors</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0-2020-11-17">v0.1.0 (2020-11-17)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Bugfixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-0-2018-04-19">v0.0.0 (2018-04-19)</a></li>
@@ -187,6 +192,24 @@
             
   <div class="section" id="release-history">
 <h1>Release History<a class="headerlink" href="#release-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v1-1-0-2021-02-10">
+<h2>v1.1.0 (2021-02-10)<a class="headerlink" href="#v1-1-0-2021-02-10" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="features">
+<h3>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Add a new plan for fixed target scanning, as used in XPP for the start of
+lu8318. This uses the <code class="docutils literal notranslate"><span class="pre">XYGridStage</span></code> from <code class="docutils literal notranslate"><span class="pre">pcdsdevices</span></code> to scan motors
+across a skewed path grid. It is feature-rich with things like path
+memory and incorporating a third motor.</p></li>
+</ul>
+</div>
+<div class="section" id="contributors">
+<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>cristinasewell</p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="v1-0-0-2020-12-22">
 <h2>v1.0.0 (2020-12-22)<a class="headerlink" href="#v1-0-0-2020-12-22" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="api-changes">
@@ -204,8 +227,8 @@ in the DAQ control variables. This actually slows down the scan and dumps
 extra, redundant data into the data stream.</p></li>
 </ul>
 </div>
-<div class="section" id="contributors">
-<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Contributors<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>zllentz</p></li>
 <li><p>ZryletTC</p></li>
@@ -214,8 +237,8 @@ extra, redundant data into the data stream.</p></li>
 </div>
 <div class="section" id="v0-1-0-2020-11-17">
 <h2>v0.1.0 (2020-11-17)<a class="headerlink" href="#v0-1-0-2020-11-17" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="features">
-<h3>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Features<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added the <code class="xref any docutils literal notranslate"><span class="pre">nabs.plans</span></code> module with the following functions:</p>
 <ul>
@@ -256,8 +279,8 @@ A function decorator that modifies a plan to execute using the <code class="xref
 </li>
 </ul>
 </div>
-<div class="section" id="id1">
-<h3>Bugfixes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Bugfixes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix issues related to SignalRO moving around in the ophyd API</p></li>
 <li><p>Fix issues related to measure_average not working for integer values</p></li>
@@ -278,8 +301,8 @@ on these python versions.</p></li>
 <li><p>Fix issue with automated documentation uploads.</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>Contributors<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Contributors<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>zllentz</p></li>
 </ul>
