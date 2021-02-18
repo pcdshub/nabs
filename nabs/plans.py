@@ -295,7 +295,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     if not detectors:
@@ -367,7 +367,7 @@ def daq_scan(*args, num=None, per_step=None, md=None):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     if isinstance(args[0], list):
@@ -436,7 +436,7 @@ def daq_list_scan(*args, per_step=None, md=None):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     if isinstance(args[0], list):
@@ -496,7 +496,7 @@ def daq_ascan(detectors, motor, start, end, nsteps):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan(detectors, motor, start, end, nsteps)
@@ -549,7 +549,7 @@ def daq_dscan(detectors, motor, start, end, nsteps):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan(detectors, motor, start, end, nsteps)
@@ -610,7 +610,7 @@ def daq_a2scan(detectors, m1, a1, b1, m2, a2, b2, nsteps):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, nsteps)
@@ -680,7 +680,7 @@ def daq_a3scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
     Note
     ----
     The events, duration, record, and use_l3t arguments come from the
-    `nabs.preprocessors.daq_step_scan_decorator`.
+    :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
     yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
@@ -691,7 +691,7 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     """
     Scan over two variables in steps simultaneously.
 
-    This is a `nabs` version of ``bluesky``'s built-in
+    This is a ``nabs`` version of ``bluesky``'s built-in
     `bluesky.plans.list_scan` plan.
     This scan is designed to be used with 3 motors, the x and y motors that
     move to a designaget target on a sample wafer, and one scan_motor that can
@@ -771,7 +771,7 @@ def fixed_target_multi_scan(sample, detectors, x_motor, y_motor, scan_motor,
 
     This function allows for multiple shots at the same target.
 
-    This is a `nabs` version of ``bluesky``'s built-in
+    This is a ``nabs`` version of ``bluesky``'s built-in
     `bluesky.plans.list_scan` plan.
     This scan is designed to be used with 3 motors, the x and y motors that
     move to a designaget target on a sample wafer, and one scan_motor that can
@@ -863,9 +863,9 @@ def daq_fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
     """
     Scan over two variables in steps simultaneously with DAQ Support.
 
-    This is a `nabs` version of ``bluesky``'s built-in
+    This is a ``nabs`` version of ``bluesky``'s built-in
     `bluesky.plans.list_scan` plan. It takes in consideration the number of
-    samples to be scanned out of the samples given in `xx` and `yy`.
+    samples to be scanned out of the samples given in ``xx`` and ``yy``.
 
     Parameters
     ----------

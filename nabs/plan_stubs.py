@@ -34,7 +34,7 @@ def measure_average(detectors, num, delay=None, stream=None):
         Time delay between successive readings. See `bluesky.plans.count`
         for more details
 
-    stream : `nabs.streams.AverageStream`, optional
+    stream : :py:class:`nabs.streams.AverageStream`, optional
         If a plan will call `measure_average` multiple times, a single
         ``AverageStream`` instance can be created and then passed in on each
         call. This allows other callbacks to subscribe to the averaged data
@@ -74,15 +74,15 @@ def update_sample(sample_name, path, n_shots):
     """
     Update the current sample information after a run.
 
-    Updates the `status` values of each target in the sample,
-    from `False` to `True` to indicate that it is shot.
+    Updates the ``status`` values of each target in the sample,
+    from ``False`` to ``True`` to indicate that it is shot.
 
     Parameters
     ----------
     sample_name : str
         A name to identify the sample grid, should be snake_case style.
     path : str
-        Path to the `.yml` file. Defaults to the path defined when
+        Path to the ``.yml`` file. Defaults to the path defined when
         creating this object.
     n_shots : int
         Indicates how many targets have been shot.
@@ -131,7 +131,7 @@ def update_sample(sample_name, path, n_shots):
 
 def get_sample_targets(sample_name, path):
     """
-    Get the `xx` and `yy` target information from a saved sample.
+    Get the ``xx`` and ``yy`` target information from a saved sample.
 
     Given a sample name, get the x, y grid points that are mapped for that
     sample.
@@ -140,13 +140,13 @@ def get_sample_targets(sample_name, path):
     ----------
     sample_name : str
         The name of the sample to get the mapped points from. To see the
-        available mapped samples call the `mapped_samples()` method.
+        available mapped samples call the ``mapped_samples`` method.
     path : str, optional
         Path to the samples yaml file.
 
     Returns
     -------
-    `xx`, `yy` : tuple
+    ``xx``, ``yy`` : tuple
         Returns two lists of dictionaries, with information about the targets.
     """
     data = None
