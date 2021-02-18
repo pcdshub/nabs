@@ -16,6 +16,8 @@ Bugfixes
 Maintenance
 -----------
 - Fix various issues with the documentation builds
+- Add ophyd as an explicit runtime dependency because it is imported
+  directly in nabs.utils.
 
 Contributors
 ------------
