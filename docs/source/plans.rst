@@ -30,9 +30,8 @@ This section will draw attention to the most useful plans and examples.
 
 .. autosummary::
    :nosignatures:
-   :toctree: generated
 
-   :noindex:~nabs.plans.daq_count
-   :noindex:~nabs.plans.daq_scan
-   :noindex:~nabs.plans.daq_list_scan
-   :noindex:~nabs.plans.daq_delay_scan
+   ~nabs.plans.daq_count
+   ~nabs.plans.daq_scan
+   ~nabs.plans.daq_list_scan
+   ~nabs.plans.daq_delay_scan
