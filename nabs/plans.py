@@ -8,29 +8,31 @@ All plans in this module will work as-is when passed into a
 
 Plans preceded by "daq" incorporate running the LCLS DAQ in the plan.
 """
+import logging
 import math
 import time
-import logging
 from collections import defaultdict
 from itertools import chain, cycle
 
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
+import numpy as np
 from bluesky import plan_patterns
 from toolz import partition
-import numpy as np
 
-
-from .plan_stubs import update_sample, get_sample_targets
 from . import preprocessors as nbpp
+from .plan_stubs import get_sample_targets, update_sample
 
 logger = logging.getLogger(__name__)
 
 
 def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
     """
-    Bluesky plan that moves motors among points for a fixed duration.
+    Generalized version of the `delay_scan` movement pattern.
+
+    This is a bluesky plan that moves motors among points for a fixed
+    duration of time, rather than through a finite number of points.
 
     For each motor, a list of points must be provided. Each motor will be moved
     through its list of points simultaneously if multiple motors are provided.
@@ -313,7 +315,7 @@ def daq_count(detectors=None, num=1, delay=None, *, per_shot=None, md=None):
 @nbpp.daq_step_scan_decorator
 def daq_scan(*args, num=None, per_step=None, md=None):
     """
-    Scan through a multi-motor start, end, num trajectory with DAQ support.
+    Scan through a multi-motor (start, end, num) trajectory with DAQ support.
 
     This is an LCLS-I DAQ version of ``bluesky``'s built-in
     `bluesky.plans.scan` plan. It also returns the motors to their starting
