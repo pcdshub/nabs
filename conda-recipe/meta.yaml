@@ -18,7 +18,7 @@ requirements:
 
     run:
       - python >=3.6
-      - bluesky
+      - bluesky >=1.6.5
       - numpy
       - ophyd
       - scipy
