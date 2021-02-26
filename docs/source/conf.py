@@ -180,7 +180,9 @@ texinfo_documents = [
 # -- Extension configuration -------------------------------------------------
 intersphinx_mapping = {
     'bluesky': ('https://blueskyproject.io/bluesky', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy', None),
     'ophyd': ('https://blueskyproject.io/ophyd', None),
     'pcdsdaq': ('https://pcdshub.github.io/pcdsdaq', None),
     'pcdsdevices': ('https://pcdshub.github.io/pcdsdevices', None),
+    'python': ('https://docs.python.org/3', None),
 }

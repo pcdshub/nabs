@@ -1,4 +1,5 @@
-bluesky
+bluesky>=1.6.5
 numpy
+ophyd
 scipy
 toolz
