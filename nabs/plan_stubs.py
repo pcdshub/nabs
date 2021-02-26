@@ -8,10 +8,10 @@ are intended as building blocks for other complete plans.
 """
 import logging
 
+import yaml
 from bluesky.plan_stubs import subscribe
 from bluesky.plans import count
 from bluesky.preprocessors import stub_wrapper
-import yaml
 
 from nabs.streams import AverageStream
 
@@ -75,7 +75,7 @@ def update_sample(sample_name, path, n_shots):
     Update the current sample information after a run.
 
     Updates the ``status`` values of each target in the sample,
-    from ``False`` to ``True`` to indicate that it is shot.
+    from `False` to `True` to indicate that it is shot.
 
     Parameters
     ----------
