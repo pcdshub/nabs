@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Plans and Data Collection &mdash; nabs 1.1.0 documentation</title>
+  <title>Plans and Data Collection &mdash; nabs 1.1.0+11.g4e82b85 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0+11.g4e82b85
               </div>
             
           
@@ -187,18 +187,18 @@ collecting and event-matching data at high rates.</p>
 <div class="section" id="implementation">
 <h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="https://blueskyproject.io/bluesky">bluesky</a> module features a
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.preprocessors.plan_mutator.html#bluesky.preprocessors.plan_mutator" title="(in bluesky v1.6.7.post23+g0a91b8b8)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.preprocessors.plan_mutator</span></code></a> concept, which allows
+<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.preprocessors.plan_mutator.html#bluesky.preprocessors.plan_mutator" title="(in bluesky v1.6.7.post43+gb3038a0f)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.preprocessors.plan_mutator</span></code></a> concept, which allows
 us to intercept messages and modify what execution instructions the
 run engine receives. In this way, we can “magically” include <code class="docutils literal notranslate"><span class="pre">DAQ</span></code>
 support in any existing <a class="reference external" href="https://blueskyproject.io/bluesky">bluesky</a>
 plan in a standardized way.</p>
-<p>See <code class="xref any docutils literal notranslate"><span class="pre">nabs.preprocessors</span></code> for the various magic methods we use to
+<p>See <a class="reference internal" href="generated/nabs.preprocessors.html#module-nabs.preprocessors" title="nabs.preprocessors"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">nabs.preprocessors</span></code></a> for the various magic methods we use to
 hook the <code class="docutils literal notranslate"><span class="pre">DAQ</span></code> into any <a class="reference external" href="https://blueskyproject.io/bluesky">bluesky</a>
 plan.</p>
 </div>
 <div class="section" id="selected-plans">
 <h2>Selected Plans<a class="headerlink" href="#selected-plans" title="Permalink to this headline">¶</a></h2>
-<p>See <code class="xref any docutils literal notranslate"><span class="pre">nabs.plans</span></code> for a full listing of these functions and their API.
+<p>See <a class="reference internal" href="generated/nabs.plans.html#module-nabs.plans" title="nabs.plans"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">nabs.plans</span></code></a> for a full listing of these functions and their API.
 This section will draw attention to the most useful plans and examples.</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -206,6 +206,18 @@ This section will draw attention to the most useful plans and examples.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/generated/nabs.plans.daq_count.html#nabs.plans.daq_count" title="nabs.plans.daq_count"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_count</span></code></a></p></td>
+<td><p>Take repeated DAQ runs with no motors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/generated/nabs.plans.daq_scan.html#nabs.plans.daq_scan" title="nabs.plans.daq_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_scan</span></code></a></p></td>
+<td><p>Scan through a multi-motor (start, end, num) trajectory with DAQ support.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/generated/nabs.plans.daq_list_scan.html#nabs.plans.daq_list_scan" title="nabs.plans.daq_list_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_list_scan</span></code></a></p></td>
+<td><p>Scan through a multi-motor list trajectory with DAQ support.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan" title="nabs.plans.daq_delay_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">daq_delay_scan</span></code></a></p></td>
+<td><p>Scan a laser delay timing motor with DAQ support.</p></td>
+</tr>
 </tbody>
 </table>
 </div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>nabs.streams.AverageStream &mdash; nabs 1.1.0 documentation</title>
+  <title>nabs.streams.AverageStream &mdash; nabs 1.1.0+11.g4e82b85 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0+11.g4e82b85
               </div>
             
           
@@ -99,6 +99,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../api.html">Full API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../nabs.optimize.html">nabs.optimize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nabs.plan_stubs.html">nabs.plan_stubs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.streams.AverageStream</a></li>
 </ul>
@@ -185,9 +187,9 @@
 <h1>nabs.streams.AverageStream<a class="headerlink" href="#nabs-streams-averagestream" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="nabs.streams.AverageStream">
-<em class="property">class </em><code class="sig-prename descclassname">nabs.streams.</code><code class="sig-name descname">AverageStream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/streams.html#AverageStream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.streams.AverageStream" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">nabs.streams.</span></code><code class="sig-name descname"><span class="pre">AverageStream</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/streams.html#AverageStream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.streams.AverageStream" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stream that averages data points together</p>
-<p>As event documents are emitted from the <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.run_engine.RunEngine.html#bluesky.run_engine.RunEngine" title="(in bluesky v1.6.7.post23+g0a91b8b8)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.run_engine.RunEngine</span></code></a>
+<p>As event documents are emitted from the <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.run_engine.RunEngine.html#bluesky.run_engine.RunEngine" title="(in bluesky v1.6.7.post43+gb3038a0f)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.run_engine.RunEngine</span></code></a>
 they are collected by <code class="docutils literal notranslate"><span class="pre">AverageStream</span></code>, averaged, and re-emitted
 as a secondary event stream. This
 allows callbacks to subscribe to the average stream for more elegant
@@ -197,24 +199,24 @@ points to average or this information can be passed through in the start
 document metadata. See the <code class="xref py py-meth docutils literal notranslate"><span class="pre">start()</span></code> for more information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>num</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of points to average together</p>
+<dd class="field-odd"><p><strong>num</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of points to average together</p>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt id="nabs.streams.AverageStream.last_event">
-<code class="sig-name descname">last_event</code><a class="headerlink" href="#nabs.streams.AverageStream.last_event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">last_event</span></code><a class="headerlink" href="#nabs.streams.AverageStream.last_event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Data from the last event emitted by the stream. Used for limited access
 to processed data without the need for a subscription.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="nabs.streams.AverageStream.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/streams.html#AverageStream.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.streams.AverageStream.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/streams.html#AverageStream.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.streams.AverageStream.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -237,14 +239,20 @@ to processed data without the need for a subscription.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datum</span></code>(doc)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">descriptor</span></code>(doc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">datum_page</span></code>(doc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">descriptor</span></code>(doc)</p></td>
 <td><p>Store a descriptor</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit</span></code>(name, doc)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit</span></code>(name, doc)</p></td>
 <td><p>Check the document schema and send to the dispatcher</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">event</span></code>(doc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">event</span></code>(doc)</p></td>
 <td><p>Send an Event through the stream</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">event_page</span></code>(doc)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_event</span></code>(doc[, stream_name, id_args, …])</p></td>
 <td><p>Process a modified event document then emit it for the modified stream</p></td>
@@ -263,6 +271,18 @@ to processed data without the need for a subscription.</p>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">unsubscribe</span></code>(token)</p></td>
 <td><p>Convenience function for dispatcher un-subscription</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>

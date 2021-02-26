@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>nabs.plan_stubs.update_sample &mdash; nabs 1.1.0 documentation</title>
+  <title>nabs.plan_stubs.update_sample &mdash; nabs 1.1.0+11.g4e82b85 documentation</title>
   
 
   
@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="nabs.streams" href="../nabs.streams.html" />
+    <link rel="next" title="nabs.plans" href="../nabs.plans.html" />
     <link rel="prev" title="nabs.plan_stubs.measure_average" href="nabs.plan_stubs.measure_average.html" /> 
 </head>
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0+11.g4e82b85
               </div>
             
           
@@ -104,6 +104,8 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plan_stubs.update_sample</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a></li>
 </ul>
 </li>
@@ -187,17 +189,17 @@
 <h1>nabs.plan_stubs.update_sample<a class="headerlink" href="#nabs-plan-stubs-update-sample" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="nabs.plan_stubs.update_sample">
-<code class="sig-prename descclassname">nabs.plan_stubs.</code><code class="sig-name descname">update_sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_name</span></em>, <em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">n_shots</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#update_sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plan_stubs.update_sample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">nabs.plan_stubs.</span></code><code class="sig-name descname"><span class="pre">update_sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shots</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#update_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plan_stubs.update_sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the current sample information after a run.</p>
-<p>Updates the <a class="reference external" href="https://blueskyproject.io/ophyd/status.html" title="(in ophyd v1.6.0.post2+g03585f0)"><code class="docutils literal notranslate"><span class="pre">Status</span> <span class="pre">objects</span> <span class="pre">(Futures)</span></code></a> values of each target in the sample,
-from <code class="xref any docutils literal notranslate"><span class="pre">False</span></code> to <code class="xref any docutils literal notranslate"><span class="pre">True</span></code> to indicate that it is shot.</p>
+<p>Updates the <code class="docutils literal notranslate"><span class="pre">status</span></code> values of each target in the sample,
+from <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.9)"><code class="xref any docutils literal notranslate"><span class="pre">False</span></code></a> to <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.9)"><code class="xref any docutils literal notranslate"><span class="pre">True</span></code></a> to indicate that it is shot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_name</strong> (<em>str</em>) – A name to identify the sample grid, should be snake_case style.</p></li>
-<li><p><strong>path</strong> (<em>str</em>) – Path to the <code class="xref any docutils literal notranslate"><span class="pre">.yml</span></code> file. Defaults to the path defined when
+<li><p><strong>sample_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A name to identify the sample grid, should be snake_case style.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> file. Defaults to the path defined when
 creating this object.</p></li>
-<li><p><strong>n_shots</strong> (<em>int</em>) – Indicates how many targets have been shot.</p></li>
+<li><p><strong>n_shots</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Indicates how many targets have been shot.</p></li>
 </ul>
 </dd>
 </dl>
@@ -211,7 +213,7 @@ creating this object.</p></li>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../nabs.streams.html" class="btn btn-neutral float-right" title="nabs.streams" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../nabs.plans.html" class="btn btn-neutral float-right" title="nabs.plans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="nabs.plan_stubs.measure_average.html" class="btn btn-neutral float-left" title="nabs.plan_stubs.measure_average" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

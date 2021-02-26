@@ -17,9 +17,11 @@ nabs.streams.AverageStream
       ~AverageStream.bulk_datum
       ~AverageStream.bulk_events
       ~AverageStream.datum
+      ~AverageStream.datum_page
       ~AverageStream.descriptor
       ~AverageStream.emit
       ~AverageStream.event
+      ~AverageStream.event_page
       ~AverageStream.process_event
       ~AverageStream.resource
       ~AverageStream.start
@@ -30,5 +32,11 @@ nabs.streams.AverageStream
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AverageStream.log
    
    

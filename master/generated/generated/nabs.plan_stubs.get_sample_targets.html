@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>nabs.plan_stubs.get_sample_targets &mdash; nabs 1.1.0 documentation</title>
+  <title>nabs.plan_stubs.get_sample_targets &mdash; nabs 1.1.0+11.g4e82b85 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0+11.g4e82b85
               </div>
             
           
@@ -104,6 +104,8 @@
 <li class="toctree-l3"><a class="reference internal" href="nabs.plan_stubs.update_sample.html">nabs.plan_stubs.update_sample</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a></li>
 </ul>
 </li>
@@ -187,23 +189,23 @@
 <h1>nabs.plan_stubs.get_sample_targets<a class="headerlink" href="#nabs-plan-stubs-get-sample-targets" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="nabs.plan_stubs.get_sample_targets">
-<code class="sig-prename descclassname">nabs.plan_stubs.</code><code class="sig-name descname">get_sample_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_name</span></em>, <em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#get_sample_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plan_stubs.get_sample_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the <code class="xref any docutils literal notranslate"><span class="pre">xx</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">yy</span></code> target information from a saved sample.</p>
+<code class="sig-prename descclassname"><span class="pre">nabs.plan_stubs.</span></code><code class="sig-name descname"><span class="pre">get_sample_targets</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#get_sample_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plan_stubs.get_sample_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the <code class="docutils literal notranslate"><span class="pre">xx</span></code> and <code class="docutils literal notranslate"><span class="pre">yy</span></code> target information from a saved sample.</p>
 <p>Given a sample name, get the x, y grid points that are mapped for that
 sample.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_name</strong> (<em>str</em>) – The name of the sample to get the mapped points from. To see the
-available mapped samples call the <code class="xref any docutils literal notranslate"><span class="pre">mapped_samples()</span></code> method.</p></li>
-<li><p><strong>path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the samples yaml file.</p></li>
+<li><p><strong>sample_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the sample to get the mapped points from. To see the
+available mapped samples call the <code class="docutils literal notranslate"><span class="pre">mapped_samples</span></code> method.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Path to the samples yaml file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>`xx`, `yy`</strong> – Returns two lists of dictionaries, with information about the targets.</p>
+<dd class="field-even"><p><strong>``xx``, ``yy``</strong> – Returns two lists of dictionaries, with information about the targets.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>

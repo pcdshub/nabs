@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>nabs.plan_stubs.measure_average &mdash; nabs 1.1.0 documentation</title>
+  <title>nabs.plan_stubs.measure_average &mdash; nabs 1.1.0+11.g4e82b85 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.1.0+11.g4e82b85
               </div>
             
           
@@ -104,6 +104,8 @@
 <li class="toctree-l3"><a class="reference internal" href="nabs.plan_stubs.update_sample.html">nabs.plan_stubs.update_sample</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a></li>
 </ul>
 </li>
@@ -187,16 +189,16 @@
 <h1>nabs.plan_stubs.measure_average<a class="headerlink" href="#nabs-plan-stubs-measure-average" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="nabs.plan_stubs.measure_average">
-<code class="sig-prename descclassname">nabs.plan_stubs.</code><code class="sig-name descname">measure_average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">detectors</span></em>, <em class="sig-param"><span class="n">num</span></em>, <em class="sig-param"><span class="n">delay</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#measure_average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nabs.plan_stubs.measure_average" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">nabs.plan_stubs.</span></code><code class="sig-name descname"><span class="pre">measure_average</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#measure_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plan_stubs.measure_average" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measure an average over a number of shots from a set of detectors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>detectors</strong> (<em>list</em>) – List of detectors to read</p></li>
-<li><p><strong>num</strong> (<em>int</em>) – Number of shots to average together</p></li>
-<li><p><strong>delay</strong> (<em>iterable</em><em> or </em><em>scalar</em><em>, </em><em>optional</em>) – Time delay between successive readings. See <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.count.html#bluesky.plans.count" title="(in bluesky v1.6.7.post23+g0a91b8b8)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.count</span></code></a>
+<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of detectors to read</p></li>
+<li><p><strong>num</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of shots to average together</p></li>
+<li><p><strong>delay</strong> (<em>iterable</em><em> or </em><em>scalar</em><em>, </em><em>optional</em>) – Time delay between successive readings. See <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.count.html#bluesky.plans.count" title="(in bluesky v1.6.7.post43+gb3038a0f)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.count</span></code></a>
 for more details</p></li>
-<li><p><strong>stream</strong> (<a class="reference internal" href="nabs.streams.AverageStream.html"><span class="doc">nabs.streams.AverageStream</span></a>, optional) – If a plan will call <a class="reference internal" href="#nabs.plan_stubs.measure_average" title="nabs.plan_stubs.measure_average"><code class="xref any py py-func docutils literal notranslate"><span class="pre">measure_average</span></code></a> multiple times, a single
+<li><p><strong>stream</strong> (<a class="reference internal" href="nabs.streams.AverageStream.html#nabs.streams.AverageStream" title="nabs.streams.AverageStream"><code class="xref py py-class docutils literal notranslate"><span class="pre">nabs.streams.AverageStream</span></code></a>, optional) – If a plan will call <a class="reference internal" href="#nabs.plan_stubs.measure_average" title="nabs.plan_stubs.measure_average"><code class="xref any py py-func docutils literal notranslate"><span class="pre">measure_average</span></code></a> multiple times, a single
 <code class="docutils literal notranslate"><span class="pre">AverageStream</span></code> instance can be created and then passed in on each
 call. This allows other callbacks to subscribe to the averaged data
 stream. If no <code class="docutils literal notranslate"><span class="pre">AverageStream</span></code> is provided then one is created for the
@@ -209,7 +211,7 @@ averaged for <code class="docutils literal notranslate"><span class="pre">num</s
 as that will appear in the event documents i.e “{name}_{field}”</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
