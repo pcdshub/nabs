@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Release History &mdash; nabs 1.1.0+11.g4e82b85 documentation</title>
+  <title>Release History &mdash; nabs 1.1.1 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                1.1.0+11.g4e82b85
+                1.1.1
               </div>
             
           
@@ -101,22 +101,27 @@
 <p class="caption"><span class="caption-text">Developer Notes</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v1-1-1-2021-03-03">v1.1.1 (2021-03-03)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v1-1-0-2021-02-10">v1.1.0 (2021-02-10)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#contributors">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2020-12-22">v1.0.0 (2020-12-22)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#api-changes">API Changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-0-2020-11-17">v0.1.0 (2020-11-17)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Bugfixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Bugfixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Maintenance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-0-2018-04-19">v0.0.0 (2018-04-19)</a></li>
@@ -192,6 +197,25 @@
             
   <div class="section" id="release-history">
 <h1>Release History<a class="headerlink" href="#release-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="v1-1-1-2021-03-03">
+<h2>v1.1.1 (2021-03-03)<a class="headerlink" href="#v1-1-1-2021-03-03" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="maintenance">
+<h3>Maintenance<a class="headerlink" href="#maintenance" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fix various issues with the documentation builds</p></li>
+<li><p>Add ophyd as an explicit runtime dependency because it is imported
+directly in nabs.utils.</p></li>
+<li><p>Require a bluesky&gt;=1.6.5 dependency to ensure a function we’re using
+is included.</p></li>
+</ul>
+</div>
+<div class="section" id="contributors">
+<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>zllentz</p></li>
+</ul>
+</div>
+</div>
 <div class="section" id="v1-1-0-2021-02-10">
 <h2>v1.1.0 (2021-02-10)<a class="headerlink" href="#v1-1-0-2021-02-10" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="features">
@@ -203,8 +227,8 @@ across a skewed path grid. It is feature-rich with things like path
 memory and incorporating a third motor.</p></li>
 </ul>
 </div>
-<div class="section" id="contributors">
-<h3>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Contributors<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>cristinasewell</p></li>
 </ul>
@@ -227,8 +251,8 @@ in the DAQ control variables. This actually slows down the scan and dumps
 extra, redundant data into the data stream.</p></li>
 </ul>
 </div>
-<div class="section" id="id1">
-<h3>Contributors<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Contributors<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>zllentz</p></li>
 <li><p>ZryletTC</p></li>
@@ -237,8 +261,8 @@ extra, redundant data into the data stream.</p></li>
 </div>
 <div class="section" id="v0-1-0-2020-11-17">
 <h2>v0.1.0 (2020-11-17)<a class="headerlink" href="#v0-1-0-2020-11-17" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id2">
-<h3>Features<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Features<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added the <a class="reference internal" href="generated/nabs.plans.html#module-nabs.plans" title="nabs.plans"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">nabs.plans</span></code></a> module with the following functions:</p>
 <ul>
@@ -279,15 +303,15 @@ A function decorator that modifies a plan to execute using the <a class="referen
 </li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Bugfixes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Bugfixes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fix issues related to SignalRO moving around in the ophyd API</p></li>
 <li><p>Fix issues related to measure_average not working for integer values</p></li>
 </ul>
 </div>
-<div class="section" id="maintenance">
-<h3>Maintenance<a class="headerlink" href="#maintenance" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Maintenance<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Restructure the repository to accumulate CI/structural changes that
 we’ve been making to other repositories.</p></li>
@@ -301,8 +325,8 @@ on these python versions.</p></li>
 <li><p>Fix issue with automated documentation uploads.</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>Contributors<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Contributors<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>zllentz</p></li>
 </ul>

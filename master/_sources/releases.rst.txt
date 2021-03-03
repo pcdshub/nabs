@@ -1,6 +1,23 @@
 Release History
 ###############
 
+
+v1.1.1 (2021-03-03)
+===================
+
+Maintenance
+-----------
+- Fix various issues with the documentation builds
+- Add ophyd as an explicit runtime dependency because it is imported
+  directly in nabs.utils.
+- Require a bluesky>=1.6.5 dependency to ensure a function we're using
+  is included.
+
+Contributors
+------------
+- zllentz
+
+
 v1.1.0 (2021-02-10)
 ===================
 
