@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>nabs.preprocessors &mdash; nabs 1.1.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> nabs
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../plans.html">Plans and Data Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimize.html">Optimization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Full API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../upcoming_changes.html">Upcoming Changes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nabs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>nabs.preprocessors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for nabs.preprocessors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Wrappers and decorators to modify existing plans.</span>
+
+<span class="sd">This is the LCLS counterpart to `bluesky.preprocessors`.</span>
+
+<span class="sd">This module contains &quot;wrapper&quot; functions that take a plan as an argument</span>
+<span class="sd">and yield messages from a new, modified plan, as well as &quot;decorator&quot;</span>
+<span class="sd">functions that can be applied to ``bluesky`` plan functions to return new</span>
+<span class="sd">plan functions with modifications.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
+<span class="kn">import</span> <span class="nn">bluesky.preprocessors</span> <span class="k">as</span> <span class="nn">bpp</span>
+<span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">is_movable</span><span class="p">,</span> <span class="n">make_decorator</span>
+
+
+<span class="k">def</span> <span class="nf">_get_daq</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to get the active DAQ object.</span>
+
+<span class="sd">    This also wraps the `pcdsdaq` import because `pcdsdaq` is an optional</span>
+<span class="sd">    dependency of ``nabs``. This will fail unless `pcdsdaq` is installed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    daq : `pcdsdaq.daq.Daq`</span>
+<span class="sd">        The DAQ (data aquisition) system `bluesky`-compatible control object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">pcdsdaq.daq</span> <span class="kn">import</span> <span class="n">get_daq</span>  <span class="c1"># NOQA</span>
+    <span class="k">return</span> <span class="n">get_daq</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">_Dummy</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to sub in for the DAQ when we need to drop a message.</span>
+
+<span class="sd">    You can&#39;t just remove a message entirely with</span>
+<span class="sd">    `bluesky.preprocessors.plan_mutator`, you need</span>
+<span class="sd">    to yield a compatible message. To accomplish this we sub in a dummy object</span>
+<span class="sd">    for the daq to create a no-op with the right return value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="daq_step_scan_wrapper"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_wrapper.html#nabs.preprocessors.daq_step_scan_wrapper">[docs]</a><span class="k">def</span> <span class="nf">daq_step_scan_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper to turn an open plan into a standard LCLS DAQ step plan.</span>
+
+<span class="sd">    This inserts the DAQ object into every `bluesky.plan_stubs.trigger` and</span>
+<span class="sd">    `bluesky.plan_stubs.read` pair, ensuring events are taken at every</span>
+<span class="sd">    bundle. It also stages the `pcdsdaq.daq.Daq` and yields an appropriate</span>
+<span class="sd">    `bluesky.plan_stubs.configure` message using the input arguments</span>
+<span class="sd">    and all motors moved prior to the first data point.</span>
+
+<span class="sd">    The DAQ trigger and the DAQ read always go first, before any other triggers</span>
+<span class="sd">    or reads, to ensure all events are recorded.</span>
+
+<span class="sd">    If the DAQ is manually passed into the wrapped plan, and it is the first</span>
+<span class="sd">    detector in the list, we will skip adding a redundant trigger/read. If the</span>
+<span class="sd">    DAQ is manually passed in as the second detector or later we will end up</span>
+<span class="sd">    with two triggers and two reads, which can cause problems. Running a scan</span>
+<span class="sd">    like this will raise a ``TypeError``.</span>
+
+<span class="sd">    See `daq_step_scan_decorator` for the function decorator version.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plan : plan</span>
+<span class="sd">        A bluesky plan that yields bluesky Msg objects.</span>
+
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    daq_step_plan : plan</span>
+<span class="sd">        The same plan as before, but modified appropriately to the run the DAQ</span>
+<span class="sd">        at every step. This will be an open generator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">daq</span> <span class="o">=</span> <span class="n">_get_daq</span><span class="p">()</span>
+    <span class="n">motor_cache</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
+        <span class="n">first_calib_cycle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">first_trigger</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">first_read</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">daq_has_triggered</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">daq_first_cycle</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">daq</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                                 <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">use_l3t</span><span class="o">=</span><span class="n">use_l3t</span><span class="p">,</span>
+                                 <span class="n">controls</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">motor_cache</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">add_daq_trigger</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">add_daq_trigger</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">daq</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">daq</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_daq_read</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">daq</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">daq</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">drop_daq_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;stage&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">stage</span><span class="p">(</span><span class="n">_Dummy</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;unstage&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">unstage</span><span class="p">(</span><span class="n">_Dummy</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">daq_mutator</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+        <span class="c1"># Reset &quot;first&quot; flags after closing a bundle</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;save&#39;</span><span class="p">,</span> <span class="s1">&#39;drop&#39;</span><span class="p">):</span>
+            <span class="n">State</span><span class="o">.</span><span class="n">first_trigger</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">State</span><span class="o">.</span><span class="n">first_read</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">State</span><span class="o">.</span><span class="n">daq_has_triggered</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Insert daq trigger before first trigger</span>
+        <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;trigger&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">obj</span> <span class="ow">is</span> <span class="n">daq</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">State</span><span class="o">.</span><span class="n">daq_has_triggered</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Scan misconfigured; daq cannot be passed &#39;</span>
+                                    <span class="s1">&#39;unless it is the first detector.&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">State</span><span class="o">.</span><span class="n">daq_has_triggered</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">State</span><span class="o">.</span><span class="n">first_trigger</span><span class="p">:</span>
+                <span class="n">State</span><span class="o">.</span><span class="n">first_trigger</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># Configure before the first begin (after all motors found)</span>
+                <span class="k">if</span> <span class="n">State</span><span class="o">.</span><span class="n">first_calib_cycle</span><span class="p">:</span>
+                    <span class="n">State</span><span class="o">.</span><span class="n">first_calib_cycle</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">return</span> <span class="n">daq_first_cycle</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="n">add_daq_trigger</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="kc">None</span>
+        <span class="c1"># Insert daq read before first read</span>
+        <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;read&#39;</span> <span class="ow">and</span> <span class="n">State</span><span class="o">.</span><span class="n">first_read</span><span class="p">:</span>
+            <span class="n">State</span><span class="o">.</span><span class="n">first_read</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="n">add_daq_read</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="kc">None</span>
+        <span class="c1"># Gather all moving devices for the daq controls configuration arg</span>
+        <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span>
+            <span class="n">motor_cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+        <span class="c1"># Strip redundant DAQ stages from inner plan</span>
+        <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;stage&#39;</span><span class="p">,</span> <span class="s1">&#39;unstage&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">msg</span><span class="o">.</span><span class="n">obj</span> <span class="ow">is</span> <span class="n">daq</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">drop_daq_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;stage&#39;</span> <span class="ow">and</span> <span class="n">is_movable</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">obj</span><span class="p">):</span>
+            <span class="n">motor_cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+        <span class="c1"># If didn&#39;t mutate, return the (None, None) signal for plan_mutator</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">stage_decorator</span><span class="p">([</span><span class="n">daq</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">daq_step_plan</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bpp</span><span class="o">.</span><span class="n">plan_mutator</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">daq_mutator</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">daq_step_plan</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="daq_step_scan_decorator"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_decorator.html#nabs.preprocessors.daq_step_scan_decorator">[docs]</a><span class="k">def</span> <span class="nf">daq_step_scan_decorator</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to turn a plan function into a standard LCLS DAQ step plan.</span>
+
+<span class="sd">    This adds the standard DAQ configuration arguments</span>
+<span class="sd">    events, duration, record, and use_l3t onto the plan function</span>
+<span class="sd">    and wraps the plan in the `daq_step_scan_wrapper` to properly</span>
+<span class="sd">    execute a step scan.</span>
+
+<span class="sd">    See `daq_step_scan_standard_args` for argument specifications for the</span>
+<span class="sd">    standard DAQ configuration arguments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plan : plan</span>
+<span class="sd">        A bluesky plan that yields bluesky Msg objects.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    daq_step_plan : plan</span>
+<span class="sd">        The same plan as before, but modified appropriately for DAQ use.</span>
+<span class="sd">        This will be a callable generator function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;record&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">use_l3t</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;use_l3t&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">daq_step_scan_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+                                                 <span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">,</span>
+                                                 <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+                                                 <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span>
+                                                 <span class="n">use_l3t</span><span class="o">=</span><span class="n">use_l3t</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">inner</span></div>
+
+
+<div class="viewcode-block" id="daq_step_scan_standard_args"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_standard_args.html#nabs.preprocessors.daq_step_scan_standard_args">[docs]</a><span class="k">def</span> <span class="nf">daq_step_scan_standard_args</span><span class="p">(</span><span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    No-op function to hold template parameter info for generated docs.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    events : int, optional</span>
+<span class="sd">        Number of events to take at each step. If omitted, uses the</span>
+<span class="sd">        duration argument or the last configured value.</span>
+
+<span class="sd">    duration : int or float, optional</span>
+<span class="sd">        Duration of time to spend at each step. If omitted, uses the events</span>
+<span class="sd">        argument or the last configured value.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="daq_during_wrapper"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_during_wrapper.html#nabs.preprocessors.daq_during_wrapper">[docs]</a><span class="k">def</span> <span class="nf">daq_during_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrap a plan so that the DAQ runs at the same time.</span>
+
+<span class="sd">    This can be used with an ordinary ``bluesky`` plan that you&#39;d like the daq</span>
+<span class="sd">    to run along with. This also stages the DAQ so that the run start/stop</span>
+<span class="sd">    will be synchronized with the bluesky runs.</span>
+
+<span class="sd">    Note that this is not a calib cycle scan. See</span>
+<span class="sd">    `daq_step_scan_wrapper` and `daq_step_scan_decorator`</span>
+<span class="sd">    for the calib cycle variant.</span>
+
+<span class="sd">    All configuration must be done by supplying config kwargs to this wrapper.</span>
+
+<span class="sd">    This must be applied outside the run_wrapper.</span>
+
+<span class="sd">    The `daq_during_decorator` is the same as the</span>
+<span class="sd">    `daq_during_wrapper`, but it is meant to be used as a function</span>
+<span class="sd">    decorator.</span>
+
+<span class="sd">    Internally, this uses the flyer interface of the `pcdsdaq.daq.Daq`</span>
+<span class="sd">    object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plan : plan</span>
+<span class="sd">        A bluesky plan that yields bluesky Msg objects.</span>
+
+<span class="sd">    record : bool, optional</span>
+<span class="sd">        Whether or not to record the run in the DAQ. Defaults to True because</span>
+<span class="sd">        we don&#39;t want to accidentally skip recording good runs.</span>
+
+<span class="sd">    use_l3t : bool, optional</span>
+<span class="sd">        Whether or not the use the l3t filter for the events argument. Defaults</span>
+<span class="sd">        to False to avoid confusion from unconfigured filters.</span>
+
+<span class="sd">    controls : list of positioners or signals, optional</span>
+<span class="sd">        If provided, values from these will make it into the DAQ data</span>
+<span class="sd">        stream as variables. For this purpose, the ``.position`` and</span>
+<span class="sd">        ``.value`` attributes will be checked, followed by the ``.get()``</span>
+<span class="sd">        method.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    daq_during_plan : plan</span>
+<span class="sd">        The same plan as before, but modified appropriately to run the DAQ at</span>
+<span class="sd">        the same time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">daq</span> <span class="o">=</span> <span class="n">_get_daq</span><span class="p">()</span>
+
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">stage_decorator</span><span class="p">([</span><span class="n">daq</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">daq_during_plan</span><span class="p">():</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">daq</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span>
+                                 <span class="n">use_l3t</span><span class="o">=</span><span class="n">use_l3t</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="n">controls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">bpp</span><span class="o">.</span><span class="n">fly_during_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">flyers</span><span class="o">=</span><span class="p">[</span><span class="n">daq</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">daq_during_plan</span><span class="p">())</span></div>
+
+
+<span class="n">daq_during_decorator</span> <span class="o">=</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">daq_during_wrapper</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, SLAC National Accelerator Laboratory.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

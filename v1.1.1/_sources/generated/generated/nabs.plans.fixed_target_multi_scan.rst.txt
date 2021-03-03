@@ -1,0 +1,6 @@
+nabs.plans.fixed\_target\_multi\_scan
+=====================================
+
+.. currentmodule:: nabs.plans
+
+.. autofunction:: fixed_target_multi_scan
