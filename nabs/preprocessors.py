@@ -8,13 +8,13 @@ and yield messages from a new, modified plan, as well as "decorator"
 functions that can be applied to ``bluesky`` plan functions to return new
 plan functions with modifications.
 """
-import inspect
-
 from functools import wraps
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import is_movable, make_decorator
+
+from . import utils
 
 
 def _get_daq():
@@ -199,32 +199,21 @@ def daq_step_scan_decorator(plan):
     """
 
     @wraps(plan)
-    def inner(*args, events=None, duration=None, record=True, use_l3t=False):
+    def inner(*args, **kwargs):
+        events = kwargs.pop('events', None)
+        duration = kwargs.pop('duration', None)
+        record = kwargs.pop('record', True)
+        use_l3t = kwargs.pop('use_l3t', False)
         return (yield from daq_step_scan_wrapper(plan(*args, **kwargs),
                                                  events=events,
                                                  duration=duration,
                                                  record=record,
                                                  use_l3t=use_l3t))
 
-    def helper_sig(*args, events=None, duration=None, record=True, use_l3t=False):
-        ...
-
-    sig = inspect.signature(plan)
-    params = list(sig.parameters.values())
-    keyword_only = [idx for idx, param in enumerate(params) if param.kind.name == 'KEYWORD_ONLY']
-    if not keyword_only:
-        start_params, end_params = params, []
-    else:
-        insert_at = keyword_only[0]
-        start_params, end_params = params[:insert_at], params[insert_at:]
-
-    wrapper_params = list(
-        param for param in list(inspect.signature(helper_sig).parameters.values())[1:]
-        if param.name not in sig.parameters
+    plan.__signature__ = utils.add_named_kwargs_to_signature(
+        plan,
+        kwargs=dict(events=None, duration=None, record=True, use_l3t=False),
     )
-
-    params = start_params + wrapper_params + end_params
-    plan.__signature__ = sig.replace(parameters=params)
     return inner
 
 
