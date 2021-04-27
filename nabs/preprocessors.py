@@ -14,6 +14,8 @@ import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
 from bluesky.utils import is_movable, make_decorator
 
+from . import utils
+
 
 def _get_daq():
     """
@@ -207,6 +209,11 @@ def daq_step_scan_decorator(plan):
                                                  duration=duration,
                                                  record=record,
                                                  use_l3t=use_l3t))
+
+    plan.__signature__ = utils.add_named_kwargs_to_signature(
+        plan,
+        kwargs=dict(events=None, duration=None, record=True, use_l3t=False),
+    )
     return inner
 
 
