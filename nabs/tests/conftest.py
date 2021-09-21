@@ -43,7 +43,7 @@ def hw():
     standard_hw = sim_hw()
     # Add some extras that we want
     standard_hw.no_op_pseudo = NoOpPseudo('', name='noop')
-    return sim_hw()
+    return standard_hw
 
 
 @pytest.fixture(scope='function')
