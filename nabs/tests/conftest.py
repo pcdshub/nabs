@@ -2,6 +2,11 @@ import asyncio
 
 import pytest
 from bluesky import RunEngine
+from ophyd.device import Component as Cpt
+from ophyd.positioner import SoftPositioner
+from ophyd.pseudopos import (PseudoPositioner, PseudoSingle,
+                             pseudo_position_argument,
+                             real_position_argument)
 from ophyd.sim import hw as sim_hw
 from pcdsdaq.daq import Daq
 from pcdsdaq.sim import set_sim_mode
@@ -19,8 +24,25 @@ def RE():
         RE.halt()
 
 
+class NoOpPseudo(PseudoPositioner):
+    softpos = Cpt(SoftPositioner)
+    noop = Cpt(PseudoSingle)
+
+    @pseudo_position_argument
+    def forward(self, pseudo_pos):
+        return self.RealPosition(pseudo_pos.noop)
+
+    @real_position_argument
+    def inverse(self, real_pos):
+        return self.PseudoPosition(real_pos.softpos)
+
+
 @pytest.fixture(scope='function')
 def hw():
+    # Everything from ophyd
+    standard_hw = sim_hw()
+    # Add some extras that we want
+    standard_hw.no_op_pseudo = NoOpPseudo('', name='noop')
     return sim_hw()
 
 
