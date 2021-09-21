@@ -12,7 +12,7 @@ from functools import wraps
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
-from bluesky.utils import is_movable, make_decorator
+from bluesky.utils import make_decorator
 
 from . import utils
 
