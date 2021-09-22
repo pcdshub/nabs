@@ -57,8 +57,14 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
     daq_none_det = list(daq_step_scan([], hw.motor, 0, 10, 11, events=10,
                                       record=False, use_l3t=True))
     assert_daq_messages(daq_none_det, hw.motor)
-    daq_pseudopos = list(daq_step_scan([], hw.no_op_pseudo.noop, 0, 10, 11, events=10,
-                                       record=False, use_l3t=False))
+    daq_pseudopos = list(
+        daq_step_scan(
+            [], hw.no_op_pseudo.noop, 0, 10, 11,
+            events=10,
+            record=False,
+            use_l3t=False
+        )
+    )
     assert_daq_messages(daq_pseudopos, hw.no_op_pseudo.noop)
 
     def assert_no_lost_msg(daq_msg_list, nodaq_msg_list):
