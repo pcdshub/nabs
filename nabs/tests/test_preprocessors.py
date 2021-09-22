@@ -27,7 +27,7 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
     """
     logger.debug('test_daq_step_scan_args')
 
-    def assert_daq_messages(msg_list):
+    def assert_daq_messages(msg_list, motor):
         """
         Make sure the msg_list is properly mutated.
 
@@ -41,7 +41,7 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
         for msg in msg_list:
             if msg.command == 'configure' and msg.obj is daq:
                 found_configure = True
-                assert msg.kwargs['controls'] == [hw.motor]
+                assert msg.kwargs['controls'] == [motor]
             elif msg.command == 'trigger' and msg.obj is daq:
                 found_trigger = True
             elif msg.command == 'read' and msg.obj is daq:
@@ -53,10 +53,19 @@ def test_daq_step_scan_args(hw, daq, daq_step_scan):
 
     daq_with_det = list(daq_step_scan([hw.det], hw.motor, 0, 10, 11, events=10,
                                       record=False, use_l3t=True))
-    assert_daq_messages(daq_with_det)
+    assert_daq_messages(daq_with_det, hw.motor)
     daq_none_det = list(daq_step_scan([], hw.motor, 0, 10, 11, events=10,
                                       record=False, use_l3t=True))
-    assert_daq_messages(daq_none_det)
+    assert_daq_messages(daq_none_det, hw.motor)
+    daq_pseudopos = list(
+        daq_step_scan(
+            [], hw.no_op_pseudo.noop, 0, 10, 11,
+            events=10,
+            record=False,
+            use_l3t=False
+        )
+    )
+    assert_daq_messages(daq_pseudopos, hw.no_op_pseudo.noop)
 
     def assert_no_lost_msg(daq_msg_list, nodaq_msg_list):
         """

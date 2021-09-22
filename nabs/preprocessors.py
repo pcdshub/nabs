@@ -12,7 +12,7 @@ from functools import wraps
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
-from bluesky.utils import is_movable, make_decorator
+from bluesky.utils import make_decorator
 
 from . import utils
 
@@ -162,8 +162,6 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         # Strip redundant DAQ stages from inner plan
         elif msg.command in ('stage', 'unstage') and msg.obj is daq:
             return drop_daq_msg(msg), None
-        elif msg.command == 'stage' and is_movable(msg.obj):
-            motor_cache.add(msg.obj)
         # If didn't mutate, return the (None, None) signal for plan_mutator
         return None, None
 
