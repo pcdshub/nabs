@@ -1,13 +1,25 @@
 Release History
 ###############
 
-v1.1.2 (2021-09-28)
+v1.1.3 (2021-09-28)
 ===================
 
 Bugfixes
 --------
 - Fix an issue where passing in a PseudoSingle to a daq-wrapped scan
   would result in duplicate controls entries in the DAQ data stream.
+
+Contributors
+------------
+- zllentz
+
+
+v1.1.2 (2021-04-27)
+===================
+
+Maintenance
+-----------
+Tweak the signatures of the daq step scans for ease of inspection
 
 Contributors
 ------------
