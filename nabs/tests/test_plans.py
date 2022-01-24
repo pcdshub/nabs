@@ -200,6 +200,14 @@ def test_daq_a3scan(RE, daq, hw):
                                      hw.motor3, 0, 10, 11,
                                      events=1))
 
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_d2scan(RE, daq, hw):
+    logger.debug('test_daq_d2scan')
+    daq_test(RE, daq, nbp.daq_d2scan([hw.det],
+                                     hw.motor1, 0, 10,
+                                     hw.motor2, 0, 10, 11,
+                                     events=1))
+
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 def test_fixed_target_scan(RE, hw, sample_file):
