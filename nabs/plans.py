@@ -617,6 +617,7 @@ def daq_a2scan(detectors, m1, a1, b1, m2, a2, b2, nsteps):
 
     yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, nsteps)
 
+
 @bpp.reset_positions_decorator()
 @bpp.relative_set_decorator()
 @nbpp.daq_step_scan_decorator
@@ -624,8 +625,8 @@ def daq_d2scan(detectors, m1, a1, b1, m2, a2, b2, nsteps):
     """
     Two-dimensional daq scan with relative positions
 
-    This moves two motors from start to end relative to their current positions 
-    in nsteps steps, taking data in the DAQ at every step, and returning the 
+    This moves two motors from start to end relative to their current positions
+    in nsteps steps, taking data in the DAQ at every step, and returning the
     motors to their original positions at the end of the scan.
 
     Parameters
@@ -676,6 +677,7 @@ def daq_d2scan(detectors, m1, a1, b1, m2, a2, b2, nsteps):
     :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
     yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, nsteps)
+
 
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
@@ -746,6 +748,7 @@ def daq_a3scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps):
 
     yield from bp.scan(detectors, m1, a1, b1, m2, a2, b2, m3, a3, b3, nsteps)
 
+
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
 def daq_anscan(detectors, *args):
@@ -756,11 +759,11 @@ def daq_anscan(detectors, *args):
     the DAQ at every step, and returning the motors to their original positions
     at the end of the scan.
 
-    Takes an arbitrary number of motors, start and stop positions 
+    Takes an arbitrary number of motors, start and stop positions
 
-    >> RE(daq_anscan([], m1, a1, b1, 
-                         m2, a2, b2, ... , 
-                         mn, an, bn, nsteps, 
+    >> RE(daq_anscan([], m1, a1, b1,
+                         m2, a2, b2, ... ,
+                         mn, an, bn, nsteps,
                          events=10))
 
     Parameters
@@ -803,6 +806,7 @@ def daq_anscan(detectors, *args):
     """
     yield from bp.scan(detectors, *args)
 
+
 @bpp.reset_positions_decorator()
 @bpp.relative_set_decorator()
 @nbpp.daq_step_scan_decorator
@@ -814,11 +818,11 @@ def daq_dnscan(detectors, *args):
     the DAQ at every step, and returning the motors to their original positions
     at the end of the scan.
 
-    Takes an arbitrary number of motors, start and stop positions 
+    Takes an arbitrary number of motors, start and stop positions
 
-    >> RE(daq_dnscan([], m1, a1, b1, 
-                         m2, a2, b2, ... , 
-                         mn, an, bn, nsteps, 
+    >> RE(daq_dnscan([], m1, a1, b1,
+                         m2, a2, b2, ... ,
+                         mn, an, bn, nsteps,
                          events=10))
 
     Parameters
@@ -860,6 +864,7 @@ def daq_dnscan(detectors, *args):
     :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
     yield from bp.scan(detectors, *args)
+
 
 def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
                       n_shots, path):
