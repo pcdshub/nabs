@@ -3,11 +3,12 @@ from collections import defaultdict
 
 import numpy as np
 import pytest
+from bluesky.simulators import summarize_plan
 from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
 from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
-from bluesky.simulators import summarize_plan
+
 import nabs.plans as nbp
 
 PLAN_TIMEOUT = 60
@@ -199,6 +200,53 @@ def test_daq_a3scan(RE, daq, hw):
                                      hw.motor2, 0, 10,
                                      hw.motor3, 0, 10, 11,
                                      events=1))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_d2scan(RE, daq, hw):
+    logger.debug('test_daq_d2scan')
+    daq_test(RE, daq, nbp.daq_d2scan([hw.det],
+                                     hw.motor1, 0, 10,
+                                     hw.motor2, 0, 10, 11,
+                                     events=1))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_anscan(RE, daq, hw):
+    logger.debug('test_daq_anscan')
+    daq_test(RE, daq, nbp.daq_anscan([hw.det],
+             hw.motor1, 0, 10, 11,
+             events=1))
+
+    daq_test(RE, daq, nbp.daq_anscan([hw.det],
+             hw.motor1, 0, 10,
+             hw.motor2, 0, 10, 11,
+             events=1))
+
+    daq_test(RE, daq, nbp.daq_anscan([hw.det],
+             hw.motor1, 0, 10,
+             hw.motor2, 0, 10,
+             hw.motor3, 0, 10, 11,
+             events=1))
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_daq_dnscan(RE, daq, hw):
+    logger.debug('test_daq_dnscan')
+    daq_test(RE, daq, nbp.daq_dnscan([hw.det],
+             hw.motor1, 0, 10, 11,
+             events=1))
+
+    daq_test(RE, daq, nbp.daq_dnscan([hw.det],
+             hw.motor1, 0, 10,
+             hw.motor2, 0, 10, 11,
+             events=1))
+
+    daq_test(RE, daq, nbp.daq_dnscan([hw.det],
+             hw.motor1, 0, 10,
+             hw.motor2, 0, 10,
+             hw.motor3, 0, 10, 11,
+             events=1))
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
