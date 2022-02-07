@@ -1,6 +1,19 @@
 Release History
 ###############
 
+v1.2.0 (2022-02-07)
+===================
+
+Features
+--------
+- Add daq_d2scan
+- Add n-dimensional daq scans: daq_dnscan, daq_anscan
+
+Contributors
+------------
+- tangkong
+
+
 v1.1.3 (2021-09-28)
 ===================
 
