@@ -59,27 +59,24 @@ class ELogPoster(CallbackBase):
         if 'post' in doc.keys():
             # Override default if key exists
             self._send_post = doc['post']
+        else:
+            self._send_post = self._elog.enable_run_posts
 
         if self._send_post:
             run_info = str({k: doc[k] for k in ['plan_name', 'plan_args']})
-            logger.info(f"Posting run start information to elog, \
-                            experiment {self._elog.logbooks['experiment']}")
+            logger.info("Posting run start information to elog")
             self._elog.post(run_info, tags=['plan_info', 'RE'])
 
         super().start(doc)
 
     def stop(self, doc):
         """ Post to ELog on plan close (stop document)"""
-
         super().stop(doc)
-
         # need to hold onto BEC, instead of the table it holds?...
         table = self._bec._table._rows
-
         # Can be None of table isn't generated (ie. bp.count)
-        if table and self._send_post:
-            logger.info(f"Posting run table information to elog, \
-                            experiment {self._elog.logbooks['experiment']}")
+        if (table is not None) and self._send_post:
+            logger.info("Posting run table information to elog")
             self._elog.post(
                 '\n'.join(table),
                 tags=['run_table', 'RE']
