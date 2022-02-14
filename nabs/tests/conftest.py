@@ -5,8 +5,7 @@ from bluesky import RunEngine
 from ophyd.device import Component as Cpt
 from ophyd.positioner import SoftPositioner
 from ophyd.pseudopos import (PseudoPositioner, PseudoSingle,
-                             pseudo_position_argument,
-                             real_position_argument)
+                             pseudo_position_argument, real_position_argument)
 from ophyd.sim import hw as sim_hw
 from pcdsdaq.daq import Daq
 from pcdsdaq.sim import set_sim_mode
@@ -51,6 +50,20 @@ def daq(RE):
     set_sim_mode(True)
     yield Daq(RE=RE, hutch_name='tst')
     set_sim_mode(False)
+
+
+@pytest.fixture(scope='function')
+def elog():
+    class MockELog:
+
+        def __init__(self, *args, **kwargs):
+            self.posts = list()
+            self.enable_run_posts = True
+
+        def post(self, *args, **kwargs):
+            self.posts.append((args, kwargs))
+
+    return MockELog('TST')
 
 
 @pytest.fixture(scope='function')
