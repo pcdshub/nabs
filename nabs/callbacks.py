@@ -42,9 +42,10 @@ class ELogPoster(CallbackBase):
     elog : HutchELog
         Instance of HutchELog connected to the desired logbook
     """
-    def __init__(self, bec, elog):
+    def __init__(self, bec, elog, ipython):
         self._bec = bec
         self._elog = elog
+        self._ipython = ipython
 
         # TO-DO:
         # - add granular switches as optional arguments
@@ -56,7 +57,8 @@ class ELogPoster(CallbackBase):
         self._send_post = doc.get('post', self._elog.enable_run_posts)
 
         if self._send_post:
-            run_info = str({k: doc[k] for k in ['plan_name', 'plan_args']})
+            # Grab last ipython input
+            run_info = self._ipython.user_ns[-1]
             logger.info("Posting run start information to elog")
             self._elog.post(run_info, tags=['plan_info', 'RE'])
 
