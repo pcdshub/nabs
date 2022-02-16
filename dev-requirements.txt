@@ -1,5 +1,5 @@
 flake8
+matplotlib
 pytest
 pcdsdaq
 pcdsdevices
-matplotlib
