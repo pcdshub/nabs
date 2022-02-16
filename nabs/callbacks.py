@@ -46,9 +46,6 @@ class ELogPoster(CallbackBase):
         self._bec = bec
         self._elog = elog
 
-        # default to elog setting
-        self._send_post = elog.enable_run_posts
-
         # TO-DO:
         # - add granular switches as optional arguments
         # - add error handling for misspelled keys
@@ -56,11 +53,7 @@ class ELogPoster(CallbackBase):
 
     def start(self, doc):
         """ Post plan information on start document"""
-        if 'post' in doc.keys():
-            # Override default if key exists
-            self._send_post = doc['post']
-        else:
-            self._send_post = self._elog.enable_run_posts
+        self._send_post = doc.get('post', self._elog.enable_run_posts)
 
         if self._send_post:
             run_info = str({k: doc[k] for k in ['plan_name', 'plan_args']})
