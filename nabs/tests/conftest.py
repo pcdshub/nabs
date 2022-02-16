@@ -55,7 +55,6 @@ def daq(RE):
 @pytest.fixture(scope='function')
 def elog():
     class MockELog:
-
         def __init__(self, *args, **kwargs):
             self.posts = list()
             self.enable_run_posts = True
@@ -64,6 +63,15 @@ def elog():
             self.posts.append((args, kwargs))
 
     return MockELog('TST')
+
+
+@pytest.fixture(scope='function')
+def ipython():
+    class MockIPython:
+        def __init__(self, *args, **kwargs):
+            self.user_ns = dict(In=[""])
+
+    return MockIPython()
 
 
 @pytest.fixture(scope='function')

@@ -19,14 +19,17 @@ def _compare_tables(fout, known_table):
             assert ln[25:] == kn[25:]
 
 
-def test_elog_callback(RE, hw, elog):
+def test_elog_callback(RE, hw, elog, ipython):
     bec = BestEffortCallback()
-    elogc = ELogPoster(bec, elog)
+    elogc = ELogPoster(bec, elog, ipython)
     elogc.enable_run_posts = True
 
     bec_uid = RE.subscribe(bec)
     elog_uid = RE.subscribe(elogc)
 
+    ipython.user_ns["In"].append(
+        "RE(bp.scan([hw.det], hw.motor, 0, 1, num=10))"
+        )
     RE(bp.scan([hw.det], hw.motor, 0, 1, num=10))
 
     assert len(elog.posts) == 2  # start and table posts
