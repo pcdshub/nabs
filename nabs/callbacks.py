@@ -58,7 +58,7 @@ class ELogPoster(CallbackBase):
 
         if self._send_post:
             # Grab last ipython input
-            run_info = self._ipython.user_ns[-1]
+            run_info = self._ipython.user_ns["In"][-1]
             logger.info("Posting run start information to elog")
             self._elog.post(run_info, tags=['plan_info', 'RE'])
 
