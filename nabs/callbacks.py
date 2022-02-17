@@ -142,7 +142,6 @@ tr:nth-child(even) {
                 style = self._FMTLOOKUP[dtype]
                 self._data[k].append(style.format(doc['data'][k]))
             except Exception as ex:
-                print(ex)
                 logger.warning(f'key: {k} not in event document')
 
     def _create_html_table(self):
