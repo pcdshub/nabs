@@ -20,5 +20,4 @@ Maintenance
 Contributors
 ------------
 - tangkong
-- klauer
 - zllentz
