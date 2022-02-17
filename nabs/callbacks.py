@@ -112,14 +112,13 @@ tr:nth-child(even) {
         """ Initialize table information """
         # these always exist
         self._data = dict(seq_num=[], time=[])
-        for k in doc['data_keys']:
-            dk_entry = doc['data_keys'][k]
+        for k, dk_entry in doc['data_keys'].items():
 
             if dk_entry['dtype'] not in self._FMTLOOKUP:
                 logger.warn(f'skipping {k}, format not recognized')
                 continue
 
-            self._data.update({k: []})
+            self._data[k] = []
             self._data_keys.append(k)
             self._format_info.update({k: dk_entry['dtype']})
 
@@ -142,7 +141,7 @@ tr:nth-child(even) {
                 style = self._FMTLOOKUP[dtype]
                 self._data[k].append(style.format(doc['data'][k]))
             except Exception as ex:
-                logger.warning(f'key: {k} not in event document')
+                logger.warning(f'Entry {k} failed with exception {ex}')
 
     def _create_html_table(self):
         df = pd.DataFrame(dict(self._data))
