@@ -115,7 +115,8 @@ tr:nth-child(even) {
         for k, dk_entry in doc['data_keys'].items():
 
             if dk_entry['dtype'] not in self._FMTLOOKUP:
-                logger.warn(f'skipping {k}, format not recognized')
+                logger.warn(f'skipping {k}, format {dk_entry["dtype"]}'
+                            'not recognized')
                 continue
 
             self._data[k] = []
@@ -142,6 +143,8 @@ tr:nth-child(even) {
                 self._data[k].append(style.format(doc['data'][k]))
             except Exception as ex:
                 logger.warning(f'Entry {k} failed with exception {ex}')
+                # Fallback to default value
+                self._data[k].append('N/A')
 
     def _create_html_table(self):
         df = pd.DataFrame(dict(self._data))
