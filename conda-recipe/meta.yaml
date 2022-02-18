@@ -21,6 +21,7 @@ requirements:
       - bluesky >=1.6.5
       - numpy
       - ophyd
+      - pandas
       - scipy
       - toolz
 
