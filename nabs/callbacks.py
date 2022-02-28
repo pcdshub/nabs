@@ -13,6 +13,8 @@ from datetime import datetime
 import pandas as pd
 from bluesky.callbacks.core import CallbackBase, make_class_safe
 
+from ._html import run_table_head, run_table_tail
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +29,7 @@ class ELogPoster(CallbackBase):
 
     .. code-block:: python
 
-        elogc = ELogPoster(bec, elog)
+        elogc = ELogPoster(elog, IPython.get_ipython())
         elogc_uid = RE.subscribe(elogc)
 
     To enable posting for a specific run:
@@ -49,31 +51,9 @@ class ELogPoster(CallbackBase):
                   'number': '{:.3g}',
                   'integer': '{:d}'}
 
-    _html_head = """<!DOCTYPE html>
-<html>
-<head>
-<style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+    _html_head = run_table_head
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-</style>
-</head>
-<body>
-"""
-
-    _html_tail = "</body> </html>"
+    _html_tail = run_table_tail
 
     def __init__(self, elog, ipython):
         self._elog = elog
