@@ -1,7 +1,13 @@
 import inspect
+import logging
+from collections import Iterable
 from typing import Any, Callable, Dict, Union
 
 from ophyd.signal import DerivedSignal, SignalRO
+
+from ._html import collapse_list_head, collapse_list_tail
+
+logger = logging.getLogger(__name__)
 
 
 class InvertedSignal(DerivedSignal):
@@ -110,3 +116,94 @@ def add_named_kwargs_to_signature(
     )
 
     return sig.replace(parameters=start_params + wrapper_params + end_params)
+
+
+def format_ophyds_to_html(obj, allow_child=False):
+    """
+    Recursively construct html that contains the output from .status() for
+    each object provided.  Base case is being passed a single ophyd object
+    with a `.status()` method.  Any object without a `.status()` method is
+    ignored.
+
+    Creates divs and buttons based on styling
+    from `nabs._html.collapse_list_head` and `nabs._html.collapse_list_tail`
+
+    Parameters
+    ----------
+    obj : ophyd object or Iterable of ophyd objects
+        Objects to format into html
+
+    Returns
+    -------
+    out : string
+        html body containing ophyd object representations (sans styling, JS)
+    """
+    if isinstance(obj, Iterable):
+        content = ""
+
+        for o in obj:
+            content += format_ophyds_to_html(o, allow_child=allow_child)
+
+        # HelpfulNamespaces tend to lack names, maybe they won't some day
+        parent_name = getattr(obj, '__name__', 'expand me')
+
+        # Wrap in a parent div
+        out = (
+            "<button class='collapsible'>" +
+            f"{parent_name}" +  # should be a namespace name
+            "</button><div class='parent'>" +
+            content +
+            "</div>"
+        )
+        return out
+
+    # check if parent level ophyd object
+    elif hasattr(obj, 'status') and (obj.parent is None or allow_child):
+        content = ""
+        try:
+            content = (
+                f"<button class='collapsible'>{obj.name}</button>" +
+                f"<div class='child content'><pre>{obj.status()}</pre></div>"
+            )
+        except Exception as ex:
+            print(f'skipped {str(obj)}, due to Exception: {ex}')
+            # logger.info(f'skipped {str(obj)}, due to Exception: {ex}')
+
+        return content
+
+
+def post_ophyds_to_elog(elog, objs, allow_child=False):
+    """
+    Take a list of ophyd objects and post their status representations
+    to the elog.  Handles singular objects, lists of objects, and
+    HelpfulNamespace's provided in hutch-python
+
+    .. code-block:: python
+
+        # pass in an object
+        post_ophyds_to_elog(elog, at2l0)
+
+        # or a list of objects
+        post_ophyds_to_elog(elog, [at2l0, im3l0])
+
+        # devices with no parents are ignored by default :(
+        post_ophyds_to_elog(elog, [at2l0, at2l0.blade_01], allow_child=True)
+
+        # or a HelpfulNamespace
+        post_ophyds_to_elog(elog, m)
+
+    Parameters
+    ----------
+    elog : HutchELog
+        elog instance to post to
+
+    objs : ophyd object or Iterable of ophyd objects
+        Objects to format and post
+
+    """
+    post = format_ophyds_to_html(objs, allow_child)
+
+    # wrap post in head and tail
+    final_post = collapse_list_head + post + collapse_list_tail
+
+    elog.post(final_post, tags=['ophyd_status'], title='ophyd status report')
