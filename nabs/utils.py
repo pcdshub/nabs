@@ -166,10 +166,13 @@ def format_ophyds_to_html(obj, allow_child=False):
                 f"<div class='child content'><pre>{obj.status()}</pre></div>"
             )
         except Exception as ex:
-            print(f'skipped {str(obj)}, due to Exception: {ex}')
-            # logger.info(f'skipped {str(obj)}, due to Exception: {ex}')
+            logger.info(f'skipped {str(obj)}, due to Exception: {ex}')
 
         return content
+
+    # fallback base case (if ignoring obj)
+    else:
+        return ""
 
 
 def post_ophyds_to_elog(elog, objs, allow_child=False):
@@ -201,7 +204,7 @@ def post_ophyds_to_elog(elog, objs, allow_child=False):
         Objects to format and post
 
     """
-    post = format_ophyds_to_html(objs, allow_child)
+    post = format_ophyds_to_html(objs, allow_child=allow_child)
 
     # wrap post in head and tail
     final_post = collapse_list_head + post + collapse_list_tail
