@@ -144,6 +144,10 @@ def format_ophyds_to_html(obj, allow_child=False):
         for o in obj:
             content += format_ophyds_to_html(o, allow_child=allow_child)
 
+        # Don't return wrapping if there's no content
+        if content == "":
+            return content
+
         # HelpfulNamespaces tend to lack names, maybe they won't some day
         parent_name = getattr(obj, '__name__', 'expand me')
 
@@ -158,7 +162,10 @@ def format_ophyds_to_html(obj, allow_child=False):
         return out
 
     # check if parent level ophyd object
-    elif hasattr(obj, 'status') and (obj.parent is None or allow_child):
+    elif (hasattr(obj, 'status') and
+            ((getattr(obj, 'parent', None) is None and
+              getattr(obj, 'biological_parent', None) is None) or
+             allow_child)):
         content = ""
         try:
             content = (
@@ -205,6 +212,10 @@ def post_ophyds_to_elog(elog, objs, allow_child=False):
 
     """
     post = format_ophyds_to_html(objs, allow_child=allow_child)
+
+    if post == "":
+        logger.info("No valid devices found, no post submitted")
+        return
 
     # wrap post in head and tail
     final_post = collapse_list_head + post + collapse_list_tail
