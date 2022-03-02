@@ -133,6 +133,10 @@ def format_ophyds_to_html(obj, allow_child=False):
     obj : ophyd object or Iterable of ophyd objects
         Objects to format into html
 
+    allow_child : bool, optional
+        Whether or not to post child devices to the elog.  Defaults to False,
+        to keep long lists of devices concise
+
     Returns
     -------
     out : string
@@ -209,6 +213,10 @@ def post_ophyds_to_elog(elog, objs, allow_child=False):
 
     objs : ophyd object or Iterable of ophyd objects
         Objects to format and post
+
+    allow_child : bool, optional
+        Whether or not to post child devices to the elog.  Defaults to False,
+        to keep long lists of devices concise
 
     """
     post = format_ophyds_to_html(objs, allow_child=allow_child)
