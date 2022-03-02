@@ -153,7 +153,10 @@ def format_ophyds_to_html(obj, allow_child=False):
             return content
 
         # HelpfulNamespaces tend to lack names, maybe they won't some day
-        parent_name = getattr(obj, '__name__', 'expand me')
+        parent_default = ('Ophyd status: ' +
+                          ', '.join('[...]' if isinstance(o, Iterable)
+                                    else o.name for o in obj))
+        parent_name = getattr(obj, '__name__', parent_default[:60] + ' ...')
 
         # Wrap in a parent div
         out = (
@@ -166,7 +169,7 @@ def format_ophyds_to_html(obj, allow_child=False):
         return out
 
     # check if parent level ophyd object
-    elif (hasattr(obj, 'status') and
+    elif (callable(getattr(obj, 'status', None)) and
             ((getattr(obj, 'parent', None) is None and
               getattr(obj, 'biological_parent', None) is None) or
              allow_child)):
