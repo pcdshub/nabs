@@ -40,7 +40,7 @@ def test_ophyd_to_elog(elog):
     assert len(elog.posts) == 2
     assert elog.posts[-1][0][0].count('<pre>') == 4
     # two list levels
-    assert elog.posts[-1][0][0].count('expand me') == 2
+    assert elog.posts[-1][0][0].count("class='parent'") == 2
 
     # half-hearted html validation
     for post in elog.posts:
