@@ -227,7 +227,8 @@ def post_ophyds_to_elog(objs, allow_child=False, hutch_elog=None):
             from elog.utils import get_primary_elog
             hutch_elog = get_primary_elog()
         except ValueError:
-            logger.debug('elog module exists, but no elog registered')
+            logger.info('elog module exists, but no elog registered')
+            return
     else:
         logger.info('Posting to provided elog')
 
