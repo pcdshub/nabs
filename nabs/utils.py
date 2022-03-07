@@ -189,7 +189,7 @@ def format_ophyds_to_html(obj, allow_child=False):
         return ""
 
 
-def post_ophyds_to_elog(elog, objs, allow_child=False):
+def post_ophyds_to_elog(objs, allow_child=False, hutch_elog=None):
     """
     Take a list of ophyd objects and post their status representations
     to the elog.  Handles singular objects, lists of objects, and
@@ -198,22 +198,19 @@ def post_ophyds_to_elog(elog, objs, allow_child=False):
     .. code-block:: python
 
         # pass in an object
-        post_ophyds_to_elog(elog, at2l0)
+        post_ophyds_to_elog(at2l0)
 
         # or a list of objects
-        post_ophyds_to_elog(elog, [at2l0, im3l0])
+        post_ophyds_to_elog([at2l0, im3l0])
 
         # devices with no parents are ignored by default :(
-        post_ophyds_to_elog(elog, [at2l0, at2l0.blade_01], allow_child=True)
+        post_ophyds_to_elog([at2l0, at2l0.blade_01], allow_child=True)
 
         # or a HelpfulNamespace
-        post_ophyds_to_elog(elog, m)
+        post_ophyds_to_elog(m)
 
     Parameters
     ----------
-    elog : HutchELog
-        elog instance to post to
-
     objs : ophyd object or Iterable of ophyd objects
         Objects to format and post
 
@@ -221,7 +218,19 @@ def post_ophyds_to_elog(elog, objs, allow_child=False):
         Whether or not to post child devices to the elog.  Defaults to False,
         to keep long lists of devices concise
 
+    hutch_elog : HutchELog, optional
+        ELog instance to post to.  If not provided, will attempt to grab
+        primary registered ELog instance
     """
+    if hutch_elog is not None:
+        try:
+            from elog.utils import get_primary_elog
+            hutch_elog = get_primary_elog()
+        except ValueError:
+            logger.debug('elog module exists, but no elog registered')
+    else:
+        logger.info('Posting to provided elog')
+
     post = format_ophyds_to_html(objs, allow_child=allow_child)
 
     if post == "":
@@ -231,4 +240,5 @@ def post_ophyds_to_elog(elog, objs, allow_child=False):
     # wrap post in head and tail
     final_post = collapse_list_head + post + collapse_list_tail
 
-    elog.post(final_post, tags=['ophyd_status'], title='ophyd status report')
+    hutch_elog.post(final_post, tags=['ophyd_status'],
+                    title='ophyd status report')
