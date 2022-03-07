@@ -222,7 +222,7 @@ def post_ophyds_to_elog(objs, allow_child=False, hutch_elog=None):
         ELog instance to post to.  If not provided, will attempt to grab
         primary registered ELog instance
     """
-    if hutch_elog is not None:
+    if hutch_elog is None:
         try:
             from elog.utils import get_primary_elog
             hutch_elog = get_primary_elog()
