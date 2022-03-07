@@ -27,16 +27,16 @@ def test_ophyd_to_elog(elog):
     group = BasicGroup('GROUP', name='group')
     some = SomeDevice('SOME', name='some')
 
-    post_ophyds_to_elog(elog, [group, some])
+    post_ophyds_to_elog([group, some], hutch_elog=elog)
     assert len(elog.posts) == 1
     # count number of content entries
     assert elog.posts[-1][0][0].count('<pre>') == 2
 
-    post_ophyds_to_elog(elog, [group.one, some.some])
+    post_ophyds_to_elog([group.one, some.some], hutch_elog=elog)
     assert len(elog.posts) == 1  # no children allowed by default
 
-    post_ophyds_to_elog(elog, [[group, some], group.one, some.some],
-                        allow_child=True)
+    post_ophyds_to_elog([[group, some], group.one, some.some],
+                        allow_child=True, hutch_elog=elog)
     assert len(elog.posts) == 2
     assert elog.posts[-1][0][0].count('<pre>') == 4
     # two list levels
