@@ -304,8 +304,8 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
 
 def step_size_decorator(plan):
     """
-    Grab the last argument (normally step number), and intepret as
-    - step size if float or < 1
+    Grab the last argument (number of steps), and intepret as
+    - step size if float
     - number of steps if integer
 
     Only works on step scans in one dimension.
@@ -328,8 +328,11 @@ def step_size_decorator(plan):
     @wraps(plan)
     def inner(*args, **kwargs):
         if 'num' in kwargs:
-            n = kwargs['num']
+            # Currently unneeded, since daq_ascan and daq_dscan
+            # do not support num kwarg
+            n = kwargs.pop('num')
         else:
+            # assumes (det_list, motor, mmin, mmax, num)
             n = args[-1]
 
         if type(n) not in [int, float]:
@@ -338,11 +341,11 @@ def step_size_decorator(plan):
 
         if type(n) is int:
             # interpret as number of steps (default)
-            yield from plan(*args[:-1], n, **kwargs)
+            yield from plan(*args[:4], n, **kwargs)
 
         elif type(n) is float:
             # interpret as step size
-            mmin, mmax = args[-3], args[-2]
+            mmin, mmax = args[2], args[3]
 
             if n > (mmax-mmin):
                 raise ValueError(f"Step size provided {n} greater "
@@ -357,7 +360,7 @@ def step_size_decorator(plan):
 
             n_steps = len(step_list)
 
-            yield from plan(*args[:-2], step_list[-1], n_steps,
+            yield from plan(*args[:3], step_list[-1], n_steps,
                             **kwargs)
 
     return inner
