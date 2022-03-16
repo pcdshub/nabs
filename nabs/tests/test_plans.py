@@ -388,3 +388,51 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     assert len(reads) == 24
     RE(msgs)
     summarize_plan(msgs)
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+@pytest.mark.parametrize(
+    'mmin, mmax, num, n_reads',
+    [
+     (-5, 5, 11, 33),
+     (-5, 5, 2., 18),   # step size, include endpoint
+     (-1, 1, 0.3, 21),  # step size, end point not close
+    ]
+)
+def test_daq_step_size(daq, hw, mmin, mmax, num, n_reads):
+    x_start = 1
+    # absolute scan
+    hw.motor1.set(x_start)
+    msgs = list(nbp.daq_ascan([hw.det], hw.motor1,
+                              mmin, mmax, num, events=1))
+    if type(num) is int:
+        a_expected_moves = list(np.linspace(mmin, mmax, num))
+    elif type(num) is float:
+        a_expected_moves = list(np.arange(mmin, mmax, num))
+        if np.isclose(a_expected_moves[-1] + num, mmax):
+            a_expected_moves.append(a_expected_moves[-1] + num)
+
+    a_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    reads = [msg for msg in msgs if msg.command == 'read']
+
+    assert np.isclose(a_moves, a_expected_moves + [x_start]).all()
+    assert len(reads) == n_reads
+
+    # relative scan
+    hw.motor1.set(x_start)
+    msgs = list(nbp.daq_dscan([hw.det], hw.motor1,
+                              mmin, mmax, num, events=1))
+    if type(num) is int:
+        d_expected_moves = list(np.linspace(mmin + x_start,
+                                            mmax + x_start, num))
+    elif type(num) is float:
+        d_expected_moves = list(np.arange(mmin + x_start,
+                                          mmax + x_start, num))
+        if np.isclose(d_expected_moves[-1] + num, mmax + x_start):
+            d_expected_moves.append(d_expected_moves[-1] + num)
+
+    d_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    reads = [msg for msg in msgs if msg.command == 'read']
+
+    assert np.isclose(d_moves, d_expected_moves + [x_start]).all()
+    assert len(reads) == n_reads
