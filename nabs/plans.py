@@ -454,6 +454,7 @@ def daq_list_scan(*args, per_step=None, md=None):
 
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
+@nbpp.step_size_decorator
 def daq_ascan(detectors, motor, start, end, nsteps):
     """
     One-dimensional daq scan with absolute positions.
@@ -507,6 +508,7 @@ def daq_ascan(detectors, motor, start, end, nsteps):
 @bpp.reset_positions_decorator()
 @bpp.relative_set_decorator()
 @nbpp.daq_step_scan_decorator
+@nbpp.step_size_decorator
 def daq_dscan(detectors, motor, start, end, nsteps):
     """
     One-dimensional daq scan with relative (delta) positions.
