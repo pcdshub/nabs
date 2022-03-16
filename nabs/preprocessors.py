@@ -12,6 +12,7 @@ from functools import wraps
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
+import numpy as np
 from bluesky.utils import make_decorator
 
 from . import utils
@@ -299,6 +300,67 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
         return (yield from bpp.fly_during_wrapper(plan, flyers=[daq]))
 
     return (yield from daq_during_plan())
+
+
+def step_size_decorator(plan):
+    """
+    Grab the last argument (normally step number), and intepret as
+    - step size if float or < 1
+    - number of steps if integer
+
+    Only works on step scans in one dimension.
+
+    Parameters
+    ----------
+    plan : plan
+        A bluesky plan that yields bluesky Msg objects.  Must be
+        a scan in one dimension, with the last argument being
+        the number of scan points / step size.
+
+    Returns
+    -------
+    step_size_plan : plan
+        The same plan as before, but modified appropriately to
+        differentiate between step size and number of steps.
+        This will be a callable generator function.
+    """
+
+    @wraps(plan)
+    def inner(*args, **kwargs):
+        if 'num' in kwargs:
+            n = kwargs['num']
+        else:
+            n = args[-1]
+
+        if type(n) not in [int, float]:
+            raise TypeError("Step size / number of steps is "
+                            "neither float nor integer")
+
+        if type(n) is int:
+            # interpret as number of steps (default)
+            yield from plan(*args[:-1], n, **kwargs)
+
+        elif type(n) is float:
+            # interpret as step size
+            mmin, mmax = args[-3], args[-2]
+
+            if n > (mmax-mmin):
+                raise ValueError(f"Step size provided {n} greater "
+                                 "than the range provided "
+                                 f"{mmax-mmin}")
+
+            step_list = list(np.arange(mmin, mmax, n))
+            # new endpoint needed, for cases where
+            # (range % step_size) != 0 or to include endpoint
+            if np.isclose(step_list[-1] + n, mmax):
+                step_list.append(step_list[-1] + n)
+
+            n_steps = len(step_list)
+
+            yield from plan(*args[:-2], step_list[-1], n_steps,
+                            **kwargs)
+
+    return inner
 
 
 daq_during_decorator = make_decorator(daq_during_wrapper)
