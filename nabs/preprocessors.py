@@ -345,6 +345,8 @@ def step_size_decorator(plan):
         elif type(n) is float:
             # interpret as step size
             start, stop = args[2], args[3]
+            # correct step size sign
+            n = np.sign(stop - start) * np.abs(n)
             if np.abs(n) > np.abs(stop-start):
                 raise ValueError(f"Step size provided {n} greater "
                                  "than the range provided "

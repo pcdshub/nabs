@@ -395,6 +395,7 @@ def orange(start, stop, num):
     if type(num) is int:
         ex_moves = list(np.linspace(start, stop, num))
     elif type(num) is float:
+        num = np.sign(stop-start) * np.abs(num)
         ex_moves = list(np.arange(start, stop, num))
         if np.isclose(ex_moves[-1] + num, stop):
             ex_moves.append(ex_moves[-1] + num)
@@ -410,6 +411,7 @@ def orange(start, stop, num):
      (-5, 5, 2., 18),    # step size, include endpoint
      (-1, 1, 0.3, 21),   # step size, end point not close
      (1, -1, -0.4, 18),  # positive to negative direction
+     (1, -1, 0.4, 18),   # ignore sign of step size
     ]
 )
 def test_daq_step_size(daq, hw, start, stop, num, n_reads):
@@ -452,7 +454,3 @@ def test_bad_step_size(RE, hw):
     with pytest.raises(ValueError):
         # step size bigger than range
         RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, 20., events=1))
-
-    with pytest.raises(ValueError):
-        # bad step direction
-        RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, -.4, events=1))
