@@ -390,13 +390,13 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     summarize_plan(msgs)
 
 
-def orange(mmin, mmax, num):
+def orange(start, stop, num):
     """ get scan points """
     if type(num) is int:
-        ex_moves = list(np.linspace(mmin, mmax, num))
+        ex_moves = list(np.linspace(start, stop, num))
     elif type(num) is float:
-        ex_moves = list(np.arange(mmin, mmax, num))
-        if np.isclose(ex_moves[-1] + num, mmax):
+        ex_moves = list(np.arange(start, stop, num))
+        if np.isclose(ex_moves[-1] + num, stop):
             ex_moves.append(ex_moves[-1] + num)
 
     return ex_moves
@@ -404,39 +404,55 @@ def orange(mmin, mmax, num):
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 @pytest.mark.parametrize(
-    'mmin, mmax, num, n_reads',
+    'start, stop, num, n_reads',
     [
-     (-5, 5, 11, 33),   # expect 3 reads / point (det, motor, daq)
-     (-5, 5, 2., 18),   # step size, include endpoint
-     (-1, 1, 0.3, 21),  # step size, end point not close
+     (-5, 5, 11, 33),    # expect 3 reads / point (det, motor, daq)
+     (-5, 5, 2., 18),    # step size, include endpoint
+     (-1, 1, 0.3, 21),   # step size, end point not close
+     (1, -1, -0.4, 18),  # positive to negative direction
     ]
 )
-def test_daq_step_size(daq, hw, mmin, mmax, num, n_reads):
+def test_daq_step_size(daq, hw, start, stop, num, n_reads):
     x_start = 1
     # absolute scan
     hw.motor1.set(x_start)
     msgs = list(nbp.daq_ascan([hw.det], hw.motor1,
-                              mmin, mmax, num, events=1))
+                              start, stop, num, events=1))
 
     a_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     reads = [msg for msg in msgs if msg.command == 'read']
 
-    a_expected_moves = orange(mmin, mmax, num)
+    a_expected_moves = orange(start, stop, num)
 
-    assert np.isclose(a_moves, a_expected_moves + [x_start]).all()
     assert len(reads) == n_reads
+    assert np.isclose(a_moves, a_expected_moves + [x_start]).all()
 
     # relative scan
     hw.motor1.set(x_start)
     msgs = list(nbp.daq_dscan([hw.det], hw.motor1,
-                              mmin, mmax, num, events=1))
+                              start, stop, num, events=1))
 
-    d_min = mmin + x_start
-    d_max = mmax + x_start
+    d_min = start + x_start
+    d_max = stop + x_start
     d_expected_moves = orange(d_min, d_max, num)
 
     d_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     reads = [msg for msg in msgs if msg.command == 'read']
 
-    assert np.isclose(d_moves, d_expected_moves + [x_start]).all()
     assert len(reads) == n_reads
+    assert np.isclose(d_moves, d_expected_moves + [x_start]).all()
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_bad_step_size(RE, hw):
+    with pytest.raises(TypeError):
+        # bad step type
+        RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, 'a', events=1))
+
+    with pytest.raises(ValueError):
+        # step size bigger than range
+        RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, 20., events=1))
+
+    with pytest.raises(ValueError):
+        # bad step direction
+        RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, -.4, events=1))
