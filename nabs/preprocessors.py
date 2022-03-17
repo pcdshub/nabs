@@ -332,10 +332,10 @@ def step_size_decorator(plan):
             # do not support num kwarg
             n = kwargs.pop('num')
         else:
-            # assumes (det_list, motor, mmin, mmax, num)
+            # assumes (det_list, motor, start, stop, num)
             n = args[-1]
 
-        if type(n) not in [int, float]:
+        if not isinstance(n, (int, float)):
             raise TypeError("Step size / number of steps is "
                             "neither float nor integer")
 
@@ -344,15 +344,19 @@ def step_size_decorator(plan):
             yield from plan(*args, **kwargs)
         elif type(n) is float:
             # interpret as step size
-            mmin, mmax = args[2], args[3]
-            if n > (mmax-mmin):
+            start, stop = args[2], args[3]
+            if np.abs(n) > np.abs(stop-start):
                 raise ValueError(f"Step size provided {n} greater "
                                  "than the range provided "
-                                 f"{mmax-mmin}")
-            step_list = list(np.arange(mmin, mmax, n))
+                                 f"{np.abs(stop-start)}")
+            step_list = list(np.arange(start, stop, n))
+            if len(step_list) == 0:
+                raise ValueError("Number of steps is 0 with the "
+                                 "provided range and step size.")
+
             # new endpoint needed, for cases where
             # (range % step_size) != 0 or to include endpoint
-            if np.isclose(step_list[-1] + n, mmax):
+            if np.isclose(step_list[-1] + n, stop):
                 step_list.append(step_list[-1] + n)
             n_steps = len(step_list)
 
