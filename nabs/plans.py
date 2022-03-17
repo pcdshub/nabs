@@ -455,7 +455,7 @@ def daq_list_scan(*args, per_step=None, md=None):
 @bpp.reset_positions_decorator()
 @nbpp.daq_step_scan_decorator
 @nbpp.step_size_decorator
-def daq_ascan(detectors, motor, start, end, nsteps):
+def daq_ascan(detectors, motor, start, end, n):
     """
     One-dimensional daq scan with absolute positions.
 
@@ -477,8 +477,9 @@ def daq_ascan(detectors, motor, start, end, nsteps):
     end : int or float
         The last point in the scan.
 
-    nsteps : int
-        The number of points in the scan.
+    n : int or float
+        if int, the number of points in the scan.
+        if float, step size
 
     events : int, optional
         Number of events to take at each step. If omitted, uses the
@@ -502,14 +503,14 @@ def daq_ascan(detectors, motor, start, end, nsteps):
     :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
-    yield from bp.scan(detectors, motor, start, end, nsteps)
+    yield from bp.scan(detectors, motor, start, end, n)
 
 
 @bpp.reset_positions_decorator()
 @bpp.relative_set_decorator()
 @nbpp.daq_step_scan_decorator
 @nbpp.step_size_decorator
-def daq_dscan(detectors, motor, start, end, nsteps):
+def daq_dscan(detectors, motor, start, end, n):
     """
     One-dimensional daq scan with relative (delta) positions.
 
@@ -531,8 +532,9 @@ def daq_dscan(detectors, motor, start, end, nsteps):
     end : int or float
         The last point in the scan, relative to the current position.
 
-    nsteps : int
-        The number of points in the scan.
+    n : int or float
+        if int, the number of points in the scan.
+        if float, step size
 
     events : int, optional
         Number of events to take at each step. If omitted, uses the
@@ -556,7 +558,7 @@ def daq_dscan(detectors, motor, start, end, nsteps):
     :py:func:`nabs.preprocessors.daq_step_scan_decorator`.
     """
 
-    yield from bp.scan(detectors, motor, start, end, nsteps)
+    yield from bp.scan(detectors, motor, start, end, n)
 
 
 @bpp.reset_positions_decorator()
