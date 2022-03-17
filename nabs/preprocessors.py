@@ -341,23 +341,19 @@ def step_size_decorator(plan):
 
         if type(n) is int:
             # interpret as number of steps (default)
-            yield from plan(*args[:4], n, **kwargs)
-
+            yield from plan(*args, **kwargs)
         elif type(n) is float:
             # interpret as step size
             mmin, mmax = args[2], args[3]
-
             if n > (mmax-mmin):
                 raise ValueError(f"Step size provided {n} greater "
                                  "than the range provided "
                                  f"{mmax-mmin}")
-
             step_list = list(np.arange(mmin, mmax, n))
             # new endpoint needed, for cases where
             # (range % step_size) != 0 or to include endpoint
             if np.isclose(step_list[-1] + n, mmax):
                 step_list.append(step_list[-1] + n)
-
             n_steps = len(step_list)
 
             yield from plan(*args[:3], step_list[-1], n_steps,
