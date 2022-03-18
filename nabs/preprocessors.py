@@ -8,6 +8,7 @@ and yield messages from a new, modified plan, as well as "decorator"
 functions that can be applied to ``bluesky`` plan functions to return new
 plan functions with modifications.
 """
+import numbers
 from functools import wraps
 
 import bluesky.plan_stubs as bps
@@ -333,16 +334,16 @@ def step_size_decorator(plan):
             n = kwargs.pop('num')
         else:
             # assumes (det_list, motor, start, stop, num)
-            n = args[-1]
+            det_list, motor, start, stop, n = args
 
-        if not isinstance(n, (int, float)):
+        if not isinstance(n, (numbers.Integral, float)):
             raise TypeError("Step size / number of steps is "
-                            "neither float nor integer")
+                            "neither float nor integer.")
 
-        if type(n) is int:
+        if isinstance(n, numbers.Integral):
             # interpret as number of steps (default)
-            yield from plan(*args, **kwargs)
-        elif type(n) is float:
+            result = yield from plan(*args, **kwargs)
+        elif isinstance(n, float):
             # interpret as step size
             start, stop = args[2], args[3]
             # correct step size sign
@@ -350,7 +351,7 @@ def step_size_decorator(plan):
             if np.abs(n) > np.abs(stop-start):
                 raise ValueError(f"Step size provided {n} greater "
                                  "than the range provided "
-                                 f"{np.abs(stop-start)}")
+                                 f"{np.abs(stop-start)}.")
             step_list = list(np.arange(start, stop, n))
             if len(step_list) == 0:
                 raise ValueError("Number of steps is 0 with the "
@@ -362,8 +363,11 @@ def step_size_decorator(plan):
                 step_list.append(step_list[-1] + n)
             n_steps = len(step_list)
 
-            yield from plan(*args[:3], step_list[-1], n_steps,
-                            **kwargs)
+            result = yield from plan(det_list, motor, start,
+                                     step_list[-1], n_steps,
+                                     **kwargs)
+
+        return result
 
     return inner
 

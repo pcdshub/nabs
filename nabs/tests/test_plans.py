@@ -10,6 +10,7 @@ from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
 
 import nabs.plans as nbp
+from nabs.utils import orange
 
 PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
@@ -388,19 +389,6 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     assert len(reads) == 24
     RE(msgs)
     summarize_plan(msgs)
-
-
-def orange(start, stop, num):
-    """ get scan points """
-    if type(num) is int:
-        ex_moves = list(np.linspace(start, stop, num))
-    elif type(num) is float:
-        num = np.sign(stop-start) * np.abs(num)
-        ex_moves = list(np.arange(start, stop, num))
-        if np.isclose(ex_moves[-1] + num, stop):
-            ex_moves.append(ex_moves[-1] + num)
-
-    return ex_moves
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)

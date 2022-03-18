@@ -1,6 +1,7 @@
 import inspect
 from typing import Any, Callable, Dict, Union
 
+import numpy as np
 from ophyd.signal import DerivedSignal, SignalRO
 
 
@@ -110,3 +111,39 @@ def add_named_kwargs_to_signature(
     )
 
     return sig.replace(parameters=start_params + wrapper_params + end_params)
+
+
+def orange(start, stop, num):
+    """
+    Get scan points based on the type of `num`.  If `num` is an
+    integer, interpret as the number of points in a scan.  If `num`
+    is a float, interpret it as a step size.
+
+    Modified to include end points.
+
+    Parameters
+    ----------
+    start : int or float
+        The first point in the scan
+
+    end : int or float
+        The last point in the scan
+
+    n : int or float
+        if int, the number of points in the scan.
+        if float, step size
+
+    Returns
+    -------
+    list
+        a list of scan points
+    """
+    if type(num) is int:
+        moves = list(np.linspace(start, stop, num))
+    elif type(num) is float:
+        num = np.sign(stop-start) * np.abs(num)
+        moves = list(np.arange(start, stop, num))
+        if np.isclose(moves[-1] + num, stop):
+            moves.append(moves[-1] + num)
+
+    return moves
