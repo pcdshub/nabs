@@ -129,7 +129,7 @@ def orange(start, stop, num):
     end : int or float
         The last point in the scan
 
-    n : int or float
+    num : int or float
         if int, the number of points in the scan.
         if float, step size
 
@@ -141,7 +141,7 @@ def orange(start, stop, num):
     if type(num) is int:
         moves = list(np.linspace(start, stop, num))
     elif type(num) is float:
-        num = np.sign(stop-start) * np.abs(num)
+        num = np.sign(stop - start) * np.abs(num)
         moves = list(np.arange(start, stop, num))
         if np.isclose(moves[-1] + num, stop):
             moves.append(moves[-1] + num)

@@ -344,14 +344,12 @@ def step_size_decorator(plan):
             # interpret as number of steps (default)
             result = yield from plan(*args, **kwargs)
         elif isinstance(n, float):
-            # interpret as step size
-            start, stop = args[2], args[3]
             # correct step size sign
             n = np.sign(stop - start) * np.abs(n)
-            if np.abs(n) > np.abs(stop-start):
+            if np.abs(n) > np.abs(stop - start):
                 raise ValueError(f"Step size provided {n} greater "
                                  "than the range provided "
-                                 f"{np.abs(stop-start)}.")
+                                 f"{np.abs(stop - start)}.")
             step_list = list(np.arange(start, stop, n))
             if len(step_list) == 0:
                 raise ValueError("Number of steps is 0 with the "
