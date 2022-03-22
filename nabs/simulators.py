@@ -87,11 +87,12 @@ def patch_sys_modules(modules):
         except Exception as ex:
             logger.debug(f'Failed to replace module {name}, {ex}')
 
-    yield
-
-    # replace the references
-    for name in cache:
-        exec(f'{name} = cache[name]')
+    try:
+        yield
+    finally:
+        # replace the references
+        for name in cache:
+            exec(f'{name} = cache[name]')
 
 
 def check_stray_calls(plan):
