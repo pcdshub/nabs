@@ -31,7 +31,7 @@ def sim_plan_inner(npts=2):
 
 @bpp.set_run_key_decorator("run_1")
 @bpp.run_decorator(md={})
-def sim_plan_outer(npts=4):
+def sim_plan_outer(npts):
     for j in range(int(npts/2)):
         yield from bps.mov(hw.motor, j * 0.2)
         yield from bps.trigger_and_read([hw.motor, hw.det])
@@ -66,9 +66,9 @@ def bad_call():
 @pytest.mark.parametrize(
     'plan',
     [
-     bad_limits,
-     bad_nesting,
-     bad_call,
+     bad_limits(),
+     bad_nesting(),
+     bad_call(),
     ]
 )
 def test_bad_plans(plan):
@@ -79,7 +79,7 @@ def test_bad_plans(plan):
 @pytest.mark.parametrize(
     'plan',
     [
-     sim_plan_outer,
+     sim_plan_outer(4),
     ]
 )
 def test_good_plans(plan):

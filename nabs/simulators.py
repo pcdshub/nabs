@@ -1,8 +1,10 @@
 """Simulation and validation functions for plans"""
+import itertools
 import logging
 import pprint
 import sys  # NOQA
 from contextlib import contextmanager
+from typing import Any, Callable, Generator, Iterator, List, Optional, Tuple
 
 from bluesky.simulators import check_limits
 
@@ -13,7 +15,7 @@ class ValidError(Exception):
     pass
 
 
-def check_open_close(plan):
+def check_open_close(plan: Iterator[Any]) -> None:
     """
     Check if a plan is open and closed correctly.
 
@@ -25,7 +27,7 @@ def check_open_close(plan):
 
     Parameters
     ----------
-    plan : iterable
+    plan : iterable or generator
         Must yield `Msg` objects
 
     Raises
@@ -67,12 +69,12 @@ def check_open_close(plan):
                                  "that of nearest open_run.")
 
 
-def raiser(*args, **kwargs):
+def raiser(*args: Any, **kwargs: Any):
     raise ValidError('forbidden method called')
 
 
 @contextmanager
-def patch_sys_modules(modules):
+def patch_sys_modules(modules: List[str]) -> Generator[Any, None, None]:
     """
     takes a list of module names as strings and stores them,
     replaces them with a raiser, and replaces them after
@@ -95,7 +97,7 @@ def patch_sys_modules(modules):
             exec(f'{name} = cache[name]')
 
 
-def check_stray_calls(plan):
+def check_stray_calls(plan: Iterator[Any]) -> None:
     """
     Validate that plan does not invoke any caput functionality
     outside of messages.
@@ -111,7 +113,7 @@ def check_stray_calls(plan):
 
     Parameters
     ----------
-    plan : iterable
+    plan : iterable or generator
         Must yield `Msg` objects
 
     Raises
@@ -120,7 +122,7 @@ def check_stray_calls(plan):
         If attempts to access any forbidden methods
     """
 
-    # context manager to replace sys.modules functions and replace
+    # context manager to patch sys.modules functions and replace
     with patch_sys_modules(patches):
         for _ in plan:
             continue
@@ -136,12 +138,15 @@ patches = [
 
 validators = [
     check_stray_calls,
-    check_limits,
     check_open_close,
+    check_limits,
 ]
 
 
-def validate_plan(plan, validators=validators):
+def validate_plan(
+    plan: Generator,
+    validators: List[Callable[..., Optional[Any]]] = validators
+) -> Tuple[bool, str]:
     """
     Validate plan with all available checkers.
 
@@ -149,6 +154,11 @@ def validate_plan(plan, validators=validators):
     ----------
     plan: generator function
         Once called, must yield `Msg` objects.
+
+    validators: list of check functions
+        functions to run on the provided plan.  These should take an
+        evaluated plan (generator) as input, and raise exceptions on
+        failure.  (should NOT take generator functions)
 
     Returns
     -------
@@ -162,9 +172,10 @@ def validate_plan(plan, validators=validators):
     """
     success, msg = True, ""
     try:
-        for check in validators:
+        plan_list = itertools.tee(plan, len(validators))
+        for i, check in enumerate(validators):
             print(f'running {check.__name__}')
-            check(plan())
+            check(plan_list[i])
     except Exception as ex:
         print(ex)
         msg = (f'Plan validation failed: {str(ex)}, for '
