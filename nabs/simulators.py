@@ -15,6 +15,34 @@ class ValidError(Exception):
     pass
 
 
+def raiser(*args: Any, **kwargs: Any):
+    raise ValidError('forbidden method called')
+
+
+@contextmanager
+def patch_sys_modules(modules: List[str]) -> Generator[Any, None, None]:
+    """
+    takes a list of module names as strings and stores them,
+    replaces them with a raiser, and replaces them after
+
+    Need to use exec/eval here due to pass-by-reference issues
+    """
+    cache = {}
+    for name in modules:
+        try:
+            cache[name] = eval(name)
+            exec(f'{name} = raiser')
+        except Exception as ex:
+            logger.debug(f'Failed to replace module {name}, {ex}')
+
+    try:
+        yield
+    finally:
+        # replace the references
+        for name in cache:
+            exec(f'{name} = cache[name]')
+
+
 def check_open_close(plan: Iterator[Any]) -> None:
     """
     Check if a plan is open and closed correctly.
@@ -69,35 +97,21 @@ def check_open_close(plan: Iterator[Any]) -> None:
                                  "that of nearest open_run.")
 
 
-def raiser(*args: Any, **kwargs: Any):
-    raise ValidError('forbidden method called')
+# Be wary of how you specify these, they are keyed based on
+# how they were imported.
+# Choosing the base method doesn't always work, connection errors
+# may raise early (e.g. before ophyd.device.put)
+default_patches = [
+            "sys.modules['ophyd'].sim.SynAxis.set",
+            # "sys.modules['pcdsdevices'].interface.MvInterface.move"
+            "sys.modules['ophyd'].signal.EpicsSignal.put"
+]
 
 
-@contextmanager
-def patch_sys_modules(modules: List[str]) -> Generator[Any, None, None]:
-    """
-    takes a list of module names as strings and stores them,
-    replaces them with a raiser, and replaces them after
-
-    Need to use exec/eval here due to pass-by-reference issues
-    """
-    cache = {}
-    for name in modules:
-        try:
-            cache[name] = eval(name)
-            exec(f'{name} = raiser')
-        except Exception as ex:
-            logger.debug(f'Failed to replace module {name}, {ex}')
-
-    try:
-        yield
-    finally:
-        # replace the references
-        for name in cache:
-            exec(f'{name} = cache[name]')
-
-
-def check_stray_calls(plan: Iterator[Any]) -> None:
+def check_stray_calls(
+    plan: Iterator[Any],
+    patches: List[str] = default_patches
+) -> None:
     """
     Validate that plan does not invoke any caput functionality
     outside of messages.
@@ -122,20 +136,12 @@ def check_stray_calls(plan: Iterator[Any]) -> None:
         If attempts to access any forbidden methods
     """
 
-    # context manager to patch sys.modules functions and replace
     with patch_sys_modules(patches):
         for _ in plan:
             continue
 
 
-# be wary of how you specify these, they are keyed based on
-# how they were imported.
-patches = [
-            "sys.modules['ophyd.sim'].SynAxis.set",
-            "sys.modules['pcdsdevices'].interface.MvInterface.move"
-]
-
-
+# check_limits is not hinted, so this list get a more lax type hint
 validators = [
     check_stray_calls,
     check_open_close,
