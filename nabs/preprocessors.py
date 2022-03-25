@@ -336,30 +336,26 @@ def step_size_decorator(plan):
             # assumes (det_list, motor, start, stop, num)
             det_list, motor, start, stop, n = args
 
-        if not isinstance(n, (numbers.Integral, float)):
+        if not isinstance(n, (numbers.Integral, numbers.Real)):
             raise TypeError("Step size / number of steps is "
                             "neither float nor integer.")
 
         if isinstance(n, numbers.Integral):
             # interpret as number of steps (default)
             result = yield from plan(*args, **kwargs)
-        elif isinstance(n, float):
+        elif isinstance(n, numbers.Real):
             # correct step size sign
             n = np.sign(stop - start) * np.abs(n)
             if np.abs(n) > np.abs(stop - start):
                 raise ValueError(f"Step size provided {n} greater "
                                  "than the range provided "
                                  f"{np.abs(stop - start)}.")
-            step_list = list(np.arange(start, stop, n))
-            if len(step_list) == 0:
+            step_list = utils.orange(start, stop, n)
+            n_steps = len(step_list)
+
+            if n_steps == 0:
                 raise ValueError("Number of steps is 0 with the "
                                  "provided range and step size.")
-
-            # new endpoint needed, for cases where
-            # (range % step_size) != 0 or to include endpoint
-            if np.isclose(step_list[-1] + n, stop):
-                step_list.append(step_list[-1] + n)
-            n_steps = len(step_list)
 
             result = yield from plan(det_list, motor, start,
                                      step_list[-1], n_steps,

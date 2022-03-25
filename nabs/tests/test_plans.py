@@ -396,10 +396,11 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     'start, stop, num, n_reads',
     [
      (-5, 5, 11, 33),    # expect 3 reads / point (det, motor, daq)
-     (-5, 5, 2., 18),    # step size, include endpoint
-     (-1, 1, 0.3, 21),   # step size, end point not close
-     (1, -1, -0.4, 18),  # positive to negative direction
-     (1, -1, 0.4, 18),   # ignore sign of step size
+     (-5, 5, float(1.), 33),    # step size, include endpoint
+     (-1, 1, np.float128(0.2), 33),   # step size, end point not close
+     (1, -1, np.float16(-0.4), 18),  # positive to negative direction
+     (1, -1, np.float64(0.4), 18),   # ignore step sign
+     (-1, 0, np.float32(0.1), 33),  # close to 0, end near start
     ]
 )
 def test_daq_step_size(daq, hw, start, stop, num, n_reads):
@@ -415,6 +416,7 @@ def test_daq_step_size(daq, hw, start, stop, num, n_reads):
     a_expected_moves = orange(start, stop, num)
 
     assert len(reads) == n_reads
+    # move back to start after plan end
     assert np.isclose(a_moves, a_expected_moves + [x_start]).all()
 
     # relative scan
@@ -422,9 +424,11 @@ def test_daq_step_size(daq, hw, start, stop, num, n_reads):
     msgs = list(nbp.daq_dscan([hw.det], hw.motor1,
                               start, stop, num, events=1))
 
-    d_min = start + x_start
-    d_max = stop + x_start
-    d_expected_moves = orange(d_min, d_max, num)
+    # daq_dscan applies the relative shift after the steps are
+    # computed, so we do here too.  This avoids some weird floating
+    # point mistakes near zero
+    d_expected_moves = orange(start, stop, num)
+    d_expected_moves = [x+x_start for x in d_expected_moves]
 
     d_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
     reads = [msg for msg in msgs if msg.command == 'read']

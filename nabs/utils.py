@@ -1,4 +1,5 @@
 import inspect
+import numbers
 from typing import Any, Callable, Dict, Union
 
 import numpy as np
@@ -113,7 +114,7 @@ def add_named_kwargs_to_signature(
     return sig.replace(parameters=start_params + wrapper_params + end_params)
 
 
-def orange(start, stop, num):
+def orange(start, stop, num, rtol=1.e-5, atol=1.e-7):
     """
     Get scan points based on the type of `num`.  If `num` is an
     integer, interpret as the number of points in a scan.  If `num`
@@ -138,12 +139,13 @@ def orange(start, stop, num):
     list
         a list of scan points
     """
-    if type(num) is int:
+    moves = []
+    if isinstance(num, numbers.Integral):
         moves = list(np.linspace(start, stop, num))
-    elif type(num) is float:
+    elif isinstance(num, numbers.Real):
         num = np.sign(stop - start) * np.abs(num)
         moves = list(np.arange(start, stop, num))
-        if np.isclose(moves[-1] + num, stop):
+        if np.isclose(moves[-1] + num, stop, rtol=rtol, atol=atol):
             moves.append(moves[-1] + num)
 
     return moves
