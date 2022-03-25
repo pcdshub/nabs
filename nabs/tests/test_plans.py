@@ -10,6 +10,7 @@ from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
 
 import nabs.plans as nbp
+from nabs.utils import orange
 
 PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
@@ -388,3 +389,60 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     assert len(reads) == 24
     RE(msgs)
     summarize_plan(msgs)
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+@pytest.mark.parametrize(
+    'start, stop, num, n_reads',
+    [
+     (-5, 5, 11, 33),    # expect 3 reads / point (det, motor, daq)
+     (-5, 5, float(1.), 33),    # step size, include endpoint
+     (-1, 1, np.float128(0.2), 33),   # step size, end point not close
+     (1, -1, -0.4, 18),  # positive to negative direction
+     (1, -1, np.float64(0.4), 18),   # ignore step sign
+     (-1, 0, np.float32(0.1), 33),  # close to 0, end near start
+    ]
+)
+def test_daq_step_size(daq, hw, start, stop, num, n_reads):
+    x_start = 1
+    # absolute scan
+    hw.motor1.set(x_start)
+    msgs = list(nbp.daq_ascan([hw.det], hw.motor1,
+                              start, stop, num, events=1))
+
+    a_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    reads = [msg for msg in msgs if msg.command == 'read']
+
+    a_expected_moves = orange(start, stop, num)
+
+    assert len(reads) == n_reads
+    # move back to start after plan end
+    assert np.isclose(a_moves, a_expected_moves + [x_start]).all()
+
+    # relative scan
+    hw.motor1.set(x_start)
+    msgs = list(nbp.daq_dscan([hw.det], hw.motor1,
+                              start, stop, num, events=1))
+
+    # daq_dscan applies the relative shift after the steps are
+    # computed, so we do here too.  This avoids some weird floating
+    # point mistakes near zero
+    d_expected_moves = orange(start, stop, num)
+    d_expected_moves = [x+x_start for x in d_expected_moves]
+
+    d_moves = [msg.args[0] for msg in msgs if msg.command == 'set']
+    reads = [msg for msg in msgs if msg.command == 'read']
+
+    assert len(reads) == n_reads
+    assert np.isclose(d_moves, d_expected_moves + [x_start]).all()
+
+
+@pytest.mark.timeout(PLAN_TIMEOUT)
+def test_bad_step_size(RE, hw):
+    with pytest.raises(TypeError):
+        # bad step type
+        RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, 'a', events=1))
+
+    with pytest.raises(ValueError):
+        # step size bigger than range
+        RE(nbp.daq_ascan([hw.det], hw.motor1, 0, 1, 20., events=1))
