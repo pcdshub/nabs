@@ -398,7 +398,7 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
      (-5, 5, 11, 33),    # expect 3 reads / point (det, motor, daq)
      (-5, 5, float(1.), 33),    # step size, include endpoint
      (-1, 1, np.float128(0.2), 33),   # step size, end point not close
-     (1, -1, np.float16(-0.4), 18),  # positive to negative direction
+     (1, -1, -0.4, 18),  # positive to negative direction
      (1, -1, np.float64(0.4), 18),   # ignore step sign
      (-1, 0, np.float32(0.1), 33),  # close to 0, end near start
     ]

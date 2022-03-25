@@ -144,8 +144,6 @@ def orange(start, stop, num, rtol=1.e-5, atol=1.e-7):
         moves = list(np.linspace(start, stop, num))
     elif isinstance(num, numbers.Real):
         num = np.sign(stop - start) * np.abs(num)
-        moves = list(np.arange(start, stop, num))
-        if np.isclose(moves[-1] + num, stop, rtol=rtol, atol=atol):
-            moves.append(moves[-1] + num)
+        moves = list(np.arange(start, stop + num, num))
 
     return moves
