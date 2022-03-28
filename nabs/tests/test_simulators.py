@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 from ophyd.sim import SynAxis, hw
 
+import nabs.plans as nbp
 from nabs.simulators import validate_plan
 
 hw = hw()
@@ -63,6 +64,10 @@ def bad_call():
     yield from bps.close_run()
 
 
+def bad_stage():
+    yield from bps.stage(hw.det)
+
+
 @pytest.mark.parametrize(
     'plan',
     [
@@ -80,8 +85,12 @@ def test_bad_plans(plan):
     'plan',
     [
      sim_plan_outer(4),
+     bp.count([hw.det], num=2),
+     bp.scan([hw.det, hw.det2, hw.motor],
+             hw.motor, 0, 1, hw.motor2, 1, 20, 10),
+     nbp.daq_dscan([hw.det], hw.motor, 1, 0, 2, events=1)
     ]
 )
-def test_good_plans(plan):
+def test_good_plans(plan, daq):
     success, _ = validate_plan(plan)
     assert success is True

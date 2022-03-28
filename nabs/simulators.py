@@ -1,10 +1,9 @@
 """Simulation and validation functions for plans"""
 import itertools
 import logging
-import pprint
 import sys  # NOQA
 from contextlib import contextmanager
-from typing import Any, Callable, Generator, Iterator, List, Optional, Tuple
+from typing import Any, Generator, Iterator, List, Tuple
 
 from bluesky.simulators import check_limits
 
@@ -19,8 +18,18 @@ def raiser(*args: Any, **kwargs: Any):
     raise ValidError('forbidden method called')
 
 
+# Be wary of how you specify these, they are keyed based on
+# how they were imported.
+default_patches = [
+            "sys.modules['ophyd'].sim.SynAxis.set",
+            "sys.modules['ophyd'].signal.EpicsSignal.put",
+]
+
+
 @contextmanager
-def patch_sys_modules(modules: List[str]) -> Generator[Any, None, None]:
+def patch_sys_modules(
+    modules: List[str] = default_patches
+) -> Generator[Any, None, None]:
     """
     takes a list of module names as strings and stores them,
     replaces them with a raiser, and replaces them after
@@ -63,49 +72,48 @@ def check_open_close(plan: Iterator[Any]) -> None:
     ValidError
         If plan is not constructed correctly
     """
-    stack = []
+    open_stack = []
     run_keys = []
-
+    staged_devices = []
     for msg in plan:
         if msg.command == 'open_run':
             if msg.run in run_keys:
                 raise ValidError("Duplicate run_key found, plans "
                                  "are nested incorrectly.")
-            stack.append(msg)
+            open_stack.append(msg)
             run_keys.append(msg.run)
 
         elif msg.command == 'close_run':
-            _ = stack.pop()
-            key = run_keys.pop()
-            if key != msg.run:
+            _ = open_stack.pop()
+            last_key = run_keys.pop()
+            if last_key != msg.run:
                 raise ValidError("Mismatched run keys, open_run "
                                  "and close_run misconfigured.")
 
-        else:
-            # generic message
-            if len(stack) == 0:
-                raise ValidError("Message found after all runs "
-                                 "have closed.")
+        elif msg.command == 'stage':
+            # keep track of staged devices
+            if msg.obj in staged_devices:
+                raise ValidError("Plan attempts to stage a device "
+                                 "that is already staged.")
+            staged_devices.append(msg.obj)
 
-            if msg.run != stack[-1].run:
-                raise ValidError("Message does not match run key "
-                                 "of corresponding open_run. Plans "
-                                 "are probably nested incorrectly.")
+        elif msg.command == 'unstage':
+            if msg.obj not in staged_devices:
+                raise ValidError("Plan attempts to unstage a device "
+                                 "that has not been staged.")
+            # Currently assumes devices are unstaged in reverse order
+            # of how they were staged.  maybe checks should happen..
+            staged_devices.pop()
 
-            if msg.run in run_keys[:-1]:
-                raise ValidError("Message run key does not match "
-                                 "that of nearest open_run.")
-
-
-# Be wary of how you specify these, they are keyed based on
-# how they were imported.
-# Choosing the base method doesn't always work, connection errors
-# may raise early (e.g. before ophyd.device.put)
-default_patches = [
-            "sys.modules['ophyd'].sim.SynAxis.set",
-            # "sys.modules['pcdsdevices'].interface.MvInterface.move"
-            "sys.modules['ophyd'].signal.EpicsSignal.put"
-]
+    # at end of plan, nothing should be left
+    if open_stack:
+        raise ValidError("Plan ended without all runs being closed.")
+    elif run_keys:
+        raise ValidError("Plan ended with unmatched run keys.")
+    elif staged_devices:
+        raise ValidError(
+            "Plan ended without unstaging all staged devices."
+        )
 
 
 def check_stray_calls(
@@ -120,10 +128,7 @@ def check_stray_calls(
     better way around this.
 
     Relies on the pre-existing knowledge of which methods make calls
-    to pyepics/caput functionality.  These are:
-    - `ophyd.positioner.PositionerBase.move()`
-    - `pcdsdevices.interface.MvInterface.move()`
-    - ...
+    to pyepics/caput functionality.
 
     Parameters
     ----------
@@ -141,7 +146,7 @@ def check_stray_calls(
             continue
 
 
-# check_limits is not hinted, so this list get a more lax type hint
+# check_limits is not hinted, so hinting this becomes miserable
 validators = [
     check_stray_calls,
     check_open_close,
@@ -151,7 +156,7 @@ validators = [
 
 def validate_plan(
     plan: Generator,
-    validators: List[Callable[..., Optional[Any]]] = validators
+    validators=validators
 ) -> Tuple[bool, str]:
     """
     Validate plan with all available checkers.
@@ -184,7 +189,51 @@ def validate_plan(
             check(plan_list[i])
     except Exception as ex:
         print(ex)
-        msg = (f'Plan validation failed: {str(ex)}, for '
-               f'plan: {pprint.pformat(plan)}')
+        msg = (f'Plan validation failed for reason: {str(ex)}')
         success = False
+
     return success, msg
+
+
+def summarize_plan(plan: Generator):
+    """Print summary of plan
+
+    Prints a minimal version of the plan, showing only moves and
+    where events are created.
+
+    Parameters
+    ----------
+    plan : iterable
+        Must yield `Msg` objects
+    """
+    read_cache: List[str] = []
+    daq_keys = ['events', 'record', 'use_l3t', 'duration']
+    daq_cfg = {k: None for k in daq_keys}
+    for msg in plan:
+        cmd = msg.command
+        if cmd == 'open_run':
+            print('{:=^80}'.format(' Open Run '))
+        elif cmd == 'close_run':
+            print('{:=^80}'.format(' Close Run '))
+        elif cmd == 'configure':
+            if msg.obj.name == 'daq':
+                daq_cfg = {k: msg.kwargs[k] for k in daq_keys}
+                print(
+                    f'Configure DAQ -> ('
+                    f'events={daq_cfg["events"]}, '
+                    f'record={daq_cfg["record"]}, '
+                    f'use_l3t={daq_cfg["use_l3t"]}, '
+                    f'duration={daq_cfg["duration"]})'
+                )
+        elif cmd == 'set':
+            print('{motor.name} -> {args[0]}'.format(motor=msg.obj,
+                                                     args=msg.args))
+        elif cmd == 'create':
+            read_cache = []
+        elif cmd == 'read':
+            read_cache.append(msg.obj.name)
+            if msg.obj.name == 'daq':
+                print(f'  Run DAQ for {daq_cfg["events"]} events, '
+                      f'(record={daq_cfg["record"]})')
+        elif cmd == 'save':
+            print('  Read {}'.format(read_cache))
