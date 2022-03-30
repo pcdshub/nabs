@@ -75,11 +75,11 @@ def check_open_close(plan: Iterator[Any]) -> None:
     open_stack = []
     run_keys = []
     staged_devices = []
-    for msg in plan:
+    for i, msg in enumerate(plan):
         if msg.command == 'open_run':
             if msg.run in run_keys:
-                raise ValidError("Duplicate run_key found, plans "
-                                 "are nested incorrectly.")
+                raise ValidError("Plan attempts to label a run with "
+                                 f"an existing run key. (msg: {i})")
             open_stack.append(msg)
             run_keys.append(msg.run)
 
@@ -87,30 +87,32 @@ def check_open_close(plan: Iterator[Any]) -> None:
             _ = open_stack.pop()
             last_key = run_keys.pop()
             if last_key != msg.run:
-                raise ValidError("Mismatched run keys, open_run "
-                                 "and close_run misconfigured.")
+                raise ValidError("Plan attempts to close the wrong "
+                                 f"run. (msg: {i})")
 
         elif msg.command == 'stage':
             # keep track of staged devices
             if msg.obj in staged_devices:
                 raise ValidError("Plan attempts to stage a device "
-                                 "that is already staged.")
+                                 "that is already staged. "
+                                 f"(msg: {i})")
             staged_devices.append(msg.obj)
 
         elif msg.command == 'unstage':
             if msg.obj not in staged_devices:
                 raise ValidError("Plan attempts to unstage a device "
-                                 "that has not been staged.")
+                                 "that has not been staged. "
+                                 f"(msg: {i})")
             # Currently assumes devices are unstaged in reverse order
-            # of how they were staged.  maybe checks should happen..
+            # of how they were staged.
             staged_devices.pop()
 
     # at end of plan, nothing should be left
     if open_stack:
         raise ValidError("Plan ended without all runs being closed.")
-    elif run_keys:
+    if run_keys:
         raise ValidError("Plan ended with unmatched run keys.")
-    elif staged_devices:
+    if staged_devices:
         raise ValidError(
             "Plan ended without unstaging all staged devices."
         )
@@ -200,6 +202,9 @@ def summarize_plan(plan: Generator):
 
     Prints a minimal version of the plan, showing only moves and
     where events are created.
+
+    Taken from bluesky.simulators.summarize_plan, but adapted to
+    print lcls-daq information specifically
 
     Parameters
     ----------
