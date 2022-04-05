@@ -27,7 +27,7 @@ class ELogPoster(CallbackBase):
 
     .. code-block:: python
 
-        elogc = ELogPoster(bec, elog)
+        elogc = ELogPoster(elog, IPython.get_ipython())
         elogc_uid = RE.subscribe(elogc)
 
     To enable posting for a specific run:
