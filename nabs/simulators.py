@@ -1,13 +1,14 @@
 """Simulation and validation functions for plans"""
 import itertools
 import logging
-import sys  # NOQA
 from contextlib import contextmanager
 from typing import Any, Generator, Iterator, List, Tuple
 
 from bluesky.simulators import check_limits
 from ophyd.signal import EpicsSignal
 from ophyd.sim import SynAxis
+
+from .utils import Process
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ default_patches = [
 @contextmanager
 def patch_sys_modules(
     modules=default_patches
-) -> Generator[Any, None, None]:
+) -> Generator[None, None, None]:
     """
     takes a list of module names as strings and stores them,
     replaces them with a raiser, and replaces them after
@@ -126,8 +127,8 @@ def check_stray_calls(
     Validate that plan does not invoke any caput functionality
     outside of messages.
 
-    This is rather jank currently, it's entirely possible there is a
-    better way around this.
+    Runs the check within a multiprocessing.Process to isolate
+    namespace from the parent process.
 
     Relies on the pre-existing knowledge of which methods make calls
     to pyepics/caput functionality.
@@ -142,10 +143,17 @@ def check_stray_calls(
     ValidError
         If attempts to access any forbidden methods
     """
+    def inner_func(plan):
+        with patch_sys_modules(patches):
+            for _ in plan:
+                continue
 
-    with patch_sys_modules(patches):
-        for _ in plan:
-            continue
+    p = Process(target=inner_func, args=(plan,))
+
+    # Disallow this subprocess from spawning (multiprocess) children
+    p.daemon = True
+    p.start()
+    p.join_and_raise()
 
 
 # check_limits is not hinted, so hinting this becomes miserable
@@ -186,9 +194,9 @@ def validate_plan(
     success, msg = True, ""
     try:
         plan_list = itertools.tee(plan, len(validators))
-        for i, check in enumerate(validators):
+        for plan, check in zip(plan_list, validators):
             print(f'running {check.__name__}')
-            check(plan_list[i])
+            check(plan)
     except Exception as ex:
         print(ex)
         msg = (f'Plan validation failed for reason: {str(ex)}')
