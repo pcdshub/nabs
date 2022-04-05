@@ -6,6 +6,8 @@ from contextlib import contextmanager
 from typing import Any, Generator, Iterator, List, Tuple
 
 from bluesky.simulators import check_limits
+from ophyd.signal import EpicsSignal
+from ophyd.sim import SynAxis
 
 logger = logging.getLogger(__name__)
 
@@ -18,17 +20,15 @@ def raiser(*args: Any, **kwargs: Any):
     raise ValidError('forbidden method called')
 
 
-# Be wary of how you specify these, they are keyed based on
-# how they were imported.
 default_patches = [
-            "sys.modules['ophyd'].sim.SynAxis.set",
-            "sys.modules['ophyd'].signal.EpicsSignal.put",
+            (SynAxis, 'set'),
+            (EpicsSignal, 'put'),
 ]
 
 
 @contextmanager
 def patch_sys_modules(
-    modules: List[str] = default_patches
+    modules=default_patches
 ) -> Generator[Any, None, None]:
     """
     takes a list of module names as strings and stores them,
@@ -37,10 +37,10 @@ def patch_sys_modules(
     Need to use exec/eval here due to pass-by-reference issues
     """
     cache = {}
-    for name in modules:
+    for mod, name in modules:
         try:
-            cache[name] = eval(name)
-            exec(f'{name} = raiser')
+            cache[(mod, name)] = getattr(mod, name)
+            setattr(mod, name, raiser)
         except Exception as ex:
             logger.debug(f'Failed to replace module {name}, {ex}')
 
@@ -48,8 +48,8 @@ def patch_sys_modules(
         yield
     finally:
         # replace the references
-        for name in cache:
-            exec(f'{name} = cache[name]')
+        for (mod, name), method in cache.items():
+            setattr(mod, name, method)
 
 
 def check_open_close(plan: Iterator[Any]) -> None:
