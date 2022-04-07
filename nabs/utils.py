@@ -1,8 +1,10 @@
 import inspect
 import multiprocessing as mp
+import numbers
 import traceback
 from typing import Any, Callable, Dict, Union
 
+import numpy as np
 from ophyd.signal import DerivedSignal, SignalRO
 
 
@@ -145,3 +147,38 @@ class Process(mp.Process):
         if self._pconn.poll():
             self._exception = self._pconn.recv()
         return self._exception
+
+
+def orange(start, stop, num, rtol=1.e-5, atol=1.e-7):
+    """
+    Get scan points based on the type of `num`.  If `num` is an
+    integer, interpret as the number of points in a scan.  If `num`
+    is a float, interpret it as a step size.
+
+    Modified to include end points.
+
+    Parameters
+    ----------
+    start : int or float
+        The first point in the scan
+
+    end : int or float
+        The last point in the scan
+
+    num : int or float
+        if int, the number of points in the scan.
+        if float, step size
+
+    Returns
+    -------
+    list
+        a list of scan points
+    """
+    moves = []
+    if isinstance(num, numbers.Integral):
+        moves = list(np.linspace(start, stop, num))
+    elif isinstance(num, numbers.Real):
+        num = np.sign(stop - start) * np.abs(num)
+        moves = list(np.arange(start, stop + num, num))
+
+    return moves

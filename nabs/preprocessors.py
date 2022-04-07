@@ -8,10 +8,12 @@ and yield messages from a new, modified plan, as well as "decorator"
 functions that can be applied to ``bluesky`` plan functions to return new
 plan functions with modifications.
 """
+import numbers
 from functools import wraps
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
+import numpy as np
 from bluesky.utils import make_decorator
 
 from . import utils
@@ -299,6 +301,69 @@ def daq_during_wrapper(plan, record=True, use_l3t=False, controls=None):
         return (yield from bpp.fly_during_wrapper(plan, flyers=[daq]))
 
     return (yield from daq_during_plan())
+
+
+def step_size_decorator(plan):
+    """
+    Grab the last argument (number of steps), and intepret as
+    - step size if float
+    - number of steps if integer
+
+    Only works on step scans in one dimension.
+
+    Parameters
+    ----------
+    plan : plan
+        A bluesky plan that yields bluesky Msg objects.  Must be
+        a scan in one dimension, with the last argument being
+        the number of scan points / step size.
+
+    Returns
+    -------
+    step_size_plan : plan
+        The same plan as before, but modified appropriately to
+        differentiate between step size and number of steps.
+        This will be a callable generator function.
+    """
+
+    @wraps(plan)
+    def inner(*args, **kwargs):
+        if 'num' in kwargs:
+            # Currently unneeded, since daq_ascan and daq_dscan
+            # do not support num kwarg
+            n = kwargs.pop('num')
+        else:
+            # assumes (det_list, motor, start, stop, num)
+            det_list, motor, start, stop, n = args
+
+        if not isinstance(n, (numbers.Integral, numbers.Real)):
+            raise TypeError("Step size / number of steps is "
+                            "neither float nor integer.")
+
+        if isinstance(n, numbers.Integral):
+            # interpret as number of steps (default)
+            result = yield from plan(*args, **kwargs)
+        elif isinstance(n, numbers.Real):
+            # correct step size sign
+            n = np.sign(stop - start) * np.abs(n)
+            if np.abs(n) > np.abs(stop - start):
+                raise ValueError(f"Step size provided {n} greater "
+                                 "than the range provided "
+                                 f"{np.abs(stop - start)}.")
+            step_list = utils.orange(start, stop, n)
+            n_steps = len(step_list)
+
+            if n_steps == 0:
+                raise ValueError("Number of steps is 0 with the "
+                                 "provided range and step size.")
+
+            result = yield from plan(det_list, motor, start,
+                                     step_list[-1], n_steps,
+                                     **kwargs)
+
+        return result
+
+    return inner
 
 
 daq_during_decorator = make_decorator(daq_during_wrapper)

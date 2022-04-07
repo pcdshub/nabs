@@ -1,6 +1,24 @@
 Release History
 ###############
 
+
+v1.3.0 (2022-03-31)
+===================
+
+API Changes
+-----------
+- 1-Dimensional scans now accept floats in the 'num' argument position and interprets it as a step size.
+
+Features
+--------
+- Add callback to RE for posting last input and run table to ELog.
+
+Contributors
+------------
+- tangkong
+- zllentz
+
+
 v1.2.0 (2022-02-07)
 ===================
 
