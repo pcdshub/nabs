@@ -24,12 +24,12 @@ def raiser(*args: Any, **kwargs: Any):
 
 
 default_patches = [
-            (SynAxis, 'set'),
-            (EpicsSignal, 'put'),
-            (EpicsSignal, 'set'),
-            (PositionerBase, 'set'),
-            (epics, 'caput'),
-            (epics.PV, 'put')
+    (SynAxis, 'set'),
+    (EpicsSignal, 'put'),
+    (EpicsSignal, 'set'),
+    (PositionerBase, 'set'),
+    (epics, 'caput'),
+    (epics.PV, 'put')
 ]
 
 
@@ -206,8 +206,7 @@ def validate_plan(
             print(f'running {check.__name__}')
             check(plan)
     except Exception as ex:
-        print(ex)
-        msg = (f'Plan validation failed for reason: {str(ex)}')
+        msg = f'Plan validation failed for reason: {str(ex)}'
         success = False
 
     return success, msg

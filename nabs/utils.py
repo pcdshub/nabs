@@ -133,7 +133,6 @@ class Process(mp.Process):
         except Exception as e:
             tb = traceback.format_exc()
             self._cconn.send((e, tb))
-            # raise e
 
     def join_and_raise(self):
         super().join()
@@ -143,7 +142,6 @@ class Process(mp.Process):
 
     @property
     def exception(self):
-        #
         if self._pconn.poll():
             self._exception = self._pconn.recv()
         return self._exception
