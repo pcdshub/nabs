@@ -4,7 +4,9 @@ import logging
 from contextlib import contextmanager
 from typing import Any, Generator, Iterator, List, Tuple
 
+import epics
 from bluesky.simulators import check_limits
+from ophyd.epics_motor import PositionerBase
 from ophyd.signal import EpicsSignal
 from ophyd.sim import SynAxis
 
@@ -24,6 +26,10 @@ def raiser(*args: Any, **kwargs: Any):
 default_patches = [
             (SynAxis, 'set'),
             (EpicsSignal, 'put'),
+            (EpicsSignal, 'set'),
+            (PositionerBase, 'set'),
+            (epics, 'caput'),
+            (epics.PV, 'put')
 ]
 
 
@@ -148,6 +154,8 @@ def check_stray_calls(
             for _ in plan:
                 continue
 
+    # run check inside multiprocess to avoid tampering with parent
+    # namespace.  Effectively an attempt at containerization.
     p = Process(target=inner_func, args=(plan,))
 
     # Disallow this subprocess from spawning (multiprocess) children
