@@ -1,6 +1,19 @@
 Release History
 ###############
 
+v1.4.0 (2022-05-03)
+===================
+
+Features
+--------
+- Adds a high level validate_plan function that runs a plan through multiple checks.
+- Adds check for proper plan construction (open_run/close_run matching, proper run_key tags)
+- Adds check for stray calls, pulling from a pre-defined list of forbidden function calls.
+
+Contributors
+------------
+- tangkong
+
 
 v1.3.0 (2022-03-31)
 ===================
