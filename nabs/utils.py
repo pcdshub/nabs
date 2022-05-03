@@ -1,5 +1,7 @@
 import inspect
+import multiprocessing as mp
 import numbers
+import traceback
 from typing import Any, Callable, Dict, Union
 
 import numpy as np
@@ -112,6 +114,37 @@ def add_named_kwargs_to_signature(
     )
 
     return sig.replace(parameters=start_params + wrapper_params + end_params)
+
+
+class Process(mp.Process):
+    """
+    A subclass of multiprocessing.Process that makes exceptions
+    accessible by the parent process.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._pconn, self._cconn = mp.Pipe()
+        self._exception = None
+
+    def run(self):
+        try:
+            super().run()
+            self._cconn.send(None)
+        except Exception as e:
+            tb = traceback.format_exc()
+            self._cconn.send((e, tb))
+
+    def join_and_raise(self):
+        super().join()
+        # raise exceptions after process is finished
+        if self.exception:
+            raise self.exception[0]
+
+    @property
+    def exception(self):
+        if self._pconn.poll():
+            self._exception = self._pconn.recv()
+        return self._exception
 
 
 def orange(start, stop, num, rtol=1.e-5, atol=1.e-7):

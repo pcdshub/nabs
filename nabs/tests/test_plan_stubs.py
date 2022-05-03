@@ -5,8 +5,7 @@ import pytest
 from bluesky.callbacks import CallbackCounter
 from bluesky.plan_stubs import close_run, open_run
 
-from nabs.plan_stubs import (measure_average, update_sample,
-                             get_sample_targets)
+from nabs.plan_stubs import get_sample_targets, measure_average, update_sample
 
 logger = logging.getLogger(__name__)
 
