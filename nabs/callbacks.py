@@ -165,3 +165,68 @@ tr:nth-child(even) {
                 tags=['run_table', 'RE'],
                 title='run_table'
             )
+
+
+class BECOptionFactoryFaker():
+    """
+    Takes an instance of the BestEffortCallback, and watches for metadata
+    keys to configure the BEC for a single run
+
+    Fakes a factory function to pass into RunRouter, for the purpose
+    of generating callbacks for a RunEngine.
+
+    Factories need to have the signature: callback(name, start_doc)
+    To restore BEC state after a completed run, we must keep bec on hand
+
+    Usage:
+
+    .. code-block: python
+
+        from event_model import RunRouter
+        from bluesky.callbacks.best_effort import BestEffortCallback
+
+        bec = BestEffortCallback()
+
+        bec_rr = RunRouter([BECOptionFactoryFaker(bec)])
+        RE.subscribe(bec_rr)
+    """
+    # Metadata key : bec attribute
+    valid_keys = {'disable_plots': '_plots_enabled',
+                  'disable_table': '_table_enabled'}
+
+    def __init__(self, bec):
+        self.bec = bec
+        self.prev_settings = {}
+
+    def __call__(self, name, doc):
+        def cb(name, doc):
+            if name == 'start':
+                # store bec settings
+                for k, v in self.valid_keys.items():
+                    if k in doc:
+                        self.prev_settings[v] = getattr(self.bec, v)
+
+                # apply desired changes to bec
+                if 'disable_plots' in doc:
+                    if doc.get('disable_plots'):
+                        self.bec.disable_plots()
+                    else:
+                        self.bec.enable_plots()
+
+                if 'disable_table' in doc:
+                    if doc.get('disable_table'):
+                        self.bec.disable_table()
+                    else:
+                        self.bec.enable_table()
+
+            elif name == 'stop':
+                # reset bec settings
+                for k, v in self.prev_settings.items():
+                    setattr(self.bec, k, v)
+                # clear history
+                self.prev_settings = {}
+
+            # Actually run bec callback
+            self.bec(name, doc)
+
+        return [cb], []
