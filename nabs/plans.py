@@ -118,6 +118,7 @@ def duration_scan(detectors, *args, duration=0, per_step=None, md=None):
 
     _md['hints'] = default_hints
     _md['hints'].update(md.get('hints', {}) or {})
+    _md['disable_plots'] = True
     # end borrowed md handling block
 
     @bpp.stage_decorator(detectors + motors)
