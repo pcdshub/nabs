@@ -22,6 +22,7 @@ requirements:
       - numpy
       - ophyd
       - pandas
+      - pyqt <5.15.0
       - scipy
       - toolz
 
