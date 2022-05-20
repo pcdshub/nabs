@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 
 import pandas as pd
+from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.callbacks.core import CallbackBase, make_class_safe
 
 logger = logging.getLogger(__name__)
@@ -167,66 +168,58 @@ tr:nth-child(even) {
             )
 
 
-class BECOptionFactoryFaker():
+class BECOptionsPerRun(BestEffortCallback):
     """
-    Takes an instance of the BestEffortCallback, and watches for metadata
-    keys to configure the BEC for a single run
+    Callback that reads options from metadata to decide whether or not
+    to plot/print table.
 
-    Fakes a factory function to pass into RunRouter, for the purpose
-    of generating callbacks for a RunEngine.
-
-    Factories need to have the signature: callback(name, start_doc)
-    To restore BEC state after a completed run, we must keep bec on hand
-
-    Usage:
+    Settings should only persist for one run, after which the settings
+    are reverted.  Options can be set by passing metadata to the RE:
 
     .. code-block: python
 
-        from event_model import RunRouter
-        from bluesky.callbacks.best_effort import BestEffortCallback
+        # Can pass as metadata in the plan
+        RE(bp.scan([], motor, -1, 1, 5, md={'disable_plots': True}))
 
-        bec = BestEffortCallback()
+        # Or as kwargs to the RunEngine
+        RE(plan(), disable_table=False)
 
-        bec_rr = RunRouter([BECOptionFactoryFaker(bec)])
-        RE.subscribe(bec_rr)
     """
     # Metadata key : bec attribute
     valid_keys = {'disable_plots': '_plots_enabled',
                   'disable_table': '_table_enabled'}
 
-    def __init__(self, bec):
-        self.bec = bec
+    def __init__(self, *args, **kwargs):
+        self.prev_settings = {}
+        super().__init__(*args, **kwargs)
+
+    def start(self, doc):
+        # clear history
         self.prev_settings = {}
 
-    def __call__(self, name, doc):
-        def cb(name, doc):
-            if name == 'start':
-                # store bec settings
-                for k, v in self.valid_keys.items():
-                    if k in doc:
-                        self.prev_settings[v] = getattr(self.bec, v)
+        # store bec settings
+        for k, v in self.valid_keys.items():
+            if k in doc:
+                self.prev_settings[v] = getattr(self, v)
 
-                # apply desired changes to bec
-                if 'disable_plots' in doc:
-                    if doc.get('disable_plots'):
-                        self.bec.disable_plots()
-                    else:
-                        self.bec.enable_plots()
+        # apply desired changes to bec
+        if 'disable_plots' in doc:
+            if doc.get('disable_plots'):
+                self.disable_plots()
+            else:
+                self.enable_plots()
 
-                if 'disable_table' in doc:
-                    if doc.get('disable_table'):
-                        self.bec.disable_table()
-                    else:
-                        self.bec.enable_table()
+        if 'disable_table' in doc:
+            if doc.get('disable_table'):
+                self.disable_table()
+            else:
+                self.enable_table()
 
-            elif name == 'stop':
-                # reset bec settings
-                for k, v in self.prev_settings.items():
-                    setattr(self.bec, k, v)
-                # clear history
-                self.prev_settings = {}
+        super().start(doc)
 
-            # Actually run bec callback
-            self.bec(name, doc)
+    def stop(self, doc):
+        # reset bec settings
+        for k, v in self.prev_settings.items():
+            setattr(self, k, v)
 
-        return [cb], []
+        super().stop(doc)
