@@ -1,6 +1,7 @@
 import bluesky.plans as bp
+import pytest
 
-from ..callbacks import ELogPoster
+from ..callbacks import BECOptionsPerRun, ELogPoster
 
 
 def test_elog_callback(RE, hw, elog, ipython):
@@ -46,3 +47,30 @@ def test_elog_callback(RE, hw, elog, ipython):
 
     # cleanup
     RE.unsubscribe(elog_uid)
+
+
+@pytest.mark.parametrize(
+    'disable_plots, disable_table',
+    [
+     (True, True), (True, False), (False, True), (False, False),
+    ]
+)
+def test_bec_options(RE, hw, disable_plots, disable_table):
+    bec = BECOptionsPerRun()
+    RE.subscribe(bec)
+
+    # starts plotting by default
+    RE(bp.scan([hw.det], hw.motor, -5, 5, 5))
+    assert bec._table
+    assert bec._live_plots
+
+    # apply via RE.  Applying through md also valid
+    RE(bp.scan([hw.det], hw.motor, -5, 5, 5),
+       disable_plots=disable_plots, disable_table=disable_table)
+    assert not bec._table == disable_table
+    assert not bec._live_plots == disable_plots
+
+    # bec restored
+    RE(bp.scan([hw.det], hw.motor, -5, 5, 5))
+    assert bec._table
+    assert bec._live_plots
