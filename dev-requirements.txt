@@ -1,6 +1,5 @@
 flake8
 matplotlib
 pytest
-pyqt5<5.15.0
 pcdsdaq
 pcdsdevices
