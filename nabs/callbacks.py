@@ -221,7 +221,7 @@ class BECOptionsPerRun(BestEffortCallback):
         super().stop(doc)
 
     def restore_settings(self):
-        # reset bec settings if they exist
+        """Reset bec settings if they exist."""
         if self.prev_settings:
             for k, v in self.prev_settings.items():
                 setattr(self, k, v)
