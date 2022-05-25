@@ -24,6 +24,8 @@ requirements:
       - pandas
       - scipy
       - toolz
+    run_constrained:
+      - pyqt <5.15.0
 
 test:
     imports:

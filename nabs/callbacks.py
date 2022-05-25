@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 
 import pandas as pd
+from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.callbacks.core import CallbackBase, make_class_safe
 
 logger = logging.getLogger(__name__)
@@ -165,3 +166,65 @@ tr:nth-child(even) {
                 tags=['run_table', 'RE'],
                 title='run_table'
             )
+
+
+class BECOptionsPerRun(BestEffortCallback):
+    """
+    Callback that reads options from metadata to decide whether or not
+    to plot/print table.
+
+    Settings should only persist for one run, after which the settings
+    are reverted.  Options can be set by passing metadata to the RE:
+
+    .. code-block: python
+
+        # Can pass as metadata in the plan
+        RE(bp.scan([], motor, -1, 1, 5, md={'disable_plots': True}))
+
+        # Or as kwargs to the RunEngine
+        RE(plan(), disable_table=False)
+
+    """
+    # Metadata key : bec attribute
+    valid_keys = {'disable_plots': '_plots_enabled',
+                  'disable_table': '_table_enabled'}
+
+    def __init__(self, *args, **kwargs):
+        self.prev_settings = {}
+        super().__init__(*args, **kwargs)
+
+    def start(self, doc):
+        self.restore_settings()
+
+        # store bec settings
+        for k, v in self.valid_keys.items():
+            if k in doc:
+                self.prev_settings[v] = getattr(self, v)
+
+        # apply desired changes to bec
+        if 'disable_plots' in doc:
+            if doc.get('disable_plots'):
+                self.disable_plots()
+            else:
+                self.enable_plots()
+
+        if 'disable_table' in doc:
+            if doc.get('disable_table'):
+                self.disable_table()
+            else:
+                self.enable_table()
+
+        super().start(doc)
+
+    def stop(self, doc):
+        self.restore_settings()
+        super().stop(doc)
+
+    def restore_settings(self):
+        """Reset bec settings if they exist."""
+        if self.prev_settings:
+            for k, v in self.prev_settings.items():
+                setattr(self, k, v)
+
+        # clear previous settings
+        self.prev_settings = {}
