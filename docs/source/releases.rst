@@ -1,6 +1,24 @@
 Release History
 ###############
 
+
+v1.5.0 (2022-06-02)
+===================
+
+Features
+--------
+- Wraps the BEC in a callback that looks for run metadata and modifies
+  functionality accordingly.
+
+Bugfixes
+--------
+- Disables plotting for delay_scan
+
+Contributors
+------------
+- tangkong
+
+
 v1.4.0 (2022-05-03)
 ===================
 
