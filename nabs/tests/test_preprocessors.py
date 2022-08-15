@@ -91,9 +91,18 @@ def test_daq_step_scan_run_events(RE, hw, daq_step_scan):
 
 def test_daq_step_scan_run_duration(RE, hw, daq_step_scan):
     """
-    Actually run a scan and make sure it doesn't error out.
+    Again, but with duration arg instead of events arg
     """
-    RE(daq_step_scan([hw.det], hw.motor, 0, 10, 11, duration=1, record=False,
+    RE(daq_step_scan([hw.det], hw.motor, 0, 10, 2, duration=1, record=False,
+                     use_l3t=True))
+
+
+def test_daq_step_scan_preconfigured(RE, hw, daq, daq_step_scan):
+    """
+    Again, but the user passes neither! (configured first)
+    """
+    daq.configure(events=10)
+    RE(daq_step_scan([hw.det], hw.motor, 0, 10, 11, record=False,
                      use_l3t=True))
 
 
