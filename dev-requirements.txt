@@ -1,6 +1,7 @@
 flake8
 matplotlib
 pytest
+pytest-coverage
 pytest-timeout
 pcdsdaq
 pcdsdevices
