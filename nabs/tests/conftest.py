@@ -1,4 +1,6 @@
 import asyncio
+import os
+import sys
 
 import pytest
 from bluesky import RunEngine
@@ -141,3 +143,8 @@ test_sample:
     status: false
     """)
     return sample_file
+
+
+@pytest.fixture(scope='function', autouse=(sys.platform == 'win32'))
+def patch_uname_for_windows(monkeypatch):
+    monkeypatch.setattr(os, 'uname', lambda: 'hostname', raising=False)

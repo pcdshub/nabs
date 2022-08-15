@@ -78,7 +78,7 @@ def bad_stage():
 )
 def test_bad_plans(plan):
     success, _ = validate_plan(plan)
-    assert success is False
+    assert not success, "Plan was supposed to be bad"
 
 
 @pytest.mark.parametrize(
@@ -92,5 +92,5 @@ def test_bad_plans(plan):
     ]
 )
 def test_good_plans(plan, daq):
-    success, _ = validate_plan(plan)
-    assert success is True
+    success, msg = validate_plan(plan)
+    assert success, msg
