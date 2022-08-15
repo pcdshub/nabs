@@ -1,5 +1,6 @@
 flake8
 matplotlib
 pytest
+pytest-timeout
 pcdsdaq
 pcdsdevices
