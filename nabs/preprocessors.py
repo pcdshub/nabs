@@ -112,9 +112,29 @@ def daq_step_scan_wrapper(plan, events=None, duration=None, record=True,
         daq_has_triggered = False
 
     def daq_first_cycle(msg):
-        yield from bps.configure(daq, events=events, duration=duration,
-                                 record=record, use_l3t=use_l3t,
-                                 controls=list(motor_cache))
+        if events is not None:
+            yield from bps.configure(
+                daq,
+                events=events,
+                record=record,
+                use_l3t=use_l3t,
+                controls=list(motor_cache),
+            )
+        elif duration is not None:
+            yield from bps.configure(
+                daq,
+                duration=duration,
+                record=record,
+                use_l3t=use_l3t,
+                controls=list(motor_cache),
+            )
+        else:
+            yield from bps.configure(
+                daq,
+                record=record,
+                use_l3t=use_l3t,
+                controls=list(motor_cache),
+            )
         return (yield from add_daq_trigger(msg))
 
     def add_daq_trigger(msg):
