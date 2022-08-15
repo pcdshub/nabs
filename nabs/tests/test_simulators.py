@@ -78,7 +78,7 @@ def bad_stage():
      bad_call,
     ]
 )
-def test_bad_plans(plan):
+def test_bad_plans(RE, plan):
     if sys.platform == 'win32' and plan is bad_call:
         pytest.skip(reason='bad_call check does not work on windows')
     success, _ = validate_plan(plan())
@@ -95,6 +95,6 @@ def test_bad_plans(plan):
      nbp.daq_dscan([hw.det], hw.motor, 1, 0, 2, events=1)
     ]
 )
-def test_good_plans(plan, daq):
+def test_good_plans(RE, plan, daq):
     success, msg = validate_plan(plan)
     assert success, msg
