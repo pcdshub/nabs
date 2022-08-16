@@ -1,7 +1,8 @@
-import asyncio
+import os
+import sys
 
 import pytest
-from bluesky import RunEngine
+from bluesky.run_engine import RunEngine, get_bluesky_event_loop
 from ophyd.device import Component as Cpt
 from ophyd.positioner import SoftPositioner
 from ophyd.pseudopos import (PseudoPositioner, PseudoSingle,
@@ -13,9 +14,9 @@ from pcdsdaq.sim import set_sim_mode
 
 @pytest.fixture(scope='function')
 def RE():
-    loop = asyncio.new_event_loop()
+    RE = RunEngine({})
+    loop = get_bluesky_event_loop()
     loop.set_debug(True)
-    RE = RunEngine({}, loop=loop)
 
     yield RE
 
@@ -141,3 +142,8 @@ test_sample:
     status: false
     """)
     return sample_file
+
+
+@pytest.fixture(scope='function', autouse=(sys.platform == 'win32'))
+def patch_uname_for_windows(monkeypatch):
+    monkeypatch.setattr(os, 'uname', lambda: 'hostname', raising=False)

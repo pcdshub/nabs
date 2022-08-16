@@ -1,6 +1,7 @@
 """Simulation and validation functions for plans"""
 import itertools
 import logging
+import sys
 from contextlib import contextmanager
 from typing import Any, Generator, Iterator, List, Tuple
 
@@ -139,6 +140,8 @@ def check_stray_calls(
     Relies on the pre-existing knowledge of which methods make calls
     to pyepics/caput functionality.
 
+    This does not work on Windows.
+
     Parameters
     ----------
     plan : iterable or generator
@@ -164,12 +167,20 @@ def check_stray_calls(
     p.join_and_raise()
 
 
-# check_limits is not hinted, so hinting this becomes miserable
-validators = [
-    check_stray_calls,
-    check_open_close,
-    check_limits,
-]
+if sys.platform == 'win32':
+    # check_stray_calls does not work on windows due to differences in
+    # the implementation of multiprocessing
+    validators = [
+        check_open_close,
+        check_limits,
+    ]
+else:
+    # check_limits is not hinted, so hinting this becomes miserable
+    validators = [
+        check_stray_calls,
+        check_open_close,
+        check_limits,
+    ]
 
 
 def validate_plan(

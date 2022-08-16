@@ -1,4 +1,5 @@
 import logging
+import sys
 from collections import defaultdict
 
 import numpy as np
@@ -6,11 +7,20 @@ import pytest
 from bluesky.simulators import summarize_plan
 from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
-from pcdsdevices.pseudopos import DelayBase
-from pcdsdevices.sim import FastMotor
 
 import nabs.plans as nbp
 from nabs.utils import orange
+
+# pcdsdevices no longer imports properly on python 3.8
+if sys.version_info >= (3, 9):
+    from pcdsdevices.pseudopos import DelayBase
+    from pcdsdevices.sim import FastMotor
+    run_time_motor_tests = True
+else:
+    DelayBase = object
+    FastMotor = object
+    run_time_motor_tests = False
+
 
 PLAN_TIMEOUT = 60
 logger = logging.getLogger(__name__)
@@ -51,6 +61,8 @@ class SimDelayStage(DelayBase):
 
 @pytest.fixture(scope='function')
 def time_motor():
+    if not run_time_motor_tests:
+        pytest.skip(reason='pcdsdevices tests do not run prior to python 3.9')
     return SimDelayStage('SIM', name='sim', egu='s', n_bounces=1)
 
 
@@ -397,7 +409,7 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     [
      (-5, 5, 11, 33),    # expect 3 reads / point (det, motor, daq)
      (-5, 5, float(1.), 33),    # step size, include endpoint
-     (-1, 1, np.float128(0.2), 33),   # step size, end point not close
+     (-1, 1, np.float64(0.2), 33),   # step size, end point not close
      (1, -1, -0.4, 18),  # positive to negative direction
      (1, -1, np.float64(0.4), 18),   # ignore step sign
      (-1, 0, np.float32(0.1), 33),  # close to 0, end near start

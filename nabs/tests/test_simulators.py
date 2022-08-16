@@ -1,3 +1,5 @@
+import sys
+
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
@@ -71,14 +73,16 @@ def bad_stage():
 @pytest.mark.parametrize(
     'plan',
     [
-     bad_limits(),
-     bad_nesting(),
-     bad_call(),
+     bad_limits,
+     bad_nesting,
+     bad_call,
     ]
 )
-def test_bad_plans(plan):
-    success, _ = validate_plan(plan)
-    assert success is False
+def test_bad_plans(RE, plan):
+    if sys.platform == 'win32' and plan is bad_call:
+        pytest.skip(reason='bad_call check does not work on windows')
+    success, _ = validate_plan(plan())
+    assert not success, "Plan was supposed to be bad"
 
 
 @pytest.mark.parametrize(
@@ -91,6 +95,6 @@ def test_bad_plans(plan):
      nbp.daq_dscan([hw.det], hw.motor, 1, 0, 2, events=1)
     ]
 )
-def test_good_plans(plan, daq):
-    success, _ = validate_plan(plan)
-    assert success is True
+def test_good_plans(RE, plan, daq):
+    success, msg = validate_plan(plan)
+    assert success, msg
