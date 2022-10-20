@@ -15,6 +15,7 @@ Maintenance
 - Make the test suite pass on Windows
 - Make the test suite compatible with bluesky v1.9.0
 - Make the test suite compatible with python 3.8
+- Fix race condition and typo in test suite
 
 Contributors
 ------------
