@@ -2,6 +2,27 @@ Release History
 ###############
 
 
+v1.5.2 (2022-10-20)
+===================
+
+Bugfixes
+--------
+- Fix an issue where any of the daq step scans would fail if run with the
+  ``duration`` arg instead of the ``events`` arg.
+
+Maintenance
+-----------
+- Make the test suite pass on Windows
+- Make the test suite compatible with bluesky v1.9.0
+- Make the test suite compatible with python 3.8
+- Fix race condition and typo in test suite
+
+Contributors
+------------
+- zllentz
+
+
+
 v1.5.0 (2022-06-02)
 ===================
 

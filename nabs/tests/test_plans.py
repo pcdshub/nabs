@@ -31,10 +31,13 @@ def test_duration_scan(RE, hw):
     """Run the duration scan and check the messages it creates."""
     logger.debug('test_duration_scan')
 
-    # These will generate as many messages as they can in 0.01s
-    scan1 = list(nbp.duration_scan([hw.det], hw.motor, [0, 1], duration=0.01))
+    # These will generate as many messages as they can in 0.1s
+    # WARNING: this test can fail if run on a low-powered CPU
+    # For example, if only 2 points are generated in the timespan
+    # TODO: revise duration_scan to make it more testable
+    scan1 = list(nbp.duration_scan([hw.det], hw.motor, [0, 1], duration=0.1))
     scan2 = list(nbp.duration_scan([hw.det1, hw.det2], hw.motor1, [-1, 1],
-                                   hw.motor2, [-2, 2], duration=0.01))
+                                   hw.motor2, [-2, 2], duration=0.1))
 
     # I won't check behavior, but they should not error out
     RE(scan1)
@@ -47,7 +50,7 @@ def test_duration_scan(RE, hw):
 
     scan2_moves = list(msg.args[0] for msg in scan2 if msg.command == 'set')
     assert scan2_moves[:8] == [-1, -2, 1, 2, -1, -2, 1, 2]
-    assert len(scan1_moves) > 20
+    assert len(scan2_moves) > 20
 
 
 class SimDelayMotor(FastMotor):
