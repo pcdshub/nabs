@@ -12,14 +12,9 @@ import nabs.plans as nbp
 from nabs.utils import orange
 
 # pcdsdevices no longer imports properly on python 3.8
-if sys.version_info >= (3, 9):
-    from pcdsdevices.pseudopos import DelayBase
-    from pcdsdevices.sim import FastMotor
-    run_time_motor_tests = True
-else:
-    DelayBase = object
-    FastMotor = object
-    run_time_motor_tests = False
+from pcdsdevices.pseudopos import DelayBase
+from pcdsdevices.sim import FastMotor
+run_time_motor_tests = True
 
 
 PLAN_TIMEOUT = 60

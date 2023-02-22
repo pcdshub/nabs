@@ -70,7 +70,7 @@ class ErrorSignal(SignalRO, DerivedSignal):
 
 def add_named_kwargs_to_signature(
     func_or_signature: Union[inspect.Signature, Callable],
-    kwargs: Dict[str, Any]
+    kwargs: dict[str, Any]
 ) -> inspect.Signature:
     """
     Add named keyword arguments with default values to a function signature.
