@@ -2,7 +2,7 @@ import inspect
 import multiprocessing as mp
 import numbers
 import traceback
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Union
 
 import numpy as np
 from ophyd.signal import DerivedSignal, SignalRO

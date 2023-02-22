@@ -3,7 +3,7 @@ import itertools
 import logging
 import sys
 from contextlib import contextmanager
-from typing import Any, Generator, Iterator, List, Tuple
+from typing import Any, Generator, Iterator
 
 import epics
 from bluesky.simulators import check_limits
