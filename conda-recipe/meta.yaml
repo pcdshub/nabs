@@ -14,8 +14,6 @@ build:
   noarch: python
   script: {{ PYTHON }} -m pip install . -vv
 
-
-
 requirements:
   build:
   - python >=3.6
@@ -32,13 +30,15 @@ requirements:
   run_constrained:
   - pyqt <5.15.0
 
-
-
 test:
+  requirements:
+  - matplotlib-base
+  - pcdsdaq
+  - pcdsdevices
+  - pytest
+  - pytest-timeout
   imports:
   - nabs
-
-
 
 about:
   home: https://github.com/pcdshub/nabs
