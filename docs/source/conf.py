@@ -12,22 +12,20 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
-
+from datetime import datetime
 
 module_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../")
 sys.path.insert(0, module_path)
 
+import nabs  # noqa: E402
 
 # -- Project information -----------------------------------------------------
-from datetime import datetime
 
 project = "nabs"
 copyright = "{}, SLAC National Accelerator Laboratory" "".format(datetime.now().year)
 author = "SLAC National Accelerator Laboratory"
 
 # The short X.Y version
-import nabs
-
 version = str(nabs.__version__)
 # The full version, including alpha/beta/rc tags
 release = str(nabs.__version__)
@@ -52,8 +50,9 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
-# Add custom CSS to avoid table wraps
+
 def setup(app):
+    # Add custom CSS to avoid table wraps
     app.add_css_file("custom.css")
 
 

@@ -6,13 +6,13 @@ import pytest
 from bluesky.simulators import summarize_plan
 from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
+# pcdsdevices no longer imports properly on python 3.8
+from pcdsdevices.pseudopos import DelayBase
+from pcdsdevices.sim import FastMotor
 
 import nabs.plans as nbp
 from nabs.utils import orange
 
-# pcdsdevices no longer imports properly on python 3.8
-from pcdsdevices.pseudopos import DelayBase
-from pcdsdevices.sim import FastMotor
 run_time_motor_tests = True
 
 
@@ -402,15 +402,15 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
 @pytest.mark.parametrize(
-    'start, stop, num, n_reads',
+    "start, stop, num, n_reads",
     [
-     (-5, 5, 11, 33),    # expect 3 reads / point (det, motor, daq)
-     (-5, 5, float(1.), 33),    # step size, include endpoint
-     (-1, 1, np.float64(0.2), 33),   # step size, end point not close
-     (1, -1, -0.4, 18),  # positive to negative direction
-     (1, -1, np.float64(0.4), 18),   # ignore step sign
-     (-1, 0, np.float32(0.1), 33),  # close to 0, end near start
-    ]
+        (-5, 5, 11, 33),  # expect 3 reads / point (det, motor, daq)
+        (-5, 5, float(1.0), 33),  # step size, include endpoint
+        (-1, 1, np.float64(0.2), 33),  # step size, end point not close
+        (1, -1, -0.4, 18),  # positive to negative direction
+        (1, -1, np.float64(0.4), 18),  # ignore step sign
+        (-1, 0, np.float32(0.1), 33),  # close to 0, end near start
+    ],
 )
 def test_daq_step_size(daq, hw, start, stop, num, n_reads):
     x_start = 1

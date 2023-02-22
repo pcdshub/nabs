@@ -71,29 +71,28 @@ def bad_stage():
 
 
 @pytest.mark.parametrize(
-    'plan',
+    "plan",
     [
-     bad_limits,
-     bad_nesting,
-     bad_call,
-    ]
+        bad_limits,
+        bad_nesting,
+        bad_call,
+    ],
 )
 def test_bad_plans(RE, plan):
-    if sys.platform == 'win32' and plan is bad_call:
-        pytest.skip(reason='bad_call check does not work on windows')
+    if sys.platform == "win32" and plan is bad_call:
+        pytest.skip(reason="bad_call check does not work on windows")
     success, _ = validate_plan(plan())
     assert not success, "Plan was supposed to be bad"
 
 
 @pytest.mark.parametrize(
-    'plan',
+    "plan",
     [
-     sim_plan_outer(4),
-     bp.count([hw.det], num=2),
-     bp.scan([hw.det, hw.det2, hw.motor],
-             hw.motor, 0, 1, hw.motor2, 1, 20, 10),
-     nbp.daq_dscan([hw.det], hw.motor, 1, 0, 2, events=1)
-    ]
+        sim_plan_outer(4),
+        bp.count([hw.det], num=2),
+        bp.scan([hw.det, hw.det2, hw.motor], hw.motor, 0, 1, hw.motor2, 1, 20, 10),
+        nbp.daq_dscan([hw.det], hw.motor, 1, 0, 2, events=1),
+    ],
 )
 def test_good_plans(RE, plan, daq):
     success, msg = validate_plan(plan)
