@@ -134,7 +134,7 @@ tr:nth-child(even) {
         self._data['seq_num'].append(doc['seq_num'])
         self._data['time'].append(
             str(datetime.fromtimestamp(doc['time']).time())[:-4]
-            )
+        )
 
         # this might break for unfilled data, but do we deal with that?
         for k in self._data_keys:
