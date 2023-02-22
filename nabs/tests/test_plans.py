@@ -6,7 +6,6 @@ import pytest
 from bluesky.simulators import summarize_plan
 from ophyd.device import Component as Cpt
 from ophyd.signal import Signal
-# pcdsdevices no longer imports properly on python 3.8
 from pcdsdevices.pseudopos import DelayBase
 from pcdsdevices.sim import FastMotor
 
