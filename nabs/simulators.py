@@ -3,7 +3,7 @@ import itertools
 import logging
 import sys
 from contextlib import contextmanager
-from typing import Any, Generator, Iterator, List, Tuple
+from typing import Any, Generator, Iterator
 
 import epics
 from bluesky.simulators import check_limits
@@ -128,7 +128,7 @@ def check_open_close(plan: Iterator[Any]) -> None:
 
 def check_stray_calls(
     plan: Iterator[Any],
-    patches: List[str] = default_patches
+    patches: list[str] = default_patches
 ) -> None:
     """
     Validate that plan does not invoke any caput functionality
@@ -186,7 +186,7 @@ else:
 def validate_plan(
     plan: Generator,
     validators=validators
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """
     Validate plan with all available checkers.
 
@@ -237,7 +237,7 @@ def summarize_plan(plan: Generator):
     plan : iterable
         Must yield `Msg` objects
     """
-    read_cache: List[str] = []
+    read_cache: list[str] = []
     daq_keys = ['events', 'record', 'use_l3t', 'duration']
     daq_cfg = {k: None for k in daq_keys}
     for msg in plan:
@@ -267,4 +267,4 @@ def summarize_plan(plan: Generator):
                 print(f'  Run DAQ for {daq_cfg["events"]} events, '
                       f'(record={daq_cfg["record"]})')
         elif cmd == 'save':
-            print('  Read {}'.format(read_cache))
+            print(f'  Read {read_cache}')

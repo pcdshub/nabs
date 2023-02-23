@@ -939,8 +939,8 @@ def fixed_target_scan(sample, detectors, x_motor, y_motor, scan_motor, ss,
         except Exception:
             current_position = x_motor.position
             try:
-                last_index = next((index for (index, d) in enumerate(xx)
-                                  if np.isclose(d["pos"], current_position)))
+                last_index = next(index for (index, d) in enumerate(xx)
+                                  if np.isclose(d["pos"], current_position))
                 update_sample(sample, path, (last_index - next_index + 1))
             except Exception:
                 logger.warning('Could not find the index in the targets list '
@@ -1007,18 +1007,24 @@ def fixed_target_multi_scan(sample, detectors, x_motor, y_motor, scan_motor,
                 temp_index += 1
                 yield from bps.mv(scan_motor, ss[i])
                 for j in range(n_shots):
-                    x = next((d['pos'] for (index, d) in enumerate(xx)
-                              if index == temp_index))
-                    y = next((d['pos'] for (index, d) in enumerate(yy)
-                              if index == temp_index))
+                    x = next(
+                        d["pos"] for (index, d) in enumerate(xx)
+                        if index == temp_index
+                    )
+                    y = next(
+                        d["pos"] for (index, d) in enumerate(yy)
+                        if index == temp_index
+                    )
                     yield from bpp.stub_wrapper(bp.list_scan(detectors,
                                                 x_motor, [x], y_motor, [y]))
             update_sample(sample, path, (len(ss)))
         except Exception:
             current_position = x_motor.position
             try:
-                last_index = next((index for (index, d) in enumerate(xx)
-                                   if np.isclose(d["pos"], current_position)))
+                last_index = next(
+                    index for (index, d) in enumerate(xx)
+                    if np.isclose(d["pos"], current_position)
+                )
                 update_sample(sample, path, (last_index - next_index + 1))
             except Exception:
                 logger.warning('Could not find the index in the targets list '

@@ -9,10 +9,16 @@ on:
 
 jobs:
   standard:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: true
+    uses: pcdshub/pcds-ci-helpers/.github/workflows/python-standard.yml@master
+    with:
+      # The workflow needs to know the package name.  This can be determined
+      # automatically if the repository name is the same as the import name.
+      package-name: "nabs"
+      # Extras that will be installed for both conda/pip:
+      testing-extras: ""
+      # Extras to be installed only for conda-based testing:
+      conda-testing-extras: "pip"
+      # Extras to be installed only for pip-based testing:
+      pip-testing-extras: ""
+      # Set if using setuptools-scm for the conda-build workflow
+      use-setuptools-scm: true

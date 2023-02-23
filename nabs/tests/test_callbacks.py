@@ -12,7 +12,7 @@ def test_elog_callback(RE, hw, elog, ipython):
 
     ipython.user_ns["In"].append(
         "RE(bp.scan([hw.det], hw.motor, 0, 1, num=10))"
-        )
+    )
     RE(bp.scan([hw.det], hw.motor, 0, 1, num=10))
 
     assert len(elog.posts) == 2  # start and table posts
@@ -21,14 +21,14 @@ def test_elog_callback(RE, hw, elog, ipython):
 
     ipython.user_ns["In"].append(
         "RE(bp.scan([hw.det], hw.motor, 0, 1, num=10), post=False)"
-        )
+    )
     RE(bp.scan([hw.det], hw.motor, 0, 1, num=10), post=False)
     assert len(elog.posts) == 2  # confirm no new entries
 
     elog.enable_run_posts = False
     ipython.user_ns["In"].append(
         "RE(bp.scan([hw.det], hw.motor, 0, 1, num=10))"
-        )
+    )
     RE(bp.scan([hw.det], hw.motor, 0, 1, num=10))
     assert len(elog.posts) == 2  # confirm no new entries
 
@@ -50,10 +50,13 @@ def test_elog_callback(RE, hw, elog, ipython):
 
 
 @pytest.mark.parametrize(
-    'disable_plots, disable_table',
+    "disable_plots, disable_table",
     [
-     (True, True), (True, False), (False, True), (False, False),
-    ]
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
+    ],
 )
 def test_bec_options(RE, hw, disable_plots, disable_table):
     bec = BECOptionsPerRun()
