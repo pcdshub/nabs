@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plans.daq_delay_scan &mdash; nabs 1.5.3 documentation</title>
+  <title>nabs.plans.daq_d2scan &mdash; nabs 1.5.3 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -20,8 +20,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="nabs.plans.daq_dnscan" href="nabs.plans.daq_dnscan.html" />
-    <link rel="prev" title="nabs.plans.daq_d2scan" href="nabs.plans.daq_d2scan.html" /> 
+    <link rel="next" title="nabs.plans.daq_delay_scan" href="nabs.plans.daq_delay_scan.html" />
+    <link rel="prev" title="nabs.plans.daq_count" href="nabs.plans.daq_count.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -62,11 +62,11 @@
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_anscan.html">nabs.plans.daq_anscan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_ascan.html">nabs.plans.daq_ascan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_count.html">nabs.plans.daq_count</a></li>
-<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_d2scan.html">nabs.plans.daq_d2scan</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plans.daq_delay_scan</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#nabs.plans.daq_delay_scan"><code class="docutils literal notranslate"><span class="pre">daq_delay_scan()</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plans.daq_d2scan</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nabs.plans.daq_d2scan"><code class="docutils literal notranslate"><span class="pre">daq_d2scan()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_delay_scan.html">nabs.plans.daq_delay_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dnscan.html">nabs.plans.daq_dnscan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dscan.html">nabs.plans.daq_dscan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_fixed_target_multi_scan.html">nabs.plans.daq_fixed_target_multi_scan</a></li>
@@ -106,9 +106,9 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../api.html">Full API</a></li>
           <li class="breadcrumb-item"><a href="../nabs.plans.html">nabs.plans</a></li>
-      <li class="breadcrumb-item active">nabs.plans.daq_delay_scan</li>
+      <li class="breadcrumb-item active">nabs.plans.daq_d2scan</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/generated/generated/nabs.plans.daq_delay_scan.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/generated/generated/nabs.plans.daq_d2scan.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -116,39 +116,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="nabs-plans-daq-delay-scan">
-<h1>nabs.plans.daq_delay_scan<a class="headerlink" href="#nabs-plans-daq-delay-scan" title="Permalink to this heading"></a></h1>
+  <section id="nabs-plans-daq-d2scan">
+<h1>nabs.plans.daq_d2scan<a class="headerlink" href="#nabs-plans-daq-d2scan" title="Permalink to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="nabs.plans.daq_delay_scan">
-<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_delay_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_delay_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_delay_scan" title="Permalink to this definition"></a></dt>
-<dd><p>Scan a laser delay timing motor with DAQ support.</p>
-<p>A delay scan is one that moves a
-<code class="xref any docutils literal notranslate"><span class="pre">pcdsdevices.epics_motor.DelayNewport</span></code> back and forth.
-Underneath, this moves a physical motor that changes the path length
-of an optical laser, thus changing the timing of the laser shot by
-introducing a delay.</p>
-<p>This is a <a class="reference internal" href="nabs.plans.duration_scan.html#nabs.plans.duration_scan" title="nabs.plans.duration_scan"><code class="xref any py py-func docutils literal notranslate"><span class="pre">duration_scan</span></code></a> in one dimension that also sets the stage
-velocity to match the configured sweep time and returns the motor to the
-starting position at the end of the scan. It is the <a class="reference internal" href="nabs.plans.delay_scan.html#nabs.plans.delay_scan" title="nabs.plans.delay_scan"><code class="xref any py py-func docutils literal notranslate"><span class="pre">delay_scan</span></code></a> with
-the DAQ added.</p>
-<p>Unlike the majority of DAQ scans, this scan does not include the delay
-stage as a control variable in the DAQ. This is because the “points” of the
-scan are not relevant to the data: we only care about the intermediate
-shots. In fact, reconfiguring the DAQ with the new controls positions only
-slows us down and makes the data more annoying to analyze!</p>
+<dt class="sig sig-object py" id="nabs.plans.daq_d2scan">
+<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_d2scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_l3t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_d2scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_d2scan" title="Permalink to this definition"></a></dt>
+<dd><p>Two-dimensional daq scan with relative positions</p>
+<p>This moves two motors from start to end relative to their current positions
+in nsteps steps, taking data in the DAQ at every step, and returning the
+motors to their original positions at the end of the scan.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em> of </em><em>readables</em>) – Objects to read into Python in the scan.</p></li>
-<li><p><strong>time_motor</strong> (<code class="xref any docutils literal notranslate"><span class="pre">pcdsdevices.epics_motor.DelayNewport</span></code>) – The movable device in egu seconds.</p></li>
-<li><p><strong>time_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The times in second to move between.</p></li>
-<li><p><strong>sweep_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The duration we take to move from one end of the range to the other.</p></li>
-<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – If provided, the time to run in seconds. If omitted, we’ll run forever.</p></li>
+<li><p><strong>m1</strong> (<em>Movable</em>) – The first movable object to scan.</p></li>
+<li><p><strong>a1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The first point in the scan for m1, relative to the current position.</p></li>
+<li><p><strong>b1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The last point in the scan for m1, relative to the current position.</p></li>
+<li><p><strong>m2</strong> (<em>Movable</em>) – The second movable object to scan.</p></li>
+<li><p><strong>a2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The first point in the scan for m2, relative to the current position.</p></li>
+<li><p><strong>b2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The last point in the scan for m2, relative to the current position.</p></li>
+<li><p><strong>nsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of points in the scan.</p></li>
+<li><p><strong>events</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Number of events to take at each step. If omitted, uses the
+duration argument or the last configured value.</p></li>
+<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Duration of time to spend at each step. If omitted, uses the events
+argument or the last configured value.</p></li>
 <li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not to record the run in the DAQ. Defaults to True because
 we don’t want to accidentally skip recording good runs.</p></li>
+<li><p><strong>use_l3t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not the use the l3t filter for the events argument. Defaults
+to False to avoid confusion from unconfigured filters.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The events, duration, record, and use_l3t arguments come from the
+<a class="reference internal" href="nabs.preprocessors.daq_step_scan_decorator.html#nabs.preprocessors.daq_step_scan_decorator" title="nabs.preprocessors.daq_step_scan_decorator"><code class="xref py py-func docutils literal notranslate"><span class="pre">nabs.preprocessors.daq_step_scan_decorator()</span></code></a>.</p>
+</div>
 </dd></dl>
 
 </section>
@@ -157,8 +160,8 @@ we don’t want to accidentally skip recording good runs.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="nabs.plans.daq_d2scan.html" class="btn btn-neutral float-left" title="nabs.plans.daq_d2scan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="nabs.plans.daq_dnscan.html" class="btn btn-neutral float-right" title="nabs.plans.daq_dnscan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nabs.plans.daq_count.html" class="btn btn-neutral float-left" title="nabs.plans.daq_count" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nabs.plans.daq_delay_scan.html" class="btn btn-neutral float-right" title="nabs.plans.daq_delay_scan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

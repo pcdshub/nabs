@@ -15,6 +15,7 @@
       daq_step_scan_decorator
       daq_step_scan_standard_args
       daq_step_scan_wrapper
+      step_size_decorator
    
    
 

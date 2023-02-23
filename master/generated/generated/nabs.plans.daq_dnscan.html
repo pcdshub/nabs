@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plans.duration_scan &mdash; nabs 1.5.3 documentation</title>
+  <title>nabs.plans.daq_dnscan &mdash; nabs 1.5.3 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -20,8 +20,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="nabs.plans.fixed_target_multi_scan" href="nabs.plans.fixed_target_multi_scan.html" />
-    <link rel="prev" title="nabs.plans.delay_scan" href="nabs.plans.delay_scan.html" /> 
+    <link rel="next" title="nabs.plans.daq_dscan" href="nabs.plans.daq_dscan.html" />
+    <link rel="prev" title="nabs.plans.daq_delay_scan" href="nabs.plans.daq_delay_scan.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -64,17 +64,17 @@
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_count.html">nabs.plans.daq_count</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_d2scan.html">nabs.plans.daq_d2scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_delay_scan.html">nabs.plans.daq_delay_scan</a></li>
-<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dnscan.html">nabs.plans.daq_dnscan</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plans.daq_dnscan</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nabs.plans.daq_dnscan"><code class="docutils literal notranslate"><span class="pre">daq_dnscan()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dscan.html">nabs.plans.daq_dscan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_fixed_target_multi_scan.html">nabs.plans.daq_fixed_target_multi_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_fixed_target_scan.html">nabs.plans.daq_fixed_target_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_list_scan.html">nabs.plans.daq_list_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_scan.html">nabs.plans.daq_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.delay_scan.html">nabs.plans.delay_scan</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plans.duration_scan</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#nabs.plans.duration_scan"><code class="docutils literal notranslate"><span class="pre">duration_scan()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.duration_scan.html">nabs.plans.duration_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.fixed_target_multi_scan.html">nabs.plans.fixed_target_multi_scan</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nabs.plans.fixed_target_scan.html">nabs.plans.fixed_target_scan</a></li>
 </ul>
@@ -106,9 +106,9 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../api.html">Full API</a></li>
           <li class="breadcrumb-item"><a href="../nabs.plans.html">nabs.plans</a></li>
-      <li class="breadcrumb-item active">nabs.plans.duration_scan</li>
+      <li class="breadcrumb-item active">nabs.plans.daq_dnscan</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/generated/generated/nabs.plans.duration_scan.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/generated/generated/nabs.plans.daq_dnscan.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -116,41 +116,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="nabs-plans-duration-scan">
-<h1>nabs.plans.duration_scan<a class="headerlink" href="#nabs-plans-duration-scan" title="Permalink to this heading"></a></h1>
+  <section id="nabs-plans-daq-dnscan">
+<h1>nabs.plans.daq_dnscan<a class="headerlink" href="#nabs-plans-daq-dnscan" title="Permalink to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="nabs.plans.duration_scan">
-<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">duration_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#duration_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.duration_scan" title="Permalink to this definition"></a></dt>
-<dd><p>Generalized version of the <a class="reference internal" href="nabs.plans.delay_scan.html#nabs.plans.delay_scan" title="nabs.plans.delay_scan"><code class="xref any py py-func docutils literal notranslate"><span class="pre">delay_scan</span></code></a> movement pattern.</p>
-<p>This is a bluesky plan that moves motors among points for a fixed
-duration of time, rather than through a finite number of points.</p>
-<p>For each motor, a list of points must be provided. Each motor will be moved
-through its list of points simultaneously if multiple motors are provided.</p>
-<p>This will take a reading at every scan step by default via
-<code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.trigger_and_read.</span></code></p>
-<p>At the end of the scan, the motors will be returned to their original
-positions.</p>
+<dt class="sig sig-object py" id="nabs.plans.daq_dnscan">
+<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_dnscan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_l3t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_dnscan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_dnscan" title="Permalink to this definition"></a></dt>
+<dd><p>N-dimensional daq scan with relative positions.</p>
+<p>This moves N motors from start to end in nsteps steps, taking data in
+the DAQ at every step, and returning the motors to their original positions
+at the end of the scan.</p>
+<p>Takes an arbitrary number of motors, start and stop positions</p>
+<dl class="simple">
+<dt>&gt;&gt; RE(daq_dnscan([], m1, a1, b1,</dt><dd><p>m2, a2, b2, … ,
+mn, an, bn, nsteps,
+events=10))</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em> of </em><em>readables</em>) – Objects to read into Python in the scan.</p></li>
-<li><p><strong>*args</strong> – <p>For one dimension, <code class="docutils literal notranslate"><span class="pre">motor,</span> <span class="pre">[point1,</span> <span class="pre">point2,</span> <span class="pre">....]</span></code>.
-In general:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">motor1</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-<span class="n">motor2</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-<span class="o">...</span><span class="p">,</span>
-<span class="n">motorN</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Motors can be any ‘settable’ object (motor, temp controller, etc.)</p>
-</p></li>
-<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The time to run in seconds.</p></li>
-<li><p><strong>per_step</strong> (<em>plan</em><em>, </em><em>optional</em>) – An alternate plan to run for every scan point. Defaults to
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plan_stubs.one_nd_step.html#bluesky.plan_stubs.one_nd_step" title="(in bluesky v1.10.0.post40+g37eb3e21)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.one_nd_step</span></code></a>.</p></li>
-<li><p><strong>md</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional metadata to include in the bluesky start document.</p></li>
+<li><p><strong>m1</strong> (<em>Movable</em>) – The first movable object to scan.</p></li>
+<li><p><strong>a1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The first point in the scan for m1, relative to the current position.</p></li>
+<li><p><strong>b1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The last point in the scan for m1, relative to the current position.</p></li>
+<li><p><strong>nsteps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of points in the scan.</p></li>
+<li><p><strong>events</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Number of events to take at each step. If omitted, uses the
+duration argument or the last configured value.</p></li>
+<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Duration of time to spend at each step. If omitted, uses the events
+argument or the last configured value.</p></li>
+<li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not to record the run in the DAQ. Defaults to True because
+we don’t want to accidentally skip recording good runs.</p></li>
+<li><p><strong>use_l3t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not the use the l3t filter for the events argument. Defaults
+to False to avoid confusion from unconfigured filters.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The events, duration, record, and use_l3t arguments come from the
+<a class="reference internal" href="nabs.preprocessors.daq_step_scan_decorator.html#nabs.preprocessors.daq_step_scan_decorator" title="nabs.preprocessors.daq_step_scan_decorator"><code class="xref py py-func docutils literal notranslate"><span class="pre">nabs.preprocessors.daq_step_scan_decorator()</span></code></a>.</p>
+</div>
 </dd></dl>
 
 </section>
@@ -159,8 +164,8 @@ In general:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="nabs.plans.delay_scan.html" class="btn btn-neutral float-left" title="nabs.plans.delay_scan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="nabs.plans.fixed_target_multi_scan.html" class="btn btn-neutral float-right" title="nabs.plans.fixed_target_multi_scan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nabs.plans.daq_delay_scan.html" class="btn btn-neutral float-left" title="nabs.plans.daq_delay_scan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nabs.plans.daq_dscan.html" class="btn btn-neutral float-right" title="nabs.plans.daq_dscan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

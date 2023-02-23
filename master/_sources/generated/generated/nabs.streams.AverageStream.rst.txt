@@ -26,6 +26,8 @@ nabs.streams.AverageStream
       ~AverageStream.resource
       ~AverageStream.start
       ~AverageStream.stop
+      ~AverageStream.stream_datum
+      ~AverageStream.stream_resource
       ~AverageStream.subscribe
       ~AverageStream.unsubscribe
    

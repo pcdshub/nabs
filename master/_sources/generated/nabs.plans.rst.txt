@@ -12,9 +12,12 @@
    
       daq_a2scan
       daq_a3scan
+      daq_anscan
       daq_ascan
       daq_count
+      daq_d2scan
       daq_delay_scan
+      daq_dnscan
       daq_dscan
       daq_fixed_target_multi_scan
       daq_fixed_target_scan

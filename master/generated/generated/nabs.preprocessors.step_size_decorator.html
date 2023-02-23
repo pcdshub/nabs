@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plan_stubs.get_sample_targets &mdash; nabs 1.5.3 documentation</title>
+  <title>nabs.preprocessors.step_size_decorator &mdash; nabs 1.5.3 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -20,8 +20,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="nabs.plan_stubs.measure_average" href="nabs.plan_stubs.measure_average.html" />
-    <link rel="prev" title="nabs.plan_stubs" href="../nabs.plan_stubs.html" /> 
+    <link rel="next" title="nabs.streams" href="../nabs.streams.html" />
+    <link rel="prev" title="nabs.preprocessors.daq_step_scan_wrapper" href="nabs.preprocessors.daq_step_scan_wrapper.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -55,17 +55,20 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../../api.html">Full API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../nabs.optimize.html">nabs.optimize</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../nabs.plan_stubs.html">nabs.plan_stubs</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plan_stubs.get_sample_targets</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#nabs.plan_stubs.get_sample_targets"><code class="docutils literal notranslate"><span class="pre">get_sample_targets()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="nabs.plan_stubs.measure_average.html">nabs.plan_stubs.measure_average</a></li>
-<li class="toctree-l3"><a class="reference internal" href="nabs.plan_stubs.update_sample.html">nabs.plan_stubs.update_sample</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plan_stubs.html">nabs.plan_stubs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nabs.preprocessors.daq_during_decorator.html">nabs.preprocessors.daq_during_decorator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.preprocessors.daq_during_wrapper.html">nabs.preprocessors.daq_during_wrapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.preprocessors.daq_step_scan_decorator.html">nabs.preprocessors.daq_step_scan_decorator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.preprocessors.daq_step_scan_standard_args.html">nabs.preprocessors.daq_step_scan_standard_args</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.preprocessors.daq_step_scan_wrapper.html">nabs.preprocessors.daq_step_scan_wrapper</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.preprocessors.step_size_decorator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nabs.preprocessors.step_size_decorator"><code class="docutils literal notranslate"><span class="pre">step_size_decorator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a></li>
 </ul>
 </li>
@@ -91,10 +94,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../api.html">Full API</a></li>
-          <li class="breadcrumb-item"><a href="../nabs.plan_stubs.html">nabs.plan_stubs</a></li>
-      <li class="breadcrumb-item active">nabs.plan_stubs.get_sample_targets</li>
+          <li class="breadcrumb-item"><a href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
+      <li class="breadcrumb-item active">nabs.preprocessors.step_size_decorator</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/generated/generated/nabs.plan_stubs.get_sample_targets.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/generated/generated/nabs.preprocessors.step_size_decorator.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -102,27 +105,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="nabs-plan-stubs-get-sample-targets">
-<h1>nabs.plan_stubs.get_sample_targets<a class="headerlink" href="#nabs-plan-stubs-get-sample-targets" title="Permalink to this heading"></a></h1>
+  <section id="nabs-preprocessors-step-size-decorator">
+<h1>nabs.preprocessors.step_size_decorator<a class="headerlink" href="#nabs-preprocessors-step-size-decorator" title="Permalink to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="nabs.plan_stubs.get_sample_targets">
-<span class="sig-prename descclassname"><span class="pre">nabs.plan_stubs.</span></span><span class="sig-name descname"><span class="pre">get_sample_targets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plan_stubs.html#get_sample_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plan_stubs.get_sample_targets" title="Permalink to this definition"></a></dt>
-<dd><p>Get the <code class="docutils literal notranslate"><span class="pre">xx</span></code> and <code class="docutils literal notranslate"><span class="pre">yy</span></code> target information from a saved sample.</p>
-<p>Given a sample name, get the x, y grid points that are mapped for that
-sample.</p>
+<dt class="sig sig-object py" id="nabs.preprocessors.step_size_decorator">
+<span class="sig-prename descclassname"><span class="pre">nabs.preprocessors.</span></span><span class="sig-name descname"><span class="pre">step_size_decorator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/preprocessors.html#step_size_decorator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.preprocessors.step_size_decorator" title="Permalink to this definition"></a></dt>
+<dd><p>Grab the last argument (number of steps), and intepret as
+- step size if float
+- number of steps if integer</p>
+<p>Only works on step scans in one dimension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the sample to get the mapped points from. To see the
-available mapped samples call the <code class="docutils literal notranslate"><span class="pre">mapped_samples</span></code> method.</p></li>
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Path to the samples yaml file.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>plan</strong> (<em>plan</em>) – A bluesky plan that yields bluesky Msg objects.  Must be
+a scan in one dimension, with the last argument being
+the number of scan points / step size.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>``xx``, ``yy``</strong> – Returns two lists of dictionaries, with information about the targets.</p>
+<dd class="field-even"><p><strong>step_size_plan</strong> – The same plan as before, but modified appropriately to
+differentiate between step size and number of steps.
+This will be a callable generator function.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a></p>
+<dd class="field-odd"><p>plan</p>
 </dd>
 </dl>
 </dd></dl>
@@ -133,8 +137,8 @@ available mapped samples call the <code class="docutils literal notranslate"><sp
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../nabs.plan_stubs.html" class="btn btn-neutral float-left" title="nabs.plan_stubs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="nabs.plan_stubs.measure_average.html" class="btn btn-neutral float-right" title="nabs.plan_stubs.measure_average" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="nabs.preprocessors.daq_step_scan_wrapper.html" class="btn btn-neutral float-left" title="nabs.preprocessors.daq_step_scan_wrapper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../nabs.streams.html" class="btn btn-neutral float-right" title="nabs.streams" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
