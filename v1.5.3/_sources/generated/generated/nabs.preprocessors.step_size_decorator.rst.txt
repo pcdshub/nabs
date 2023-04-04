@@ -1,0 +1,6 @@
+nabs.preprocessors.step\_size\_decorator
+========================================
+
+.. currentmodule:: nabs.preprocessors
+
+.. autofunction:: step_size_decorator

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nabs.plans.duration_scan &mdash; nabs 1.5.3 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="nabs.plans.fixed_target_multi_scan" href="nabs.plans.fixed_target_multi_scan.html" />
+    <link rel="prev" title="nabs.plans.delay_scan" href="nabs.plans.delay_scan.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            nabs
+          </a>
+              <div class="version">
+                1.5.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../plans.html">Plans and Data Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimize.html">Optimization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">Full API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../nabs.optimize.html">nabs.optimize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plan_stubs.html">nabs.plan_stubs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_a2scan.html">nabs.plans.daq_a2scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_a3scan.html">nabs.plans.daq_a3scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_anscan.html">nabs.plans.daq_anscan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_ascan.html">nabs.plans.daq_ascan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_count.html">nabs.plans.daq_count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_d2scan.html">nabs.plans.daq_d2scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_delay_scan.html">nabs.plans.daq_delay_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dnscan.html">nabs.plans.daq_dnscan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dscan.html">nabs.plans.daq_dscan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_fixed_target_multi_scan.html">nabs.plans.daq_fixed_target_multi_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_fixed_target_scan.html">nabs.plans.daq_fixed_target_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_list_scan.html">nabs.plans.daq_list_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_scan.html">nabs.plans.daq_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.delay_scan.html">nabs.plans.delay_scan</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plans.duration_scan</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nabs.plans.duration_scan"><code class="docutils literal notranslate"><span class="pre">duration_scan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.fixed_target_multi_scan.html">nabs.plans.fixed_target_multi_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.fixed_target_scan.html">nabs.plans.fixed_target_scan</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../upcoming_changes.html">Upcoming Changes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nabs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../api.html">Full API</a></li>
+          <li class="breadcrumb-item"><a href="../nabs.plans.html">nabs.plans</a></li>
+      <li class="breadcrumb-item active">nabs.plans.duration_scan</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/generated/generated/nabs.plans.duration_scan.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nabs-plans-duration-scan">
+<h1>nabs.plans.duration_scan<a class="headerlink" href="#nabs-plans-duration-scan" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="nabs.plans.duration_scan">
+<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">duration_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#duration_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.duration_scan" title="Permalink to this definition"></a></dt>
+<dd><p>Generalized version of the <a class="reference internal" href="nabs.plans.delay_scan.html#nabs.plans.delay_scan" title="nabs.plans.delay_scan"><code class="xref any py py-func docutils literal notranslate"><span class="pre">delay_scan</span></code></a> movement pattern.</p>
+<p>This is a bluesky plan that moves motors among points for a fixed
+duration of time, rather than through a finite number of points.</p>
+<p>For each motor, a list of points must be provided. Each motor will be moved
+through its list of points simultaneously if multiple motors are provided.</p>
+<p>This will take a reading at every scan step by default via
+<code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.trigger_and_read.</span></code></p>
+<p>At the end of the scan, the motors will be returned to their original
+positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em> of </em><em>readables</em>) – Objects to read into Python in the scan.</p></li>
+<li><p><strong>*args</strong> – <p>For one dimension, <code class="docutils literal notranslate"><span class="pre">motor,</span> <span class="pre">[point1,</span> <span class="pre">point2,</span> <span class="pre">....]</span></code>.
+In general:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">motor1</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+<span class="n">motor2</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+<span class="o">...</span><span class="p">,</span>
+<span class="n">motorN</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Motors can be any ‘settable’ object (motor, temp controller, etc.)</p>
+</p></li>
+<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The time to run in seconds.</p></li>
+<li><p><strong>per_step</strong> (<em>plan</em><em>, </em><em>optional</em>) – An alternate plan to run for every scan point. Defaults to
+<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plan_stubs.one_nd_step.html#bluesky.plan_stubs.one_nd_step" title="(in bluesky v1.10.0.post40+g37eb3e21)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.one_nd_step</span></code></a>.</p></li>
+<li><p><strong>md</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional metadata to include in the bluesky start document.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nabs.plans.delay_scan.html" class="btn btn-neutral float-left" title="nabs.plans.delay_scan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nabs.plans.fixed_target_multi_scan.html" class="btn btn-neutral float-right" title="nabs.plans.fixed_target_multi_scan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

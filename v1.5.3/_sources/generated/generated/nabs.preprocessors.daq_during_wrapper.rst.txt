@@ -1,0 +1,6 @@
+nabs.preprocessors.daq\_during\_wrapper
+=======================================
+
+.. currentmodule:: nabs.preprocessors
+
+.. autofunction:: daq_during_wrapper
