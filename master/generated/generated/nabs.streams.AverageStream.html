@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.streams.AverageStream &mdash; nabs 1.5.3 documentation</title>
+  <title>nabs.streams.AverageStream &mdash; nabs 1.5.4.dev9+g862a2f1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -36,7 +36,7 @@
             nabs
           </a>
               <div class="version">
-                1.5.3
+                1.5.4.dev9+g862a2f1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -106,7 +106,7 @@
 <dt class="sig sig-object py" id="nabs.streams.AverageStream">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nabs.streams.</span></span><span class="sig-name descname"><span class="pre">AverageStream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/streams.html#AverageStream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.streams.AverageStream" title="Permalink to this definition"></a></dt>
 <dd><p>Stream that averages data points together</p>
-<p>As event documents are emitted from the <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.run_engine.RunEngine.html#bluesky.run_engine.RunEngine" title="(in bluesky v1.10.0.post40+g37eb3e21)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.run_engine.RunEngine</span></code></a>
+<p>As event documents are emitted from the <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.run_engine.RunEngine.html#bluesky.run_engine.RunEngine" title="(in bluesky v1.11.0.post8+g90bdda70)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.run_engine.RunEngine</span></code></a>
 they are collected by <code class="docutils literal notranslate"><span class="pre">AverageStream</span></code>, averaged, and re-emitted
 as a secondary event stream. This
 allows callbacks to subscribe to the average stream for more elegant

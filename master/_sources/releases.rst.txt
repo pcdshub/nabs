@@ -2,6 +2,19 @@ Release History
 ###############
 
 
+v1.5.4 (2023-07-25)
+===================
+
+Maintenance
+-----------
+- Adjust PyQt pinning to select PyQt5.
+
+Contributors
+------------
+- klauer
+
+
+
 v1.5.3 (2023-04-04)
 ===================
 
