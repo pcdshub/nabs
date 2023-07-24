@@ -28,7 +28,7 @@ requirements:
   - scipy
   - toolz
   run_constrained:
-  - pyqt <5.15.0
+  - pyqt =5
 
 test:
   requires:
