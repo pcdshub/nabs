@@ -1,0 +1,6 @@
+nabs.plans.daq\_scan
+====================
+
+.. currentmodule:: nabs.plans
+
+.. autofunction:: daq_scan

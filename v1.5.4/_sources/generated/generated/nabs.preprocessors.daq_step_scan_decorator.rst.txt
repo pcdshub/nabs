@@ -1,0 +1,6 @@
+nabs.preprocessors.daq\_step\_scan\_decorator
+=============================================
+
+.. currentmodule:: nabs.preprocessors
+
+.. autofunction:: daq_step_scan_decorator

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nabs.plan_stubs &mdash; nabs 1.5.4 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            nabs
+          </a>
+              <div class="version">
+                1.5.4
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../plans.html">Plans and Data Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimize.html">Optimization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Full API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../upcoming_changes.html">Upcoming Changes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nabs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">nabs.plan_stubs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for nabs.plan_stubs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Plan pieces that may be useful for assembling plans.</span>
+
+<span class="sd">This is the LCLS counterpart to `bluesky.plan_stubs`.</span>
+
+<span class="sd">The plans in this module are not meant to be run individually, instead these</span>
+<span class="sd">are intended as building blocks for other complete plans.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">bluesky.plan_stubs</span> <span class="kn">import</span> <span class="n">subscribe</span>
+<span class="kn">from</span> <span class="nn">bluesky.plans</span> <span class="kn">import</span> <span class="n">count</span>
+<span class="kn">from</span> <span class="nn">bluesky.preprocessors</span> <span class="kn">import</span> <span class="n">stub_wrapper</span>
+
+<span class="kn">from</span> <span class="nn">nabs.streams</span> <span class="kn">import</span> <span class="n">AverageStream</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="measure_average"><a class="viewcode-back" href="../../generated/generated/nabs.plan_stubs.measure_average.html#nabs.plan_stubs.measure_average">[docs]</a><span class="k">def</span> <span class="nf">measure_average</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure an average over a number of shots from a set of detectors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detectors : list</span>
+<span class="sd">        List of detectors to read</span>
+
+<span class="sd">    num : int</span>
+<span class="sd">        Number of shots to average together</span>
+
+<span class="sd">    delay : iterable or scalar, optional</span>
+<span class="sd">        Time delay between successive readings. See `bluesky.plans.count`</span>
+<span class="sd">        for more details</span>
+
+<span class="sd">    stream : :py:class:`nabs.streams.AverageStream`, optional</span>
+<span class="sd">        If a plan will call `measure_average` multiple times, a single</span>
+<span class="sd">        ``AverageStream`` instance can be created and then passed in on each</span>
+<span class="sd">        call. This allows other callbacks to subscribe to the averaged data</span>
+<span class="sd">        stream. If no ``AverageStream`` is provided then one is created for the</span>
+<span class="sd">        purpose of this function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    averaged_event : dict</span>
+<span class="sd">        A dictionary of all the measurements taken from the list of detectors</span>
+<span class="sd">        averaged for ``num`` shots. The keys follow the same naming convention</span>
+<span class="sd">        as that will appear in the event documents i.e &quot;{name}_{field}&quot;</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The returned average dictionary will only contain keys for &#39;number&#39; or</span>
+<span class="sd">    &#39;array&#39; fields. Field types that can not be averaged such as &#39;string&#39; will</span>
+<span class="sd">    be ignored, do not expect them in the output.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a stream and subscribe if not given one</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="n">AverageStream</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="n">subscribe</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span>
+        <span class="c1"># Manually kick the LiveDispatcher to emit a start document because we</span>
+        <span class="c1"># will not see the original one since this is subscribed after open_run</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">start</span><span class="p">({</span><span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+    <span class="c1"># Ensure we sync our stream with request if using a prior one</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+    <span class="c1"># Measure our detectors</span>
+    <span class="k">yield from</span> <span class="n">stub_wrapper</span><span class="p">(</span><span class="n">count</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="p">))</span>
+    <span class="c1"># Return the measured average as a dictionary for use in adaptive plans</span>
+    <span class="k">return</span> <span class="n">stream</span><span class="o">.</span><span class="n">last_event</span></div>
+
+
+<div class="viewcode-block" id="update_sample"><a class="viewcode-back" href="../../generated/generated/nabs.plan_stubs.update_sample.html#nabs.plan_stubs.update_sample">[docs]</a><span class="k">def</span> <span class="nf">update_sample</span><span class="p">(</span><span class="n">sample_name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update the current sample information after a run.</span>
+
+<span class="sd">    Updates the ``status`` values of each target in the sample,</span>
+<span class="sd">    from `False` to `True` to indicate that it is shot.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sample_name : str</span>
+<span class="sd">        A name to identify the sample grid, should be snake_case style.</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the ``.yml`` file. Defaults to the path defined when</span>
+<span class="sd">        creating this object.</span>
+<span class="sd">    n_shots : int</span>
+<span class="sd">        Indicates how many targets have been shot.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">get_sample_targets</span><span class="p">(</span><span class="n">sample_name</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># list of dictionaries</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># find the index of the targets that is next to be shot</span>
+    <span class="n">x_index</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">index</span> <span class="k">for</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Could not get a target index that has not been shot,&#39;</span>
+                         <span class="s1">&#39; probably all targets were shot from this sample?&#39;</span><span class="p">)</span>
+
+    <span class="n">temp_x</span><span class="p">,</span> <span class="n">temp_y</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_shots</span><span class="p">):</span>
+        <span class="c1"># update the status for the next target where the status is False</span>
+        <span class="n">x_target</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">xx</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">y_target</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">yy</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># should not be getting here but just in case:</span>
+        <span class="k">if</span> <span class="n">x_target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Could not update the status of targets. &#39;</span>
+                             <span class="s1">&#39;Probably all targets from this sample were shot &#39;</span>
+                             <span class="s1">&#39;already....&#39;</span><span class="p">)</span>
+        <span class="n">x_target</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">y_target</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">temp_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_target</span><span class="p">)</span>
+        <span class="n">temp_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_target</span><span class="p">)</span>
+
+    <span class="c1"># update the list original list of target</span>
+    <span class="n">xx</span><span class="p">[</span><span class="n">x_index</span><span class="p">:(</span><span class="n">x_index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_x</span><span class="p">))]</span> <span class="o">=</span> <span class="n">temp_x</span>
+    <span class="n">yy</span><span class="p">[</span><span class="n">x_index</span><span class="p">:(</span><span class="n">x_index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp_y</span><span class="p">))]</span> <span class="o">=</span> <span class="n">temp_y</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;xx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xx</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;yy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yy</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">sample_file</span><span class="p">:</span>
+        <span class="n">yaml_dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">sample_file</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">yaml_dict</span><span class="p">[</span><span class="n">sample_name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sample_file</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="n">yaml_dict</span><span class="p">,</span> <span class="n">sample_file</span><span class="p">,</span>
+                       <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_sample_targets"><a class="viewcode-back" href="../../generated/generated/nabs.plan_stubs.get_sample_targets.html#nabs.plan_stubs.get_sample_targets">[docs]</a><span class="k">def</span> <span class="nf">get_sample_targets</span><span class="p">(</span><span class="n">sample_name</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the ``xx`` and ``yy`` target information from a saved sample.</span>
+
+<span class="sd">    Given a sample name, get the x, y grid points that are mapped for that</span>
+<span class="sd">    sample.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sample_name : str</span>
+<span class="sd">        The name of the sample to get the mapped points from. To see the</span>
+<span class="sd">        available mapped samples call the ``mapped_samples`` method.</span>
+<span class="sd">    path : str, optional</span>
+<span class="sd">        Path to the samples yaml file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``xx``, ``yy`` : tuple</span>
+<span class="sd">        Returns two lists of dictionaries, with information about the targets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">sample_file</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">sample_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error when loading the samples yaml file: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                         <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">err</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;The file is empty, no sample grid yet. &#39;</span>
+                        <span class="s1">&#39;Please use `save_presets` to insert grids &#39;</span>
+                        <span class="s1">&#39;in the file.&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">sample_name</span><span class="p">)]</span>
+        <span class="n">xx</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;xx&#39;</span><span class="p">]</span>
+        <span class="n">yy</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;yy&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;This sample </span><span class="si">{</span><span class="n">sample_name</span><span class="si">}</span><span class="s1"> might not exist in the file.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

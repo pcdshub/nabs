@@ -1,0 +1,44 @@
+nabs.streams.AverageStream
+==========================
+
+.. currentmodule:: nabs.streams
+
+.. autoclass:: AverageStream
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AverageStream.__init__
+      ~AverageStream.bulk_datum
+      ~AverageStream.bulk_events
+      ~AverageStream.datum
+      ~AverageStream.datum_page
+      ~AverageStream.descriptor
+      ~AverageStream.emit
+      ~AverageStream.event
+      ~AverageStream.event_page
+      ~AverageStream.process_event
+      ~AverageStream.resource
+      ~AverageStream.start
+      ~AverageStream.stop
+      ~AverageStream.stream_datum
+      ~AverageStream.stream_resource
+      ~AverageStream.subscribe
+      ~AverageStream.unsubscribe
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AverageStream.log
+   
+   
