@@ -21,14 +21,14 @@ requirements:
   - pip
   run:
   - python >=3.6
-  - bluesky >=1.6.5
+  - bluesky >=1.6.5,<1.11
   - numpy
   - ophyd
   - pandas
   - scipy
   - toolz
   run_constrained:
-  - pyqt <5.15.0
+  - pyqt =5
 
 test:
   requires:
