@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.preprocessors &mdash; nabs 1.5.4.dev9+g862a2f1 documentation</title>
+  <title>nabs.preprocessors &mdash; nabs 1.5.5.dev5+g232a6ff documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -11,11 +11,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2b52e9f4"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -33,7 +33,7 @@
             nabs
           </a>
               <div class="version">
-                1.5.4.dev9+g862a2f1
+                1.5.5.dev5+g232a6ff
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -102,6 +102,7 @@
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">make_decorator</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">DaqNotConfiguredError</span>
 
 
 <span class="k">def</span> <span class="nf">_get_daq</span><span class="p">():</span>
@@ -118,7 +119,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">pcdsdaq.daq</span> <span class="kn">import</span> <span class="n">get_daq</span>  <span class="c1"># NOQA</span>
-    <span class="k">return</span> <span class="n">get_daq</span><span class="p">()</span>
+    <span class="n">daq</span> <span class="o">=</span> <span class="n">get_daq</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">daq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">DaqNotConfiguredError</span><span class="p">(</span>
+            <span class="s2">&quot;The daq must first be configured to be used in a scan.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">daq</span>
 
 
 <span class="k">class</span> <span class="nc">_Dummy</span><span class="p">:</span>
@@ -137,7 +143,9 @@
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="daq_step_scan_wrapper"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_wrapper.html#nabs.preprocessors.daq_step_scan_wrapper">[docs]</a><span class="k">def</span> <span class="nf">daq_step_scan_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="viewcode-block" id="daq_step_scan_wrapper">
+<a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_wrapper.html#nabs.preprocessors.daq_step_scan_wrapper">[docs]</a>
+<span class="k">def</span> <span class="nf">daq_step_scan_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                           <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrapper to turn an open plan into a standard LCLS DAQ step plan.</span>
@@ -279,7 +287,10 @@
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">daq_step_plan</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="daq_step_scan_decorator"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_decorator.html#nabs.preprocessors.daq_step_scan_decorator">[docs]</a><span class="k">def</span> <span class="nf">daq_step_scan_decorator</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
+
+<div class="viewcode-block" id="daq_step_scan_decorator">
+<a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_decorator.html#nabs.preprocessors.daq_step_scan_decorator">[docs]</a>
+<span class="k">def</span> <span class="nf">daq_step_scan_decorator</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to turn a plan function into a standard LCLS DAQ step plan.</span>
 
@@ -322,7 +333,10 @@
     <span class="k">return</span> <span class="n">inner</span></div>
 
 
-<div class="viewcode-block" id="daq_step_scan_standard_args"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_standard_args.html#nabs.preprocessors.daq_step_scan_standard_args">[docs]</a><span class="k">def</span> <span class="nf">daq_step_scan_standard_args</span><span class="p">(</span><span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+
+<div class="viewcode-block" id="daq_step_scan_standard_args">
+<a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_step_scan_standard_args.html#nabs.preprocessors.daq_step_scan_standard_args">[docs]</a>
+<span class="k">def</span> <span class="nf">daq_step_scan_standard_args</span><span class="p">(</span><span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                 <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    No-op function to hold template parameter info for generated docs.</span>
@@ -349,7 +363,10 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="daq_during_wrapper"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_during_wrapper.html#nabs.preprocessors.daq_during_wrapper">[docs]</a><span class="k">def</span> <span class="nf">daq_during_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="daq_during_wrapper">
+<a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.daq_during_wrapper.html#nabs.preprocessors.daq_during_wrapper">[docs]</a>
+<span class="k">def</span> <span class="nf">daq_during_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_l3t</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrap a plan so that the DAQ runs at the same time.</span>
 
@@ -408,7 +425,10 @@
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">daq_during_plan</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="step_size_decorator"><a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.step_size_decorator.html#nabs.preprocessors.step_size_decorator">[docs]</a><span class="k">def</span> <span class="nf">step_size_decorator</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
+
+<div class="viewcode-block" id="step_size_decorator">
+<a class="viewcode-back" href="../../generated/generated/nabs.preprocessors.step_size_decorator.html#nabs.preprocessors.step_size_decorator">[docs]</a>
+<span class="k">def</span> <span class="nf">step_size_decorator</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Grab the last argument (number of steps), and intepret as</span>
 <span class="sd">    - step size if float</span>
@@ -469,6 +489,7 @@
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">return</span> <span class="n">inner</span></div>
+
 
 
 <span class="n">daq_during_decorator</span> <span class="o">=</span> <span class="n">make_decorator</span><span class="p">(</span><span class="n">daq_during_wrapper</span><span class="p">)</span>

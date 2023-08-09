@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plans.daq_fixed_target_scan &mdash; nabs 1.5.4.dev9+g862a2f1 documentation</title>
+  <title>nabs.plans.daq_fixed_target_scan &mdash; nabs 1.5.5.dev5+g232a6ff documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
@@ -12,11 +12,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2b52e9f4"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -36,7 +36,7 @@
             nabs
           </a>
               <div class="version">
-                1.5.4.dev9+g862a2f1
+                1.5.5.dev5+g232a6ff
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -117,13 +117,13 @@
            <div itemprop="articleBody">
              
   <section id="nabs-plans-daq-fixed-target-scan">
-<h1>nabs.plans.daq_fixed_target_scan<a class="headerlink" href="#nabs-plans-daq-fixed-target-scan" title="Permalink to this heading"></a></h1>
+<h1>nabs.plans.daq_fixed_target_scan<a class="headerlink" href="#nabs-plans-daq-fixed-target-scan" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="nabs.plans.daq_fixed_target_scan">
-<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_fixed_target_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_fixed_target_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_fixed_target_scan" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_fixed_target_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_fixed_target_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_fixed_target_scan" title="Link to this definition"></a></dt>
 <dd><p>Scan over two variables in steps simultaneously with DAQ Support.</p>
 <p>This is a <code class="docutils literal notranslate"><span class="pre">nabs</span></code> version of <code class="docutils literal notranslate"><span class="pre">bluesky</span></code>’s built-in
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.11.0.post8+g90bdda70)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code></a> plan. It takes in consideration the number of
+<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.11.0.post33+g6e3c4721)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code></a> plan. It takes in consideration the number of
 samples to be scanned out of the samples given in <code class="docutils literal notranslate"><span class="pre">xx</span></code> and <code class="docutils literal notranslate"><span class="pre">yy</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
