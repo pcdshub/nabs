@@ -17,6 +17,7 @@ import numpy as np
 from bluesky.utils import make_decorator
 
 from . import utils
+from .exceptions import DaqNotConfiguredError
 
 
 def _get_daq():
@@ -33,7 +34,12 @@ def _get_daq():
     """
 
     from pcdsdaq.daq import get_daq  # NOQA
-    return get_daq()
+    daq = get_daq()
+    if daq is None:
+        raise DaqNotConfiguredError(
+            "The daq must first be configured to be used in a scan."
+        )
+    return daq
 
 
 class _Dummy:
