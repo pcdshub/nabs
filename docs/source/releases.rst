@@ -2,6 +2,20 @@ Release History
 ###############
 
 
+v1.5.5 (2023-09-14)
+===================
+
+Maintenance
+-----------
+- Raise an error if the daq has not yet been initialized in the hutch-python
+  session.
+
+Contributors
+------------
+- klauer
+
+
+
 v1.5.4 (2023-07-25)
 ===================
 
