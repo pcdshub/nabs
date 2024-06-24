@@ -107,8 +107,8 @@ def optimize(signal, motor, tolerance,
         signal = InvertedSignal(raw)
 
     # Create plan metadata
-    _md = {'detectors': [signal],
-           'motors': [motor],
+    _md = {'detectors': [signal.name],
+           'motors': [motor.name],
            'plan_args': {'signal': repr(signal),
                          'motor': repr(motor),
                          'tolerance': tolerance,
