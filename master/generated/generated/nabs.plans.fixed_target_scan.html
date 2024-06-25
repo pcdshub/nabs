@@ -1,22 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plans.fixed_target_scan &mdash; nabs 1.5.5.dev5+g232a6ff documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>nabs.plans.fixed_target_scan &mdash; nabs 1.5.6.dev27+g1abf3c1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c97855ec" />
+
   
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=2b52e9f4"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=be1569c1"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -35,9 +35,6 @@
           <a href="../../index.html" class="icon icon-home">
             nabs
           </a>
-              <div class="version">
-                1.5.5.dev5+g232a6ff
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -123,23 +120,23 @@
 <span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">fixed_target_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#fixed_target_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.fixed_target_scan" title="Link to this definition"></a></dt>
 <dd><p>Scan over two variables in steps simultaneously.</p>
 <p>This is a <code class="docutils literal notranslate"><span class="pre">nabs</span></code> version of <code class="docutils literal notranslate"><span class="pre">bluesky</span></code>’s built-in
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.11.0.post33+g6e3c4721)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code></a> plan.
+<code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code> plan.
 This scan is designed to be used with 3 motors, the x and y motors that
 move to a designaget target on a sample wafer, and one scan_motor that can
 be delay time, laser power or some other motor positions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the sample we’re interested in.</p></li>
-<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – Objects to read into Python in the scan.</p></li>
+<li><p><strong>sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the sample we’re interested in.</p></li>
+<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – Objects to read into Python in the scan.</p></li>
 <li><p><strong>x_motor</strong> (<em>obj</em>) – Motor object corresponding to the x axes.</p></li>
 <li><p><strong>y_motor</strong> (<em>obj</em>) – Motor object corresponding to the y axes.</p></li>
 <li><p><strong>scan_motor</strong> (<em>obj</em>) – The motor being scanned. It can be e.g., delay time, laser power, some
 other motor position, etc.</p></li>
-<li><p><strong>ss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – List of all the points (samples) for the scan_motor to go through.</p></li>
-<li><p><strong>n_shots</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Indicates how many shots should be taken, or how many samples should
+<li><p><strong>ss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – List of all the points (samples) for the scan_motor to go through.</p></li>
+<li><p><strong>n_shots</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Indicates how many shots should be taken, or how many samples should
 be scanned on the grid.</p></li>
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Path where the sample file is located.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Path where the sample file is located.</p></li>
 </ul>
 </dd>
 </dl>
@@ -158,7 +155,7 @@ be scanned on the grid.</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+    <p>&#169; Copyright 2025, SLAC National Accelerator Laboratory.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

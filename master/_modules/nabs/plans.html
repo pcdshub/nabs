@@ -1,21 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plans &mdash; nabs 1.5.5.dev5+g232a6ff documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>nabs.plans &mdash; nabs 1.5.6.dev27+g1abf3c1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c97855ec" />
+
   
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=2b52e9f4"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=be1569c1"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -32,9 +32,6 @@
           <a href="../../index.html" class="icon icon-home">
             nabs
           </a>
-              <div class="version">
-                1.5.5.dev5+g232a6ff
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -93,28 +90,28 @@
 
 <span class="sd">Plans preceded by &quot;daq&quot; incorporate running the LCLS DAQ in the plan.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">cycle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">cycle</span>
 
-<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
-<span class="kn">import</span> <span class="nn">bluesky.plans</span> <span class="k">as</span> <span class="nn">bp</span>
-<span class="kn">import</span> <span class="nn">bluesky.preprocessors</span> <span class="k">as</span> <span class="nn">bpp</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">bluesky</span> <span class="kn">import</span> <span class="n">plan_patterns</span>
-<span class="kn">from</span> <span class="nn">toolz</span> <span class="kn">import</span> <span class="n">partition</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plans</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.preprocessors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_patterns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">toolz</span><span class="w"> </span><span class="kn">import</span> <span class="n">partition</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">preprocessors</span> <span class="k">as</span> <span class="n">nbpp</span>
-<span class="kn">from</span> <span class="nn">.plan_stubs</span> <span class="kn">import</span> <span class="n">get_sample_targets</span><span class="p">,</span> <span class="n">update_sample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">preprocessors</span> <span class="k">as</span> <span class="n">nbpp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plan_stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sample_targets</span><span class="p">,</span> <span class="n">update_sample</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="duration_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.duration_scan.html#nabs.plans.duration_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">duration_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">duration_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generalized version of the `delay_scan` movement pattern.</span>
 
@@ -211,7 +208,7 @@
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">stage_decorator</span><span class="p">(</span><span class="n">detectors</span> <span class="o">+</span> <span class="n">motors</span><span class="p">)</span>
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">inner</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">():</span>
         <span class="c1"># Start timing after a dummy yield so it doesn&#39;t start early</span>
         <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">null</span><span class="p">()</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
@@ -227,7 +224,7 @@
 
 <div class="viewcode-block" id="delay_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.delay_scan.html#nabs.plans.delay_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
                <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A ``bluesky`` plan that sets up and executes the delay scan.</span>
@@ -271,7 +268,7 @@
     <span class="n">space_delta</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">spatial_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">spatial_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">velo</span> <span class="o">=</span> <span class="n">space_delta</span><span class="o">/</span><span class="n">sweep_time</span>
 
-    <span class="k">def</span> <span class="nf">inner_delay_scan</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_delay_scan</span><span class="p">():</span>
         <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">abs_set</span><span class="p">(</span><span class="n">time_motor</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="n">velo</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">duration_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span>
                                          <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
@@ -282,7 +279,7 @@
 
 <div class="viewcode-block" id="daq_delay_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_delay_scan.html#nabs.plans.daq_delay_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">daq_delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span> <span class="n">sweep_time</span><span class="p">,</span>
                    <span class="n">duration</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan a laser delay timing motor with DAQ support.</span>
@@ -327,7 +324,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">inner_daq_delay_scan</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_daq_delay_scan</span><span class="p">():</span>
         <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">delay_scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">time_motor</span><span class="p">,</span> <span class="n">time_points</span><span class="p">,</span>
                                       <span class="n">sweep_time</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">))</span>
 
@@ -343,7 +340,7 @@
 <div class="viewcode-block" id="daq_count">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_count.html#nabs.plans.daq_count">[docs]</a>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_count</span><span class="p">(</span><span class="n">detectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">per_shot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_count</span><span class="p">(</span><span class="n">detectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">per_shot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Take repeated DAQ runs with no motors.</span>
 
@@ -413,7 +410,7 @@
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_scan.html#nabs.plans.daq_scan">[docs]</a>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_scan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_scan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan through a multi-motor (start, end, num) trajectory with DAQ support.</span>
 
@@ -488,7 +485,7 @@
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_list_scan.html#nabs.plans.daq_list_scan">[docs]</a>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_list_scan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_list_scan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">per_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan through a multi-motor list trajectory with DAQ support.</span>
 
@@ -561,7 +558,7 @@
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">step_size_decorator</span>
-<span class="k">def</span> <span class="nf">daq_ascan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_ascan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    One-dimensional daq scan with absolute positions.</span>
 
@@ -619,7 +616,7 @@
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">relative_set_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">step_size_decorator</span>
-<span class="k">def</span> <span class="nf">daq_dscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_dscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">motor</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    One-dimensional daq scan with relative (delta) positions.</span>
 
@@ -675,7 +672,7 @@
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_a2scan.html#nabs.plans.daq_a2scan">[docs]</a>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_a2scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_a2scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Two-dimensional daq scan with absolute positions.</span>
 
@@ -740,7 +737,7 @@
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">relative_set_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_d2scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_d2scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Two-dimensional daq scan with relative positions</span>
 
@@ -803,7 +800,7 @@
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_a3scan.html#nabs.plans.daq_a3scan">[docs]</a>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_a3scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_a3scan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Three-dimensional daq scan with absolute positions.</span>
 
@@ -876,7 +873,7 @@
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_anscan.html#nabs.plans.daq_anscan">[docs]</a>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_anscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_anscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    N-dimensional daq scan with absolute positions.</span>
 
@@ -938,7 +935,7 @@
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">reset_positions_decorator</span><span class="p">()</span>
 <span class="nd">@bpp</span><span class="o">.</span><span class="n">relative_set_decorator</span><span class="p">()</span>
 <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_step_scan_decorator</span>
-<span class="k">def</span> <span class="nf">daq_dnscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_dnscan</span><span class="p">(</span><span class="n">detectors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    N-dimensional daq scan with relative positions.</span>
 
@@ -997,7 +994,7 @@
 
 <div class="viewcode-block" id="fixed_target_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.fixed_target_scan.html#nabs.plans.fixed_target_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">fixed_target_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fixed_target_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span>
                       <span class="n">n_shots</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan over two variables in steps simultaneously.</span>
@@ -1050,7 +1047,7 @@
                          <span class="s1">&#39;Please provide a number in range.&#39;</span><span class="p">)</span>
 
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">inner_scan</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_scan</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)):</span>
                 <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -1078,7 +1075,7 @@
 
 <div class="viewcode-block" id="fixed_target_multi_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.fixed_target_multi_scan.html#nabs.plans.fixed_target_multi_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">fixed_target_multi_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fixed_target_multi_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">,</span>
                             <span class="n">ss</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan over three variables in steps simultaneously.</span>
@@ -1129,7 +1126,7 @@
                          <span class="s1">&#39;Please provide a number in range.&#39;</span><span class="p">)</span>
 
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">inner_scan</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_scan</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">temp_index</span> <span class="o">=</span> <span class="n">next_index</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)):</span>
@@ -1165,14 +1162,14 @@
 
 <div class="viewcode-block" id="daq_fixed_target_multi_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_fixed_target_multi_scan.html#nabs.plans.daq_fixed_target_multi_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">daq_fixed_target_multi_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_fixed_target_multi_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span>
                                 <span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">n_shots</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                 <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="n">control_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">]</span>
 
     <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="n">control_devices</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">inner_daq_fixed_target_scan</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_daq_fixed_target_scan</span><span class="p">():</span>
         <span class="k">yield from</span> <span class="n">fixed_target_multi_scan</span><span class="p">(</span><span class="n">sample</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="o">=</span><span class="n">detectors</span><span class="p">,</span>
                                            <span class="n">x_motor</span><span class="o">=</span><span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="o">=</span><span class="n">y_motor</span><span class="p">,</span>
                                            <span class="n">scan_motor</span><span class="o">=</span><span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span>
@@ -1184,7 +1181,7 @@
 
 <div class="viewcode-block" id="daq_fixed_target_scan">
 <a class="viewcode-back" href="../../generated/generated/nabs.plans.daq_fixed_target_scan.html#nabs.plans.daq_fixed_target_scan">[docs]</a>
-<span class="k">def</span> <span class="nf">daq_fixed_target_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">daq_fixed_target_scan</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="p">,</span> <span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span>
                           <span class="n">n_shots</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scan over two variables in steps simultaneously with DAQ Support.</span>
@@ -1223,7 +1220,7 @@
     <span class="n">control_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="p">,</span> <span class="n">scan_motor</span><span class="p">]</span>
 
     <span class="nd">@nbpp</span><span class="o">.</span><span class="n">daq_during_decorator</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="n">control_devices</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">inner_daq_fixed_target_scan</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_daq_fixed_target_scan</span><span class="p">():</span>
         <span class="k">yield from</span> <span class="n">fixed_target_scan</span><span class="p">(</span><span class="n">sample</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span> <span class="n">detectors</span><span class="o">=</span><span class="n">detectors</span><span class="p">,</span>
                                      <span class="n">x_motor</span><span class="o">=</span><span class="n">x_motor</span><span class="p">,</span> <span class="n">y_motor</span><span class="o">=</span><span class="n">y_motor</span><span class="p">,</span>
                                      <span class="n">scan_motor</span><span class="o">=</span><span class="n">scan_motor</span><span class="p">,</span> <span class="n">ss</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span>
@@ -1240,7 +1237,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+    <p>&#169; Copyright 2025, SLAC National Accelerator Laboratory.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

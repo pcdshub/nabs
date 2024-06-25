@@ -1,22 +1,22 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nabs.plans.daq_list_scan &mdash; nabs 1.5.5.dev5+g232a6ff documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>nabs.plans.daq_list_scan &mdash; nabs 1.5.6.dev27+g1abf3c1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c97855ec" />
+
   
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=2b52e9f4"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=be1569c1"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -35,9 +35,6 @@
           <a href="../../index.html" class="icon icon-home">
             nabs
           </a>
-              <div class="version">
-                1.5.5.dev5+g232a6ff
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -123,12 +120,12 @@
 <span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_list_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_l3t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_list_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_list_scan" title="Link to this definition"></a></dt>
 <dd><p>Scan through a multi-motor list trajectory with DAQ support.</p>
 <p>This is an LCLS-I DAQ version of <code class="docutils literal notranslate"><span class="pre">bluesky</span></code>’s built-in
-<a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.11.0.post33+g6e3c4721)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code></a> plan. It also returns the motors
+<code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code> plan. It also returns the motors
 to their starting points after the scan is complete.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em>, </em><em>optional</em>) – List of ‘readable’ objects to read at every step.</p></li>
+<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>, </em><em>optional</em>) – List of ‘readable’ objects to read at every step.</p></li>
 <li><p><strong>*args</strong> – <p>For one dimension, <code class="docutils literal notranslate"><span class="pre">motor,</span> <span class="pre">[point1,</span> <span class="pre">point2,</span> <span class="pre">....]</span></code>.
 In general:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">motor1</span><span class="p">,</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
@@ -139,18 +136,18 @@ In general:</p>
 </div>
 <p>Motors can be any ‘settable’ object (motor, temp controller, etc.)</p>
 </p></li>
-<li><p><strong>events</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Number of events to take at each step. If omitted, uses the
+<li><p><strong>events</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Number of events to take at each step. If omitted, uses the
 duration argument or the last configured value.</p></li>
-<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>optional</em>) – Duration of time to spend at each step. If omitted, uses the events
+<li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – Duration of time to spend at each step. If omitted, uses the events
 argument or the last configured value.</p></li>
-<li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not to record the run in the DAQ. Defaults to True because
+<li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not to record the run in the DAQ. Defaults to True because
 we don’t want to accidentally skip recording good runs.</p></li>
-<li><p><strong>use_l3t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not the use the l3t filter for the events argument. Defaults
+<li><p><strong>use_l3t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not the use the l3t filter for the events argument. Defaults
 to False to avoid confusion from unconfigured filters.</p></li>
 <li><p><strong>per_step</strong> (<em>callable</em><em>, </em><em>optional</em>) – Hook for customizing action of inner loop (messages per step).
-See docstring of <a class="reference external" href="https://blueskyproject.io/bluesky/generated/bluesky.plan_stubs.one_nd_step.html#bluesky.plan_stubs.one_nd_step" title="(in bluesky v1.11.0.post33+g6e3c4721)"><code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.one_nd_step</span></code></a> (the default)
+See docstring of <code class="xref any docutils literal notranslate"><span class="pre">bluesky.plan_stubs.one_nd_step</span></code> (the default)
 for details.</p></li>
-<li><p><strong>md</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional metadata to include in the start document.</p></li>
+<li><p><strong>md</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional metadata to include in the start document.</p></li>
 </ul>
 </dd>
 </dl>
@@ -174,7 +171,7 @@ for details.</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, SLAC National Accelerator Laboratory.</p>
+    <p>&#169; Copyright 2025, SLAC National Accelerator Laboratory.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
