@@ -286,7 +286,7 @@ def test_fixed_target_scan(RE, hw, sample_file):
     assert moves == expected_moves
 
     RE(msgs)
-    summarize_plan(msgs)
+    summarize_plan(m for m in msgs)
 
     with pytest.raises(IndexError):
         RE(nbp.fixed_target_scan(sample='test_sample', detectors=[hw.det],
@@ -327,7 +327,7 @@ def test_fixed_target_multi_scan(RE, hw, sample_file):
     assert len(reads) == 24
 
     RE(msgs)
-    summarize_plan(msgs)
+    summarize_plan(m for m in msgs)
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
@@ -351,7 +351,7 @@ def test_daq_fixed_target_scan(RE, daq, hw, sample_file):
     assert configure_message.kwargs['controls'] == [hw.motor1, hw.motor2,
                                                     hw.motor3]
     RE(msgs)
-    summarize_plan(msgs)
+    summarize_plan(m for m in msgs)
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
@@ -396,7 +396,7 @@ def test_daq_fixed_target_multi_scan(RE, daq, hw, sample_file):
     assert moves == expected_moves
     assert len(reads) == 24
     RE(msgs)
-    summarize_plan(msgs)
+    summarize_plan(m for m in msgs)
 
 
 @pytest.mark.timeout(PLAN_TIMEOUT)
