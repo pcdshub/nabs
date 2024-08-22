@@ -1,5 +1,5 @@
 bluesky>=1.6.5
-numpy
+numpy<2.0.0
 ophyd
 pandas
 pyqt5

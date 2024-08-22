@@ -21,8 +21,8 @@ requirements:
   - pip
   run:
   - python >=3.6
-  - bluesky >=1.6.5
-  - numpy
+  - bluesky-base >=1.6.5
+  - numpy <2.0.0
   - ophyd
   - pandas
   - scipy
