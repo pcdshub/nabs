@@ -2,6 +2,5 @@ bluesky==1.10.0
 numpy<2.0.0
 ophyd
 pandas
-pyqt5
 scipy
 toolz
