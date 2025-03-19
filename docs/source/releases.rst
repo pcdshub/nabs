@@ -2,13 +2,12 @@ Release History
 ###############
 
 
-v1.5.6 (2024-08-20)
+v1.5.6 (2025-03-19)
 ===================
 
 Maintenance
 -----------
 - Updates test suite and some plans for numpy 2.0 compatibility (primarily with updated bluesky >1.12.0).
-  Note that the dependencies of nabs are still not numpy 2.0 compatible.
 - Specify bluesky-base in conda recipe to remove matplotlib qt dependencies
 
 Contributors
