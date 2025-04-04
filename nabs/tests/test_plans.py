@@ -69,7 +69,7 @@ def test_delay_scan(RE, hw, time_motor):
 
     # Speed of light is more or less 3e8
     goal = 1/(3e8)
-    msgs = nbp.delay_scan([hw.det], time_motor, [0, goal], 1, duration=0.01)
+    msgs = nbp.delay_scan([hw.det], time_motor, [0, goal], 1, duration=0.1)
     moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
     # first point is the velo, which should be close to 1 with 1 bounce set
     assert np.isclose(moves[0], 1, rtol=1e-2)
