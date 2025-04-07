@@ -1,0 +1,6 @@
+nabs.plan\_stubs.get\_sample\_targets
+=====================================
+
+.. currentmodule:: nabs.plan_stubs
+
+.. autofunction:: get_sample_targets

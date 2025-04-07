@@ -1,0 +1,6 @@
+nabs.plan\_stubs.measure\_average
+=================================
+
+.. currentmodule:: nabs.plan_stubs
+
+.. autofunction:: measure_average

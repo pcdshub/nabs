@@ -1,0 +1,6 @@
+nabs.plans.daq\_d2scan
+======================
+
+.. currentmodule:: nabs.plans
+
+.. autofunction:: daq_d2scan

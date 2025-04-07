@@ -1,0 +1,180 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nabs.plans.daq_fixed_target_scan &mdash; nabs 1.5.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c97855ec" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8f564690"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="nabs.plans.daq_list_scan" href="nabs.plans.daq_list_scan.html" />
+    <link rel="prev" title="nabs.plans.daq_fixed_target_multi_scan" href="nabs.plans.daq_fixed_target_multi_scan.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            nabs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../plans.html">Plans and Data Collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimize.html">Optimization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api.html">Full API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../nabs.optimize.html">nabs.optimize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.plan_stubs.html">nabs.plan_stubs</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../nabs.plans.html">nabs.plans</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_a2scan.html">nabs.plans.daq_a2scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_a3scan.html">nabs.plans.daq_a3scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_anscan.html">nabs.plans.daq_anscan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_ascan.html">nabs.plans.daq_ascan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_count.html">nabs.plans.daq_count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_d2scan.html">nabs.plans.daq_d2scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_delay_scan.html">nabs.plans.daq_delay_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dnscan.html">nabs.plans.daq_dnscan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_dscan.html">nabs.plans.daq_dscan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_fixed_target_multi_scan.html">nabs.plans.daq_fixed_target_multi_scan</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nabs.plans.daq_fixed_target_scan</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nabs.plans.daq_fixed_target_scan"><code class="docutils literal notranslate"><span class="pre">daq_fixed_target_scan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_list_scan.html">nabs.plans.daq_list_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.daq_scan.html">nabs.plans.daq_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.delay_scan.html">nabs.plans.delay_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.duration_scan.html">nabs.plans.duration_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.fixed_target_multi_scan.html">nabs.plans.fixed_target_multi_scan</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nabs.plans.fixed_target_scan.html">nabs.plans.fixed_target_scan</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.preprocessors.html">nabs.preprocessors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../nabs.streams.html">nabs.streams</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Notes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../releases.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../upcoming_changes.html">Upcoming Changes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">nabs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../api.html">Full API</a></li>
+          <li class="breadcrumb-item"><a href="../nabs.plans.html">nabs.plans</a></li>
+      <li class="breadcrumb-item active">nabs.plans.daq_fixed_target_scan</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/generated/generated/nabs.plans.daq_fixed_target_scan.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nabs-plans-daq-fixed-target-scan">
+<h1>nabs.plans.daq_fixed_target_scan<a class="headerlink" href="#nabs-plans-daq-fixed-target-scan" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="nabs.plans.daq_fixed_target_scan">
+<span class="sig-prename descclassname"><span class="pre">nabs.plans.</span></span><span class="sig-name descname"><span class="pre">daq_fixed_target_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/nabs/plans.html#daq_fixed_target_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nabs.plans.daq_fixed_target_scan" title="Link to this definition"></a></dt>
+<dd><p>Scan over two variables in steps simultaneously with DAQ Support.</p>
+<p>This is a <code class="docutils literal notranslate"><span class="pre">nabs</span></code> version of <code class="docutils literal notranslate"><span class="pre">bluesky</span></code>’s built-in
+<code class="xref any docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code> plan. It takes in consideration the number of
+samples to be scanned out of the samples given in <code class="docutils literal notranslate"><span class="pre">xx</span></code> and <code class="docutils literal notranslate"><span class="pre">yy</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the sample we’re interested in.</p></li>
+<li><p><strong>detectors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – Objects to read into Python in the scan.</p></li>
+<li><p><strong>x_motor</strong> (<em>obj</em>) – Motor object corresponding to the x axes.</p></li>
+<li><p><strong>y_motor</strong> (<em>obj</em>) – Motor object corresponding to the y axes.</p></li>
+<li><p><strong>scan_motor</strong> (<em>obj</em>) – The motor being scanned. It can be e.g., delay time, laser power, some
+other motor position, etc.</p></li>
+<li><p><strong>ss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – List of all the points (samples) for the scan_motor to go through.</p></li>
+<li><p><strong>n_shots</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Indicates how many shots should be taken, or how many samples should
+be scanned on the grid.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Path where the sample file is located.</p></li>
+<li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether or not to record the run in the DAQ. Defaults to True because
+we don’t want to accidentally skip recording good runs.</p></li>
+<li><p><strong>events</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Number of events to take at each step. If omitted, uses the
+duration argument or the last configured value.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nabs.plans.daq_fixed_target_multi_scan.html" class="btn btn-neutral float-left" title="nabs.plans.daq_fixed_target_multi_scan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="nabs.plans.daq_list_scan.html" class="btn btn-neutral float-right" title="nabs.plans.daq_list_scan" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, SLAC National Accelerator Laboratory.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

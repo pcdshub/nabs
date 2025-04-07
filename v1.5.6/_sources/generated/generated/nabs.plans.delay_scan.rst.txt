@@ -1,0 +1,6 @@
+nabs.plans.delay\_scan
+======================
+
+.. currentmodule:: nabs.plans
+
+.. autofunction:: delay_scan
