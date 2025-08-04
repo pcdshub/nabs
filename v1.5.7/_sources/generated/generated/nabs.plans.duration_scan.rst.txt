@@ -1,0 +1,6 @@
+nabs.plans.duration\_scan
+=========================
+
+.. currentmodule:: nabs.plans
+
+.. autofunction:: duration_scan

@@ -1,0 +1,6 @@
+nabs.plan\_stubs.update\_sample
+===============================
+
+.. currentmodule:: nabs.plan_stubs
+
+.. autofunction:: update_sample

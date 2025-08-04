@@ -1,0 +1,6 @@
+nabs.optimize.golden\_section\_search
+=====================================
+
+.. currentmodule:: nabs.optimize
+
+.. autofunction:: golden_section_search

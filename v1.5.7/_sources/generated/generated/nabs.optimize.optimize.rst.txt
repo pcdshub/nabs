@@ -1,0 +1,6 @@
+nabs.optimize.optimize
+======================
+
+.. currentmodule:: nabs.optimize
+
+.. autofunction:: optimize

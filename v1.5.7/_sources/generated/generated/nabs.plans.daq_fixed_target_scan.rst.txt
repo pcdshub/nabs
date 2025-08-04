@@ -1,0 +1,6 @@
+nabs.plans.daq\_fixed\_target\_scan
+===================================
+
+.. currentmodule:: nabs.plans
+
+.. autofunction:: daq_fixed_target_scan
