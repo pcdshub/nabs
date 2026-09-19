@@ -27,4 +27,3 @@ Beamline Scientist!", e.g. it is something that should not be done by hand.
    :caption: Developer Notes
 
    releases.rst
-   upcoming_changes.rst
