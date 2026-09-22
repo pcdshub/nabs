@@ -24,13 +24,13 @@ def test_duration_scan(RE, hw):
     """Run the duration scan and check the messages it creates."""
     logger.debug('test_duration_scan')
 
-    # These will generate as many messages as they can in 0.1s
+    # These will generate as many messages as they can in 0.5s
     # WARNING: this test can fail if run on a low-powered CPU
     # For example, if only 2 points are generated in the timespan
     # TODO: revise duration_scan to make it more testable
-    scan1 = list(nbp.duration_scan([hw.det], hw.motor, [0, 1], duration=0.1))
+    scan1 = list(nbp.duration_scan([hw.det], hw.motor, [0, 1], duration=0.5))
     scan2 = list(nbp.duration_scan([hw.det1, hw.det2], hw.motor1, [-1, 1],
-                                   hw.motor2, [-2, 2], duration=0.1))
+                                   hw.motor2, [-2, 2], duration=0.5))
 
     # I won't check behavior, but they should not error out
     RE(scan1)
@@ -69,7 +69,7 @@ def test_delay_scan(RE, hw, time_motor):
 
     # Speed of light is more or less 3e8
     goal = 1/(3e8)
-    msgs = nbp.delay_scan([hw.det], time_motor, [0, goal], 1, duration=0.1)
+    msgs = nbp.delay_scan([hw.det], time_motor, [0, goal], 1, duration=0.5)
     moves = list(msg.args[0] for msg in msgs if msg.command == 'set')
     # first point is the velo, which should be close to 1 with 1 bounce set
     assert np.isclose(moves[0], 1, rtol=1e-2)
