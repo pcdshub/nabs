@@ -1,7 +1,6 @@
 """Simulation and validation functions for plans"""
 import itertools
 import logging
-import sys
 from contextlib import contextmanager
 from typing import Any, Generator, Iterator
 
@@ -10,8 +9,6 @@ from bluesky.simulators import check_limits
 from ophyd.epics_motor import PositionerBase
 from ophyd.signal import EpicsSignal
 from ophyd.sim import SynAxis
-
-from .utils import Process
 
 logger = logging.getLogger(__name__)
 
@@ -134,13 +131,12 @@ def check_stray_calls(
     Validate that plan does not invoke any caput functionality
     outside of messages.
 
-    Runs the check within a multiprocessing.Process to isolate
-    namespace from the parent process.
+    Note that this does some monkeypatching of many common EPICS
+    commands: if interrupted, there is a risk of the interactive
+    session no longer working properly.
 
     Relies on the pre-existing knowledge of which methods make calls
     to pyepics/caput functionality.
-
-    This does not work on Windows.
 
     Parameters
     ----------
@@ -152,35 +148,17 @@ def check_stray_calls(
     ValidError
         If attempts to access any forbidden methods
     """
-    def inner_func(plan):
-        with patch_sys_modules(patches):
-            for _ in plan:
-                continue
-
-    # run check inside multiprocess to avoid tampering with parent
-    # namespace.  Effectively an attempt at containerization.
-    p = Process(target=inner_func, args=(plan,))
-
-    # Disallow this subprocess from spawning (multiprocess) children
-    p.daemon = True
-    p.start()
-    p.join_and_raise()
+    with patch_sys_modules(patches):
+        for _ in plan:
+            continue
 
 
-if sys.platform == 'win32':
-    # check_stray_calls does not work on windows due to differences in
-    # the implementation of multiprocessing
-    validators = [
-        check_open_close,
-        check_limits,
-    ]
-else:
-    # check_limits is not hinted, so hinting this becomes miserable
-    validators = [
-        check_stray_calls,
-        check_open_close,
-        check_limits,
-    ]
+# check_limits is not hinted, so hinting this becomes miserable
+validators = [
+    check_stray_calls,
+    check_open_close,
+    check_limits,
+]
 
 
 def validate_plan(
